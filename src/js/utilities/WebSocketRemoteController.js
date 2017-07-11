@@ -60,11 +60,11 @@ class WebSocketRemoteController {
             var subDir = self.getShortFolderName(message.folder);
             self.updateFunctions.setSource(parentDir, subDir, message.index);
           } else {
-            continueVideo();
+            self.updateFunctions.play();
           }
           break;
         case "pause":
-          pauseVideo();
+          self.updateFunctions.pause();
           break;
         case "seek":
           seekPercent(parseInt(message.percent));

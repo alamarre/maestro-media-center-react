@@ -10,18 +10,36 @@ class VideoPlayer extends React.Component {
           this.props.remoteController.mapUpdateFunctions({
               setSource: this.setSourcePath.bind(this),
               next: this.goToNextEpisode.bind(this),
-              previous: this.goToPreviousEpisode.bind(this)
+              previous: this.goToPreviousEpisode.bind(this),
+              play: this.play.bind(this),
+              pause: this.pause.bind(this)
           })
       }
   }
 
   render() {
-      
+      var currentEpisodeStyle = {
+          position: "absolute",
+        left: 100,
+        right: 100,
+        bottom: 20,
+        fontSize: 36,
+        color: "white",
+        backgroundColor: "black",
+        zIndex: 100,
+        transition: "opacity 0.5s",
+        opacity: 0
+    }
+
+    if(this.state.showEpisodeInfo) {
+        currentEpisodeStyle["opacity"] = 1;
+    }
     return (
         <div>
-         <video style={{display: this.state.source != null ? 'block' : 'none' }} ref='video' data-source={this.state.source} controls autoPlay={true}>
+         <video onPlay={this.hideEpisodeInfo.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls autoPlay={true}>
             <source src={this.state.source} type="video/mp4" />
-            </video>
+         </video>
+         <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.episodeInfo}</div>
         </div>
     )
   }
@@ -52,8 +70,27 @@ class VideoPlayer extends React.Component {
   }
 
   updateSource() {
-    this.setState({"source": this.props.episodeLoader.getRootPath() + this.state.parentPath+"/"+this.state.subdirectory+"/"+this.state.episodes[this.state.index]});
+    this.setState({
+        "source": this.props.episodeLoader.getRootPath() + this.state.parentPath+"/"+this.state.subdirectory+"/"+this.state.episodes[this.state.index],
+        "episodeInfo": this.state.episodes[this.state.index]
+    });
     this.refs.video.load();
+  }
+
+  pause() {
+    this.refs.video.pause();
+  }
+
+  play() {
+    this.refs.video.play();
+  }
+
+  showEpisodeInfo() {
+    this.setState({"showEpisodeInfo": true});
+  }
+
+  hideEpisodeInfo() {
+    this.setState({"showEpisodeInfo": false});
   }
 
   goToNextEpisode() {
