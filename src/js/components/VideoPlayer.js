@@ -15,6 +15,12 @@ class VideoPlayer extends React.Component {
               pause: this.pause.bind(this)
           })
       }
+      if(this.props.location.query.folder) {
+        var path = this.props.location.query.folder;
+        var parentPath = path.substring(0, path.lastIndexOf('/'));
+        var subdirectory = path.substring(path.lastIndexOf('/')+1);
+        this.setSourcePath(parentPath, subdirectory)
+      }
   }
 
   render() {
@@ -45,7 +51,7 @@ class VideoPlayer extends React.Component {
   }
 
   setSourcePath(parentPath, subdirectory, index) {
-    this.setState({"parentPath": parentPath, "subdirectory": subdirectory, "index": index});
+    this.state = ({"parentPath": parentPath, "subdirectory": subdirectory, "index": index});
     this.getEpisodes();
     this.getSeasons();
   }

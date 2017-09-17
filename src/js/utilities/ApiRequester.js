@@ -60,10 +60,13 @@ apiRequest(module, path, request) {
     if(path!="") {
         url +="/"+path;
     }
-    if (url.indexOf("?") == -1) {
-        url += "?access_token=" + authTokenManager.getToken();
-    } else {
-        url += "&access_token=" + authTokenManager.getToken();
+    let token = authTokenManager.getToken();
+    if(token && token != "") {
+        if (url.indexOf("?") == -1) {
+            url += "?access_token=" + authTokenManager.getToken();
+        } else {
+            url += "&access_token=" + authTokenManager.getToken();
+        }
     }
     request.url = url;
     this.ajaxRequest(request);

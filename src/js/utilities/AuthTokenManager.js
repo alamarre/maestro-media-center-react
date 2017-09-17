@@ -4,7 +4,7 @@ class AuthTokenManager {
     }
 
     isAuthenticated() {
-        return getToken() != "";
+        return this.getToken() != "";
     }
     
     getToken() {
@@ -31,12 +31,16 @@ class AuthTokenManager {
         var expires = "expires=" + d.toGMTString();
         document.cookie = cname + "=" + cvalue + "; " + expires;
     }
+
+    setToken(token) {
+        if (typeof token!="undefined") {
+            this.setCookie("access_token", token, 365);
+        }
+    }
     
     saveToken() {
         var token = this.queryStringReader.getParameter("access_token")
-        if (typeof token!="undefined") {
-            setCookie("access_token", token, 365);
-        }
+        this.setToken(token);
     }
 }
 
