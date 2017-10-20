@@ -54,24 +54,6 @@ class ApiRequester {
     this.jQuery.ajax(requestInfo);
 }
 
-apiRequest(module, path, request) {
-    var authTokenManager = this.authTokenManager;
-    var url = "/api/v1.0/" + module;
-    if(path!="") {
-        url +="/"+path;
-    }
-    let token = authTokenManager.getToken();
-    if(token && token != "") {
-        if (url.indexOf("?") == -1) {
-            url += "?access_token=" + authTokenManager.getToken();
-        } else {
-            url += "&access_token=" + authTokenManager.getToken();
-        }
-    }
-    request.url = url;
-    this.ajaxRequest(request);
-}
-
 apiRequestPromise(module, path, request, version) {
     var authTokenManager = this.authTokenManager;
     var self = this;
@@ -85,6 +67,11 @@ apiRequestPromise(module, path, request, version) {
         } else {
             url += "&access_token=" + authTokenManager.getToken();
         }
+
+        if(authTokenManager.isProfileSet()) {
+            url += "&profile=" + authTokenManager.getProfile();
+        }
+        
         request.url = url;
         request.success = function() {
             fulfill.apply(this, arguments);

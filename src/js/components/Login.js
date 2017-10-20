@@ -9,11 +9,11 @@ class Login extends React.Component {
     }
 
     login() {
-        console.log(this.passwordInput);
         var self = this;
-        this.props.login.loginPromise(this.usernameInput.value, this.passwordInput.value).then(function(token) {
-            self.props.authTokenManager.setToken(token);
-            self.props.router.push("/");
+        this.props.login.loginPromise(this.usernameInput.value, this.passwordInput.value)
+        .then((token) => {
+            this.props.authTokenManager.setToken(token);
+            this.props.router.push("/profile");
         }, function(error) {
             console.log(error);
         })
@@ -25,6 +25,8 @@ class Login extends React.Component {
             <label>Password:</label><input type="text" type="password" ref={(input) => { this.passwordInput = input; }} />
             <button onClick={this.login.bind(this)}>Login</button>
         </div>;
+
+        
         return (
             <div>{body}</div>
         )

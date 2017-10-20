@@ -1,14 +1,11 @@
 class AuthTokenManager {
     constructor(queryStringReader) {
         this.queryStringReader = queryStringReader;
+        this.profile = "";
     }
 
     isAuthenticated() {
         return this.getToken() != "";
-    }
-    
-    getToken() {
-        return this.getCookie("access_token");
     }
     
     getCookie(cname)
@@ -32,10 +29,29 @@ class AuthTokenManager {
         document.cookie = cname + "=" + cvalue + "; " + expires;
     }
 
+    getToken() {
+        return this.getCookie("access_token");
+    }
+
     setToken(token) {
         if (typeof token!="undefined") {
             this.setCookie("access_token", token, 365);
         }
+    }
+
+    isProfileSet() {
+        return this.getProfile() != "";
+    }
+
+    getProfile() {
+        return this.profile;//this.getCookie("user_profile");
+    }
+
+    setProfile(profile) {
+        this.profile = profile;
+        /*if (typeof profile!="undefined") {
+            this.setCookie("user_profile", profile, 365);
+        }*/
     }
     
     saveToken() {

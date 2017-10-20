@@ -12,6 +12,8 @@ class Home extends React.Component {
     componentWillMount() {
         if(!this.props.authTokenManager.isAuthenticated() && this.props.router.location.pathname != "/login") {
             this.props.router.push("/login");
+        } else if(!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profiles") {
+            this.props.router.push("/profiles");
         }
     }
           

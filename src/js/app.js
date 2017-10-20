@@ -30,12 +30,17 @@ import LoginProvider from "./utilities/LoginProvider";
 let loginProvider = new LoginProvider(apiRequester);
 import LoginComponent from "./components/Login";
 
+import ProfileProvider from "./utilities/providers/ProfileProvider";
+import ChooseProfile from "./components/ChooseProfile";
+let profileProvider = new ProfileProvider(apiRequester);
+
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} >
       <Route path="videos" component={(props) => (<VideosListing {...props} episodeLoader={episodeLoader}  />)} />
       <Route path="view" component={(props) => (<VideoPlayer {...props} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider}  />)} />
+      <Route path="profiles" component={(props) => (<ChooseProfile {...props} authTokenManager={authTokenManager} profileProvider={profileProvider}  />)} />
     </Route>
   </Router>
 ), div)
