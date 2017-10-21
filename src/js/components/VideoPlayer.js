@@ -42,7 +42,7 @@ class VideoPlayer extends React.Component {
     }
     return (
         <div>
-         <video onPlay={this.hideEpisodeInfo.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls autoPlay={true}>
+         <video onPlay={this.hideEpisodeInfo.bind(this)} onEnded={this.goToNextEpisode.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls autoPlay={true}>
             <source src={this.state.source} type="video/mp4" />
          </video>
          <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.episodeInfo}</div>
@@ -76,11 +76,18 @@ class VideoPlayer extends React.Component {
   }
 
   updateSource() {
+    let source = this.props.episodeLoader.getRootPath() + this.state.parentPath+"/"+this.state.subdirectory+"/"+this.state.episodes[this.state.index];
+    
+    
     this.setState({
-        "source": this.props.episodeLoader.getRootPath() + this.state.parentPath+"/"+this.state.subdirectory+"/"+this.state.episodes[this.state.index],
+        "source": source,
         "episodeInfo": this.state.episodes[this.state.index]
     });
     this.refs.video.load();
+    
+    if(this.props.episodeLoader.recordProgress) {
+        this.props.episodeLoader.recordProgress(source);
+    }
   }
 
   pause() {
@@ -110,6 +117,7 @@ class VideoPlayer extends React.Component {
     index++;
     if(index < this.state.episodes.length) {
         this.setState({"index": index});
+        this.updateSource();
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {
             if(this.state.parentFolders[i]== this.state.subdirectory) {
@@ -131,6 +139,7 @@ class VideoPlayer extends React.Component {
     index--;
     if(index > 0) {
         this.setState({"index": index});
+        this.updateSource();
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {
             if(this.state.parentFolders[i + 1]== this.state.subdirectory) {
