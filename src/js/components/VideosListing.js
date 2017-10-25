@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Link } from 'react-router'
+import ShowPicker from "./ShowPicker"
 
 class VideosListing extends React.Component {
   constructor(props) {
@@ -21,22 +22,52 @@ class VideosListing extends React.Component {
 		this.setState({"folders": folderData.folders, "files": folderData.files});
 	}
 
-  render() {
-		var self = this;
-		var folders = this.state.folders.map(function(folder) {
-			return <div key={folder} onClick={self.fetchFolder.bind(self, folder)}>{folder}</div>
+	selectSource(item) {
+        this.props.cacheProvider.getCacheFromPath(item.path)
+        .then(cachePath => {
+			this.setState({showName: item.name, showPath: item.path, cachePath: cachePath})
+        });
+    }
+
+    cancelShowChooser() {
+        this.setState({"showName": null});
+    }
+
+    render() {
+		var folders = this.state.folders.map((folder) => {
+			return <div key={folder} onClick={this.fetchFolder.bind(this, folder)}>{folder}</div>
 		});
 
 		var index = 0;
-		var files = this.state.files.map(function(file) {
-			var url = "view?index="+index+"&folder="+encodeURIComponent(self.state.root)+"&file="+encodeURIComponent(file);
+		var files = this.state.files.map((file) => {
+			let fileName = (file.name) ? file.name : file;
+			let folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
+			var url = "view?index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(fileName);
 			index++;
-			return <div key={file} ><Link to={url}>{file}</Link></div>
+			if(file.type && file.type == "tv") {
+				return <div key={fileName} onClick={evt => this.selectSource(file)} >{fileName}</div>
+            }
+            
+			return <div key={fileName} ><Link to={url}>{fileName}</Link></div>
 		});
+
+		let showPicker = null;
+
+		if(this.state.showName) {
+			showPicker = <ShowPicker 
+                router={this.props.router}
+				showProgressProvider={this.props.showProgressProvider}
+				showName={this.state.showName}
+                showPath={this.state.showPath}
+				cancelFunction={this.cancelShowChooser.bind(this)}
+				showCache={this.state.cachePath}>
+			</ShowPicker>
+		}
 		return (
 				<div>
 				 {folders}
 				 {files}
+				 {showPicker}
 				</div>
 		)
 	 }

@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Link } from 'react-router'
 
+import SearchResults from "./SearchResults";
+
 class Home extends React.Component {
 
     constructor(props) {
@@ -19,6 +21,7 @@ class Home extends React.Component {
           
     render() {
         var body = this.props.children || <div>
+            <SearchResults router={this.props.router} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider}  /> 
             <Link to="videos">Videos</Link>
             <Link to="hello">Settings</Link>
         </div>;

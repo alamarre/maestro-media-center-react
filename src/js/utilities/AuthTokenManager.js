@@ -44,14 +44,15 @@ class AuthTokenManager {
     }
 
     getProfile() {
-        return this.profile;//this.getCookie("user_profile");
+        //return this.profile;
+        return this.getCookie("user_profile");
     }
 
     setProfile(profile) {
-        this.profile = profile;
-        /*if (typeof profile!="undefined") {
+        //this.profile = profile;
+        if (typeof profile!="undefined") {
             this.setCookie("user_profile", profile, 365);
-        }*/
+        }
     }
     
     saveToken() {

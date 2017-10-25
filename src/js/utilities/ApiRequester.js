@@ -6,6 +6,11 @@ class ApiRequester {
         this.jQuery = jQuery;
     }
 
+    updateSettings(host, scheme) {
+        this.host = host;
+        this.scheme = scheme;
+    }
+
     getHost() {
         return this.scheme + "://" + this.host;
     }

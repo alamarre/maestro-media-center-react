@@ -5,7 +5,11 @@ import { Link } from 'react-router'
 class VideoPlayer extends React.Component {
   constructor(props) {
       super(props);
-      this.state = {};
+      let episodeLoader = this.props.episodeLoader;
+      
+      this.episodeLoader = episodeLoader;
+      this.type = this.props.location.query.type
+      this.state={};
       if(this.props.remoteController) {
           this.props.remoteController.mapUpdateFunctions({
               setSource: this.setSourcePath.bind(this),
@@ -19,7 +23,8 @@ class VideoPlayer extends React.Component {
         var path = this.props.location.query.folder;
         var parentPath = path.substring(0, path.lastIndexOf('/'));
         var subdirectory = path.substring(path.lastIndexOf('/')+1);
-        this.setSourcePath(parentPath, subdirectory)
+        
+        this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
       }
   }
 
@@ -42,7 +47,7 @@ class VideoPlayer extends React.Component {
     }
     return (
         <div>
-         <video onPlay={this.hideEpisodeInfo.bind(this)} onEnded={this.goToNextEpisode.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls autoPlay={true}>
+         <video onEnded={this.goToNextEpisode.bind(this)} onPlay={this.hideEpisodeInfo.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls autoPlay={true}>
             <source src={this.state.source} type="video/mp4" />
          </video>
          <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.episodeInfo}</div>
@@ -51,15 +56,17 @@ class VideoPlayer extends React.Component {
   }
 
   setSourcePath(parentPath, subdirectory, index) {
-    this.state = ({"parentPath": parentPath, "subdirectory": subdirectory, "index": index});
+    this.state = {"parentPath": parentPath, "subdirectory": subdirectory, "index": index};
     this.getEpisodes();
     this.getSeasons();
   }
 
   getEpisodes() {
     var self = this;
-    this.setState({"parentFolders": null, "episodes": null});
-    this.props.episodeLoader.getListingPromise(this.state.parentPath +"/" +this.state.subdirectory).then(function(listing) {
+    if(this.state.episodes) {
+        this.setState({"parentFolders": null, "episodes": null});
+    }
+    this.episodeLoader.getListingPromise(this.state.parentPath +"/" +this.state.subdirectory).then(function(listing) {
         self.setState({"episodes": listing.files});
         if(self.state.index == null) {
             self.state.index = listing.files.length -1;
@@ -70,24 +77,29 @@ class VideoPlayer extends React.Component {
 
   getSeasons() {
     var self = this;
-    this.props.episodeLoader.getListingPromise(this.state.parentPath).then(function(listing) {
+    this.episodeLoader.getListingPromise(this.state.parentPath).then(function(listing) {
         self.setState({"parentFolders": listing.folders});
     });
   }
 
   updateSource() {
-    let source = this.props.episodeLoader.getRootPath() + this.state.parentPath+"/"+this.state.subdirectory+"/"+this.state.episodes[this.state.index];
-    
-    
+    let parentPath = this.state.parentPath.startsWith("/") ? this.state.parentPath : "/" +this.state.parentPath;
+    let episode = this.state.episodes[this.state.index];
+    let source = this.episodeLoader.getRootPath() + parentPath + "/"+this.state.subdirectory+"/"+ episode;
+    if(episode.path) {
+        source = this.episodeLoader.getRootPath() + episode.path;
+    }
     this.setState({
         "source": source,
         "episodeInfo": this.state.episodes[this.state.index]
     });
     this.refs.video.load();
-    
-    if(this.props.episodeLoader.recordProgress) {
-        this.props.episodeLoader.recordProgress(source);
+
+    if(this.props.chromecastManager.isConnected()) {
+        this.props.chromecastManager.playVideo(source, parentPath + "/"+this.state.subdirectory, this.state.index, this.type);
     }
+
+    this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started");
   }
 
   pause() {
@@ -116,8 +128,7 @@ class VideoPlayer extends React.Component {
 
     index++;
     if(index < this.state.episodes.length) {
-        this.setState({"index": index});
-        this.updateSource();
+        this.setState({"index": index}, () => this.updateSource());
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {
             if(this.state.parentFolders[i]== this.state.subdirectory) {
@@ -138,8 +149,7 @@ class VideoPlayer extends React.Component {
 
     index--;
     if(index > 0) {
-        this.setState({"index": index});
-        this.updateSource();
+        this.setState({"index": index}, () => this.updateSource());
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {
             if(this.state.parentFolders[i + 1]== this.state.subdirectory) {

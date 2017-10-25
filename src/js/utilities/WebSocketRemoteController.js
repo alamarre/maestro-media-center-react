@@ -1,9 +1,14 @@
 class WebSocketRemoteController {
   constructor(host, clientName, webSocketPort) {
-      this.webSocketUrl = "ws://" + host +":"+webSocketPort + "/events";
+      this.webSocketUrl = "ws://" + host +":"+webSocketPort;
       this.clientName = clientName;
-      this.guid = clientName;
       this.updateFunctions = {};
+  }
+
+  updateSettings(host, clientName, webSocketPort) {
+    this.webSocketUrl = "ws://" + host +":"+webSocketPort
+    this.clientName = clientName;
+    this.guid = clientName;
   }
 
   mapUpdateFunctions(functions) {
@@ -21,15 +26,23 @@ class WebSocketRemoteController {
     return parentFolder;
   }
 
+  safeRun(func) {
+    if(func) {
+      func();
+    }
+  }
+
   connect() {
     var self = this;
+    if(!this.webSocketUrl) {
+      return;
+    }
     this.webSocket = new WebSocket(this.webSocketUrl);
     var ws = this.webSocket;
     ws.onopen = function () {
 		ws.send(JSON.stringify({
-				"action" : "setId",
-				id : self.guid,
-				host : self.clientName
+			  "action" : "setId",
+				id : self.clientName
 			}));
     };
     
@@ -43,28 +56,30 @@ class WebSocketRemoteController {
       if (message && message.action) {
         switch (message.action) {
         case "playNext":
-          self.updateFunctions.next();
+          safeRun(self.updateFunctions.next);
           break;
         case "playPrevious":
-          self.updateFunctions.previous();
+          safeRun(self.updateFunctions.previous);
           break;
         case "skipForward":
-          skipForward();
+          safeRun(self.updateFunctions.skipForward);
           break;
         case "skipBack":
-          skipBack();
+          safeRun(self.updateFunctions.skipBack);
           break;
         case "play":
           if (typeof message.folder != "undefined") {
             var parentDir = self.getParentFolder(message.folder);
             var subDir = self.getShortFolderName(message.folder);
-            self.updateFunctions.setSource(parentDir, subDir, message.index);
+            if(self.updateFunctions.setSource) {
+              self.updateFunctions.setSource(parentDir, subDir, message.index);
+            }
           } else {
-            self.updateFunctions.play();
+            safeRun(self.updateFunctions.play);
           }
           break;
         case "pause":
-          self.updateFunctions.pause();
+          safeRun(self.updateFunctions.pause);
           break;
         case "seek":
           seekPercent(parseInt(message.percent));

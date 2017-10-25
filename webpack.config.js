@@ -12,7 +12,7 @@ var jquery = require("jquery");
 module.exports = {
   context: __dirname,
   devtool: debug ? "inline-sourcemap" : null,
-  entry: APP_DIR + "/app.js",
+  entry: APP_DIR + "/web/app.js",
   output: {
     path: BUILD_DIR,
     filename: "app.js"
@@ -43,7 +43,10 @@ module.exports = {
     ]
   },
   plugins: debug ? [
-      new HtmlWebpackPlugin({"title":"Maestro Media Center"}),
+      new HtmlWebpackPlugin({
+          "title":"Maestro Media Center",
+          template: "template.html"
+        }),
       new webpack.ProvidePlugin({
       jQuery: 'jquery',
       $: 'jquery',

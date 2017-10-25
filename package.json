@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "devrun": "./node_modules/.bin/webpack-dev-server --config webpack.config.js --progress --colors",
-    "castrun": "./node_modules/.bin/webpack-dev-server --config webpack.chromecast.config.js --progress --colors",
+    "castrun": "./node_modules/.bin/webpack-dev-server --config webpack.chromecast.config.js --progress --colors --host 0.0.0.0 --port 8088",
     "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch"
   },
   "author": "Al Lamarre",
@@ -16,6 +16,7 @@
     "jquery": "^3.2.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
+    "react-modal": "^3.0.4",
     "react-router": "^3.0.2",
     "require-globify": "^1.4.1",
     "scriptjs": "^2.5.8"
