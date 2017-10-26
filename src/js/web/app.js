@@ -47,12 +47,15 @@ let profileProvider = new ProfileProvider(apiRequester);
 let CachedBasedSearch = require("../utilities/providers/CacheBasedSearch");
 let cacheBasedSearch = new CachedBasedSearch(cacheProvider);
 
+let SettingsManager = require("../utilities/CookiesSettingsManager");
+let settingsManager = new SettingsManager();
+
 let searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
 
 //episodeLoader = searchBasedShowProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+    <Route path="/" component={(props) => (<Home {...props} settingsManager={settingsManager} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
       <Route path="videos" component={(props) => (<VideosListing {...props} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
       <Route path="view"component={(props) => (<VideoPlayer {...props} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider}  />)} />

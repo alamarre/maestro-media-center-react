@@ -68,15 +68,19 @@ class WebSocketRemoteController {
           safeRun(self.updateFunctions.skipBack);
           break;
         case "play":
-          if (typeof message.folder != "undefined") {
-            var parentDir = self.getParentFolder(message.folder);
-            var subDir = self.getShortFolderName(message.folder);
-            if(self.updateFunctions.setSource) {
-              self.updateFunctions.setSource(parentDir, subDir, message.index);
-            }
-          } else {
-            safeRun(self.updateFunctions.play);
-          }
+          safeRun(self.updateFunctions.play);
+          break;
+        case "load":
+          var parentDir = self.getParentFolder(message.folder);
+          var subDir = self.getShortFolderName(message.folder);
+
+          let event = new CustomEvent("maestro-load-video", {
+            parentDir: parentDir,
+            subDirectory: subDir,
+            index: message.index
+          })
+          
+          document.dispatchEvent(event);
           break;
         case "pause":
           safeRun(self.updateFunctions.pause);
