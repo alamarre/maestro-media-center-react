@@ -9,7 +9,7 @@
     "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch"
   },
   "author": "Al Lamarre",
-  "license": "AGPL v3.0",
+  "license": "AGPL-3.0",
   "dependencies": {
     "babelify": "^7.3.0",
     "bootstrap": "4.0.0-beta.2",
