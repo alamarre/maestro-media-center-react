@@ -1,9 +1,78 @@
-body {
-    font-weight: bold;
+#app {
+    background-color: black;
+    color: white;
+    height: 100%;
+    width: 100%;
+    padding: 30px;
+    position: absolute;
 }
 
-.cast-button {
+.settings {
     position: absolute;
     top: 10px;
     right: 20px;
+    z-index: 1;
 }
+
+.cast-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.maestroButton {
+    background-color: transparent;
+    border: none;
+    color: #DDD;
+    margin: 15px;
+    padding: 0;
+}
+.maestroButton:focus {
+    outline: 0;
+}
+
+.roundedButton {
+    border: none;
+    border: 5px solid #DDD;
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.remoteButton {
+    background-color: transparent;
+    border: none;
+    border: 5px solid #DDD;
+    color: #DDD;
+    margin: 15px;
+    padding: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+.remoteButton:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.2);
+    cursor: pointer;
+}
+.remoteButton:active {
+    border-color: #FFF;
+    color: #FFF;
+    cursor: pointer;
+}
+.remoteButton:focus {
+    outline: 0;
+}
+.remoteContainer {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center
+}
+
+#wrapper {
+    height: 100%;
+    display: table;
+}
+
+@import "custom";
+
+@import "~bootstrap/scss/bootstrap";

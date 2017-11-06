@@ -20,6 +20,7 @@ let CacheProvider = require("../utilities/providers/CacheProvider");
 let CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
 let ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
 let ChromecastListener = require("./ChromecastListener");
+let VideoPlayer = require("../components/VideoPlayer")
 
 let authTokenManager = new AuthTokenManger(new QueryStringReader());
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host+":"+port);
@@ -38,7 +39,7 @@ document.body.appendChild(div);
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} chromecastListener={chromecastListener} />)} >
-      <Route path="view"component={(props) => (<VideoPlayer {...props} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+      <Route path="view"component={(props) => (<VideoPlayer {...props} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
     </Route>
   </Router>
 ), div)

@@ -34,12 +34,15 @@ class SearchResults extends React.Component {
 
     render() {
         let searchResults = this.state.searchResults.map(item => {
-            return <div key={item.path} onClick={evt => this.selectSource(item)}>{item.name}</div>
+            return <li className="list-group-item" key={item.path} onClick={evt => this.selectSource(item)}>{item.name}</li>
         });
+
+        searchResults = <ul style={{position: "absolute"}} className="list-group">{searchResults}</ul>;
         let showPicker = null;
         if(this.state.showName) {
             showPicker = <ShowPicker 
                 router={this.props.router}
+                videoLoader={this.props.videoLoader}
                 showProgressProvider={this.props.showProgressProvider}
                 showPath = {this.state.showPath}
                 showName={this.state.showName}

@@ -9,14 +9,18 @@ class VideoPlayer extends React.Component {
       
       this.episodeLoader = episodeLoader;
       this.type = this.props.location.query.type
-      this.state={};
+      this.state={"overlayVisibility": false};
       if(this.props.remoteController) {
           this.props.remoteController.mapUpdateFunctions({
               setSource: this.setSourcePath.bind(this),
               next: this.goToNextEpisode.bind(this),
               previous: this.goToPreviousEpisode.bind(this),
               play: this.play.bind(this),
-              pause: this.pause.bind(this)
+              pause: this.pause.bind(this),
+              skipForward: this.skipForward.bind(this),
+              skipBack: this.skipBack.bind(this),
+              toggleVisibility: this.toggleVisibility.bind(this),
+              seek: this.seek.bind(this)
           })
       }
       if(this.props.location.query.folder) {
@@ -26,6 +30,17 @@ class VideoPlayer extends React.Component {
         
         this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
       }
+  }
+
+  componentWillMount() {
+    document.addEventListener("maestro-load-video", (event) => {
+        event = event.detail;
+        var path = event.folder;
+        var parentPath = path.substring(0, path.lastIndexOf('/'));
+        var subdirectory = path.substring(path.lastIndexOf('/')+1);
+        this.type = event.type;
+        this.setSourcePath(parentPath, subdirectory, event.index);
+    });
   }
 
   render() {
@@ -42,6 +57,23 @@ class VideoPlayer extends React.Component {
         opacity: 0
     }
 
+    let overlayStyle = {
+        position: "absolute",
+        left: 0,
+        center: 0,
+        right: 0,
+        top: 0,
+        backgroundColor: "black",
+        width: "100%",
+        height: "100%",
+        zIndex: 10000,
+        opacity: 0
+    }
+
+    if(this.state.overlayVisibility) {
+        overlayStyle.opacity = 1;
+    }
+
     if(this.state.showEpisodeInfo) {
         currentEpisodeStyle["opacity"] = 1;
     }
@@ -51,8 +83,13 @@ class VideoPlayer extends React.Component {
             <source src={this.state.source} type="video/mp4" />
          </video>
          <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.episodeInfo}</div>
+         <div style={overlayStyle}></div>
         </div>
     )
+  }
+
+  toggleVisibility() {
+      this.setState({"overlayVisibility": !this.state.overlayVisibility});
   }
 
   setSourcePath(parentPath, subdirectory, index) {
@@ -95,10 +132,6 @@ class VideoPlayer extends React.Component {
     });
     this.refs.video.load();
 
-    if(this.props.chromecastManager.isConnected()) {
-        this.props.chromecastManager.playVideo(source, parentPath + "/"+this.state.subdirectory, this.state.index, this.type);
-    }
-
     this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started");
   }
 
@@ -108,6 +141,18 @@ class VideoPlayer extends React.Component {
 
   play() {
     this.refs.video.play();
+  }
+
+  skipForward() {
+    this.refs.video.currentTime += 15;
+  }
+
+  skipBack() {
+    this.refs.video.currentTime -= 15;
+  }
+
+  seek(percent) {
+      this.refs.video.currentTime = (this.refs.video.duration * percent) / 100;
   }
 
   showEpisodeInfo() {
@@ -148,7 +193,7 @@ class VideoPlayer extends React.Component {
     var episodes = this.state.episodes;
 
     index--;
-    if(index > 0) {
+    if(index >= 0) {
         this.setState({"index": index}, () => this.updateSource());
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {

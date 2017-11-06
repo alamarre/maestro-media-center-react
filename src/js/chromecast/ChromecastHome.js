@@ -11,7 +11,13 @@ class Home extends React.Component {
 
     componentWillMount() {
         document.addEventListener("server-connected", (evt) => {
-            this.setState(evt);
+            this.setState(evt.detail);
+        });
+
+        document.addEventListener("maestro-load-video", (event) => {
+            event = event.detail;
+            //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
+            this.props.router.push(`/view?type=${event.type}&index=${event.index}&folder=${event.folder}`);
         });
     }
           

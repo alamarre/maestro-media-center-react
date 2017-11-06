@@ -30,14 +30,39 @@ module.exports = {
             use: 'json-loader'
         },
         {
-            test: /\.scss$/,
-            include : APP_DIR,
-            loader: ExtractTextPlugin.extract('css-loader!sass-loader')
-        },
-        {
             test: /\.svg$/,
             include : APP_DIR,
             loader: 'svg-url-loader'
+        },
+        {
+            test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            // Limiting the size of the woff fonts breaks font-awesome ONLY for the extract text plugin
+            // loader: "url?limit=10000"
+            use: "url-loader"
+        },
+        {
+            test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
+            use: 'file-loader'
+        },
+        {
+            test: /\.(scss)$/,
+            use: [{
+              loader: 'style-loader', // inject CSS to page
+            }, {
+              loader: 'css-loader', // translates CSS into CommonJS modules
+            }, {
+              loader: 'postcss-loader', // Run post css actions
+              options: {
+                plugins: function () { // post css plugins, can be exported to postcss.config.js
+                  return [
+                    require('precss'),
+                    require('autoprefixer')
+                  ];
+                }
+              }
+            }, {
+              loader: 'sass-loader' // compiles SASS to CSS
+            }]
         }
 
     ]
@@ -48,9 +73,11 @@ module.exports = {
           template: "template.html"
         }),
       new webpack.ProvidePlugin({
-      jQuery: 'jquery',
-      $: 'jquery',
-      jquery: 'jquery'
+        jQuery: 'jquery',
+        $: 'jquery',
+        jquery: 'jquery',
+        'window.jQuery': 'jquery',
+        Popper: ['popper.js', 'default']
     }),
       new ExtractTextPlugin({
             filename: "style.css",

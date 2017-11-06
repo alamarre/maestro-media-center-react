@@ -9,21 +9,29 @@ class ChromecastListener {
         const context = cast.framework.CastReceiverContext.getInstance();
         const player = context.getPlayerManager();
 
-        player.setMessageInterceptor(
+        const CUSTOM_CHANNEL = 'urn:x-cast:com.maestromediacenter';
+        context.addCustomMessageListener(CUSTOM_CHANNEL, (customEvent) => {
+            let data = customEvent.data;
+
+            this.authTokenManager.setProfile(data.profile);
+            this.authTokenManager.setToken(data.token);
+            this.getValidServerUrl(data.ips, data.scheme, data.port)
+            .then((host, clientIp) =>{
+                this.apiRequester.updateSettings(data.scheme, host+":"+data.port);
+                this.webSocketRemoteController.updateSettings(host, data.clientName, data.port);
+                this.webSocketRemoteController.connect();
+
+                let connectedEvent = new CustomEvent("server-connected", {detail: {"clientName": data.clientName, "ip": clientIp}})
+                document.dispatchEvent(connectedEvent);
+            });
+        });
+
+        /*player.setMessageInterceptor(
         cast.framework.messages.MessageType.LOAD,
         request => {
             return new Promise((resolve, reject) => {
                 let data = request.media.customData;
-                this.authTokenManager.setProfile(data.profile);
-                this.authTokenManager.setToken(data.token);
-                this.getValidServerUrl(data.ips, data.scheme, data.port)
-                .then((host, clientIp) =>{
-                    this.apiRequester.updateSettings(data.scheme, host+":"+data.port);
-                    this.webSocketRemoteController.updateSettings(host, data.clientName, data.port);
-                    this.webSocketRemoteController.connect();
-
-                    let connectedEvent = new CustomEvent("server-connected", {"clientName": data.clientName, "ip": clientIp})
-                    document.dispatchEvent(connectedEvent);
+                
                     resolve(request);
                 }, reject);
                 
@@ -35,7 +43,7 @@ class ChromecastListener {
             status => {
             status.customData = {};
             return status;
-        });
+        });*/
 
         context.start();
     }
@@ -59,7 +67,7 @@ class ChromecastListener {
                     if(serverUrls.length==0) {
                         f();
                     }
-                    this.getValidServerUrl(serverUrls, scheme).then(s, f);
+                    this.getValidServerUrl(serverUrls, scheme, port).then(s, f);
                 }
             });
         });

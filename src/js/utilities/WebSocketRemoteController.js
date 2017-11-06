@@ -11,6 +11,16 @@ class WebSocketRemoteController {
     this.guid = clientName;
   }
 
+  updateClientName(clientName) {
+    this.clientName = clientName;
+    if(this.webSocket) {
+      this.webSocket.send(JSON.stringify({
+        "action" : "setId",
+        id : this.clientName
+      }));
+    }
+  }
+
   mapUpdateFunctions(functions) {
     this.updateFunctions = functions;
   }
@@ -39,57 +49,54 @@ class WebSocketRemoteController {
     }
     this.webSocket = new WebSocket(this.webSocketUrl);
     var ws = this.webSocket;
-    ws.onopen = function () {
-		ws.send(JSON.stringify({
-			  "action" : "setId",
-				id : self.clientName
-			}));
+    ws.onopen = () => {
+      if(self.clientName) {
+      ws.send(JSON.stringify({
+          "action" : "setId",
+          id : self.clientName
+        }));
+      }
     };
     
-    ws.onclose = function () {
+    ws.onclose = () => {
       self.connect();
     };
-    ws.onmessage = function (evt) {
+    ws.onmessage = (evt) => {
       var received_msg = evt.data;
       var message = JSON.parse(received_msg);
       console.log(message);
       if (message && message.action) {
         switch (message.action) {
         case "playNext":
-          safeRun(self.updateFunctions.next);
+          this.safeRun(self.updateFunctions.next);
           break;
         case "playPrevious":
-          safeRun(self.updateFunctions.previous);
+          this.safeRun(self.updateFunctions.previous);
           break;
         case "skipForward":
-          safeRun(self.updateFunctions.skipForward);
+          this.safeRun(self.updateFunctions.skipForward);
           break;
         case "skipBack":
-          safeRun(self.updateFunctions.skipBack);
+          this.safeRun(self.updateFunctions.skipBack);
           break;
         case "play":
-          safeRun(self.updateFunctions.play);
+          this.safeRun(self.updateFunctions.play);
           break;
         case "load":
-          var parentDir = self.getParentFolder(message.folder);
-          var subDir = self.getShortFolderName(message.folder);
-
-          let event = new CustomEvent("maestro-load-video", {
-            parentDir: parentDir,
-            subDirectory: subDir,
-            index: message.index
-          })
+          let event = new CustomEvent("maestro-load-video", {detail:message});
           
           document.dispatchEvent(event);
           break;
         case "pause":
-          safeRun(self.updateFunctions.pause);
+          this.safeRun(self.updateFunctions.pause);
           break;
         case "seek":
-          seekPercent(parseInt(message.percent));
+          if(self.updateFunctions.seek) {
+            self.updateFunctions.seek(parseInt(message.percent));
+          }
           break;
         case "toggleVisibility":
-          $("#overlay").toggle();
+          this.safeRun(self.updateFunctions.toggleVisibility);
           break;
         }
       }

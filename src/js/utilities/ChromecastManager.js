@@ -1,7 +1,8 @@
 class ChromecastManager {
-    constructor(apiRequester, authTokenManager, scheme, port) {
+    constructor(apiRequester, authTokenManager, settingsManager, scheme, port) {
         this.apiRequester = apiRequester;
         this.authTokenManager = authTokenManager;
+        this.settingsManager = settingsManager;
         this.scheme = scheme;
         this.port = port;
         window.chromecastPromise.then(() => this.initialize());
@@ -24,23 +25,29 @@ class ChromecastManager {
 
     connect() {
         this.apiRequester.apiRequestPromise("server", "ips", {}).then((ips) => {
-            var mediaInfo = new chrome.cast.media.MediaInfo("http://fake.com", 'video/mp4');
+            var mediaInfo = new chrome.cast.media.MediaInfo("https://chromecast.maestromediacenter.com/nonsense.mp4", 'video/mp4');
             
             //mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
             //mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
             //mediaInfo.metadata.title = ;
             let castSession = cast.framework.CastContext.getInstance().getCurrentSession();
-            mediaInfo.customData = {
-                ips: ips,
-                scheme: this.scheme,
-                profile: this.authTokenManager.getProfile(),
-                token: this.authTokenManager.getToken(),
-                port: this.port,
-                clientName: castSession.getCastDevice().friendlyName
-            };
+            if(castSession) {
+                mediaInfo.customData = {
+                    ips: ips,
+                    scheme: this.scheme,
+                    profile: this.authTokenManager.getProfile(),
+                    token: this.authTokenManager.getToken(),
+                    port: this.port,
+                    clientName: castSession.getCastDevice().friendlyName
+                };
 
-            let request = new chrome.cast.media.LoadRequest(mediaInfo);
-            castSession.loadMedia(request).then(() => console.log("loaded"));
+                let request = new chrome.cast.media.LoadRequest(mediaInfo);
+                /*castSession.loadMedia(request).then(() => console.log("loaded"), (err) => {
+                    console.log(err);
+                });*/
+                const CUSTOM_CHANNEL = 'urn:x-cast:com.maestromediacenter';
+                castSession.sendMessage(CUSTOM_CHANNEL, mediaInfo.customData, () => {console.log("sent")}, (err) => { console.log(err);});
+            }
         });
     }
 

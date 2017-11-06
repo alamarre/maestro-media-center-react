@@ -1,3 +1,5 @@
+//import 'bootstrap';
+import 'font-awesome/scss/font-awesome.scss';
 import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, Link, hashHistory } from 'react-router'
@@ -23,17 +25,22 @@ let CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisod
 let SearchBasedShowProvider = require("../utilities/providers/SearchBasedShowProvider");
 let ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
 let ChromecastManager  = require("../utilities/ChromecastManager");
+let SettingsManager = require("../utilities/CookiesSettingsManager");
+let VideoLoader = require("../utilities/VideoLoader");
+let RemoteControllerComponent = require("../components/RemoteController");
 
+let settingsManager = new SettingsManager();
 let authTokenManager = new AuthTokenManger(new QueryStringReader());
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host+":"+port);
-let chromecastManager = new ChromecastManager(apiRequester, authTokenManager, scheme, port);
+let chromecastManager = new ChromecastManager(apiRequester, authTokenManager, settingsManager, scheme, port);
 var episodeLoader = new EpisodeLoader(apiRequester);
 let cacheProvider = new CacheProvider(apiRequester);
 let showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
 let cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
 
-var webSocketRemoteController = new WebSocketRemoteController(host, "Desktop Test Client", wsPort);
+var webSocketRemoteController = new WebSocketRemoteController(host, settingsManager.get("myClientName"), wsPort);
 var div = document.createElement("div");
+div.id = "app";
 document.body.appendChild(div);
 
 import LoginProvider from "../utilities/LoginProvider";
@@ -47,19 +54,24 @@ let profileProvider = new ProfileProvider(apiRequester);
 let CachedBasedSearch = require("../utilities/providers/CacheBasedSearch");
 let cacheBasedSearch = new CachedBasedSearch(cacheProvider);
 
-let SettingsManager = require("../utilities/CookiesSettingsManager");
-let settingsManager = new SettingsManager();
-
 let searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
+
+const WebSocketSender = require("../utilities/WebSocketSender");
+let webSocketSender = new WebSocketSender(host, wsPort);
+webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
+webSocketSender.connect();
+
+let videoLoader = new VideoLoader(webSocketSender);
 
 //episodeLoader = searchBasedShowProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} settingsManager={settingsManager} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
-      <Route path="videos" component={(props) => (<VideosListing {...props} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
+    <Route path="/" component={(props) => (<Home {...props} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+      <Route path="videos" component={(props) => (<VideosListing {...props} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
       <Route path="view"component={(props) => (<VideoPlayer {...props} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider}  />)} />
-      <Route path="profiles" component={(props) => (<ChooseProfile {...props} authTokenManager={authTokenManager} profileProvider={profileProvider}  />)} />
+      <Route path="profile" component={(props) => (<ChooseProfile {...props} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider}  />)} />
+      <Route path="remote" component={(props) => (<RemoteControllerComponent {...props} remote={webSocketSender} />)} />
     </Route>
   </Router>
 ), div)

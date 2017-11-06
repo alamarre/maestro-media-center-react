@@ -1,5 +1,5 @@
 import React from 'react'
-import Modal from 'react-modal';
+import {Modal} from 'react-bootstrap';
 
 class ShowPicker extends React.Component {
 
@@ -45,8 +45,9 @@ class ShowPicker extends React.Component {
             }
         }
         let folder = this.props.showPath + "/" +this.state.season;
-        let url = "view?type=tv&index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(episode);
-        this.props.router.push(url);
+        //let url = "view?type=tv&index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(episode);
+        //this.props.router.push(url);
+        this.props.videoLoader.loadVideo("tv", folder, index);
     }
 
     render() {
@@ -59,19 +60,30 @@ class ShowPicker extends React.Component {
         });
 
         let episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).map(episode => {
-            return <div onClick={evt => this.play(episode)} value={episode} key={episode}>{episode}</div>;
+            return <div key={episode}>
+                <button className="maestroButton roundedButton fa fa-play" onClick={evt => this.play(episode)}></button>
+                <span>{episode}</span>
+            </div>;
+
         });
 
         let keepWatchingView = null;
         if(this.state.keepWatchingData && this.state.season == this.state.keepWatchingData.season) {
             let episode = this.state.keepWatchingData.episode;
-            keepWatchingView = <div onClick={evt => this.play(episode)}>Keep watching: {episode}</div>;
+            keepWatchingView = <div>
+                <button className="maestroButton roundedButton fa fa-play c" onClick={evt => this.play(episode)}></button>
+                <span>Keep watching: {episode}</span>
+                </div>;
         }
 
         let body = <div>
-            <Modal isOpen={true}>
+            <Modal show={true} animation={false} onHide={evt => this.props.cancelFunction()}>
+            <Modal.Header>
+            <Modal.Title>{this.props.showName}</Modal.Title>
+            </Modal.Header>
                 
-                <div>{this.props.showName}</div>
+                <Modal.Body>
+                
                 {keepWatchingView}
                 <div>
                     <select defaultValue={this.state.season} onChange={evt => this.setSeason(evt.target.value)}>
@@ -81,7 +93,10 @@ class ShowPicker extends React.Component {
                 <div>
                 </div>
                 {episodes}
-                <button onClick={evt => this.props.cancelFunction()}>Cancel</button>
+                </Modal.Body>
+                <Modal.Footer>
+                <button className="btn btn-secondary" onClick={evt => this.props.cancelFunction()}>Cancel</button>
+                </Modal.Footer>
             </Modal>
         </div>;
    

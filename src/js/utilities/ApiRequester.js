@@ -6,7 +6,7 @@ class ApiRequester {
         this.jQuery = jQuery;
     }
 
-    updateSettings(host, scheme) {
+    updateSettings(scheme, host) {
         this.host = host;
         this.scheme = scheme;
     }

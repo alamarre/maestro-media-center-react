@@ -15,6 +15,11 @@ class CacheProvider {
         return this.cachePromise;
     } 
 
+    reload() {
+        this.cachePromise = this.apiRequester.apiRequestPromise("folders", "cache", {});
+        this.rootFoldersPromise = this.apiRequester.apiRequestPromise("folders", "root", {});
+    }
+
     isTvShow(path) {
         if(path.indexOf("/")==0) {
             path = path.substring(1);

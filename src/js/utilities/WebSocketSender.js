@@ -1,11 +1,47 @@
 class WebSocketSender {
     constructor(host, webSocketPort) {
-        this.webSocketUrl = "ws://" + host +":"+webSocketPort + "/events";
+        this.webSocketUrl = "ws://" + host +":"+webSocketPort;
         this.updateFunctions = {};
+        this.devices = [];
     }
   
     updateSettings(host, webSocketPort) {
-      this.webSocketUrl = "ws://" + host +":"+webSocketPort + "/events"
+      this.webSocketUrl = "ws://" + host +":"+webSocketPort;
+    }
+
+    getDevices() {
+        return this.devices;
+    }
+
+    connect() {
+        if(!this.webSocketUrl) {
+          return;
+        }
+        this.webSocket = new WebSocket(this.webSocketUrl);
+        var ws = this.webSocket;
+        ws.onopen =  () => {
+          ws.send(JSON.stringify({
+              "action" : "list",
+              "keepUpdating": true
+            }));
+        };
+        
+        ws.onclose = () => {
+          this.connect();
+        };
+        ws.onmessage = (evt) => {
+          var received_msg = evt.data;
+          var message = JSON.parse(received_msg);
+          if(message.action == "list") {
+              this.devices = message.ids;
+              let event = new CustomEvent("maestro-remote-client-list-updated", message);
+              document.dispatchEvent(event);
+          }
+        }
+    }
+
+    hasClient() {
+        return this.client && this.client != "";
     }
 
     setClient(client) {
@@ -13,19 +49,19 @@ class WebSocketSender {
     }
 
     playNext() {
-        this.sendMessage(, {
+        this.sendMessage({
             "action": "playNext"
         })
     }
 
     playPrevious() {
-        this.sendMessage(client, {
+        this.sendMessage({
             "action": "playPrevious"
         })
     }
 
     skipForward() {
-        this.sendMessage(client, {
+        this.sendMessage({
             "action": "skipForward"
         })
     }
@@ -37,84 +73,43 @@ class WebSocketSender {
     }
 
     play() {
-        this.sendMessage(client, {
-            "action": "skipBack"
+        this.sendMessage({
+            "action": "play"
+        })
+    }
+
+    toggleVisibility() {
+        this.sendMessage({
+            "action": "toggleVisibility"
+        })
+    }
+
+    load(type, folder, index) {
+        this.sendMessage({
+            "action": "load",
+            "type": type,
+            folder: folder,
+            index: index
         })
     }
 
     pause() {
-        this.sendMessage(client, {
-            "action": "skipBack"
-        })
-    }
-
-    seek() {
         this.sendMessage({
-            "action": "skipBack"
+            "action": "pause"
         })
     }
 
-    sendMessage(client, message) {
+    seek(percent) {
+        this.sendMessage({
+            "action": "seek",
+            "percent": percent
+        })
+    }
+
+    sendMessage(message) {
         message.client = this.client;
         this.webSocket.send(JSON.stringify(message));
     }
-  
-    connect() {
-      var self = this;
-      if(!this.webSocketUrl) {
-        return;
-      }
-      this.webSocket = new WebSocket(this.webSocketUrl);
-      var ws = this.webSocket;
-      
-      ws.onclose = function () {
-        self.connect();
-      };
-      ws.onmessage = function (evt) {
-        var received_msg = evt.data;
-        var message = JSON.parse(received_msg);
-        console.log(message);
-        if (message && message.action) {
-          switch (message.action) {
-          case "playNext":
-            safeRun(self.updateFunctions.next);
-            break;
-          case "playPrevious":
-            safeRun(self.updateFunctions.previous);
-            break;
-          case "skipForward":
-            safeRun(self.updateFunctions.skipForward);
-            break;
-          case "skipBack":
-            safeRun(self.updateFunctions.skipBack);
-            break;
-          case "play":
-            if (typeof message.folder != "undefined") {
-              var parentDir = self.getParentFolder(message.folder);
-              var subDir = self.getShortFolderName(message.folder);
-              if(self.updateFunctions.setSource) {
-                self.updateFunctions.setSource(parentDir, subDir, message.index);
-              }
-            } else {
-              safeRun(self.updateFunctions.play);
-            }
-            break;
-          case "pause":
-            safeRun(self.updateFunctions.pause);
-            break;
-          case "seek":
-            seekPercent(parseInt(message.percent));
-            break;
-          case "toggleVisibility":
-            $("#overlay").toggle();
-            break;
-          }
-        }
-  
-      };
-    }
-  
-    
-  }
+}
   
   module.exports = WebSocketSender;

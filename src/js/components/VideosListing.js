@@ -33,6 +33,10 @@ class VideosListing extends React.Component {
         this.setState({"showName": null});
     }
 
+    loadVideo(type, folder, index) {
+        this.props.videoLoader.loadVideo(type, folder, index);
+    }
+
     render() {
 		var folders = this.state.folders.map((folder) => {
 			return <div key={folder} onClick={this.fetchFolder.bind(this, folder)}>{folder}</div>
@@ -42,13 +46,13 @@ class VideosListing extends React.Component {
 		var files = this.state.files.map((file) => {
 			let fileName = (file.name) ? file.name : file;
 			let folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
-			var url = "view?index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(fileName);
-			index++;
+			//var url = "view?index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(fileName);
+			
 			if(file.type && file.type == "tv") {
 				return <div key={fileName} onClick={evt => this.selectSource(file)} >{fileName}</div>
             }
             
-			return <div key={fileName} ><Link to={url}>{fileName}</Link></div>
+			return <div key={fileName} onClick={this.loadVideo.bind(this, file.type, folder, index++)} >{fileName}</div>
 		});
 
 		let showPicker = null;
@@ -56,6 +60,7 @@ class VideosListing extends React.Component {
 		if(this.state.showName) {
 			showPicker = <ShowPicker 
                 router={this.props.router}
+                videoLoader={this.props.videoLoader}
 				showProgressProvider={this.props.showProgressProvider}
 				showName={this.state.showName}
                 showPath={this.state.showPath}
