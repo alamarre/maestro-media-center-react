@@ -61,13 +61,13 @@ class Home extends EasyInputComponent {
         }
     
         let remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") !="") ? 
-            <Link to="remote">Remote Control</Link>
+            <Link className="nostyle" to="remote">Remote Control</Link>
             : null;
         var body = this.props.children || <div>
             <div>
                 <SearchResults router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider}  /> 
             </div>
-            <Link to="videos">Browse the collection</Link>
+            <Link className="nostyle" to="videos">Browse the collection</Link>
             {remoteLink}
         </div>;
         return (

@@ -72,7 +72,7 @@ class ChooseProfile extends React.Component {
             </div>;
         } else if (this.state.profiles) {
             let profiles = this.state.profiles.map((profile) => {
-                return <button className="maestroButton fa fa-user fa-3x" style={{border: "solid 1px white", width:"150px"}} key={profile.profileName} onClick={this.setProfile.bind(this,profile.profileName)}>
+                return <button className="maestroButton fa fa-user fa-3x" style={{border: "solid 1px white", width:"300px", fontSize: "100px"}} key={profile.profileName} onClick={this.setProfile.bind(this,profile.profileName)}>
                     <div style ={{textOverflow: "ellipsis", overflow: "hidden"}}>{profile.profileName}</div>
                 </button>;
             });

@@ -8,10 +8,25 @@ var BUILD_DIR = path.resolve(__dirname, 'build');
 var APP_DIR = path.resolve(__dirname, 'src/js/');
 
 var jquery = require("jquery");
-
+var alwaysPlugins = [
+    new HtmlWebpackPlugin({
+    "title":"Maestro Media Center",
+    template: "template.html"
+  }),
+new webpack.ProvidePlugin({
+  jQuery: 'jquery',
+  $: 'jquery',
+  jquery: 'jquery',
+  'window.jQuery': 'jquery',
+  Popper: ['popper.js', 'default']
+}),
+new ExtractTextPlugin({
+      filename: "style.css",
+      allChunks: true
+  })]
 module.exports = {
   context: __dirname,
-  devtool: debug ? "inline-sourcemap" : null,
+  devtool: debug ? "inline-sourcemap" : false,
   entry: APP_DIR + "/web/app.js",
   output: {
     path: BUILD_DIR,
@@ -67,25 +82,14 @@ module.exports = {
 
     ]
   },
-  plugins: debug ? [
-      new HtmlWebpackPlugin({
-          "title":"Maestro Media Center",
-          template: "template.html"
-        }),
-      new webpack.ProvidePlugin({
-        jQuery: 'jquery',
-        $: 'jquery',
-        jquery: 'jquery',
-        'window.jQuery': 'jquery',
-        Popper: ['popper.js', 'default']
-    }),
-      new ExtractTextPlugin({
-            filename: "style.css",
-            allChunks: true
-        })
-  ] : [
+  plugins: debug ? alwaysPlugins.concat([
+    new webpack.DefinePlugin({
+        'process.env': {
+          'PORT': 3000
+        }
+      })
+  ]): alwaysPlugins.concat([
     new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
-  ],
+    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: true }),
+  ]),
 };

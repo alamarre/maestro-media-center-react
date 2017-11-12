@@ -5,6 +5,7 @@
     width: 100%;
     padding: 30px;
     position: absolute;
+    font-size: 30px;
 }
 
 .settings {
@@ -12,6 +13,18 @@
     top: 10px;
     right: 20px;
     z-index: 1;
+}
+
+a.nostyle:link {
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
+}
+
+a.nostyle:visited {
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
 }
 
 .cast-button {
@@ -25,6 +38,7 @@
     border: none;
     color: #DDD;
     margin: 15px;
+    font-size: 20px;
     padding: 0;
 }
 .maestroButton:focus {
@@ -35,6 +49,7 @@
     border: none;
     border: 5px solid #DDD;
     border-radius: 50%;
+    font-size: 20px;
     padding: 10px;
 }
 
@@ -45,6 +60,7 @@
     color: #DDD;
     margin: 15px;
     padding: 0;
+    font-size: 20px;
     width: 100px;
     height: 100px;
     border-radius: 50%;

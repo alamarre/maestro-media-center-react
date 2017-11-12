@@ -6,9 +6,11 @@ import { Router, Route, Link, hashHistory } from 'react-router'
 
 require("../style.scss");
 
-var host = "localhost";
-var scheme = "http";
-var port = 3000;
+var host = window.location.hostname;
+
+// this could also have been done with substring, but was simple
+var scheme = window.location.protocol == "http:" ? "http": "https";
+var port = process.env.PORT || window.location.port;
 var wsPort = port;
 var jquery = require("jquery");
 
