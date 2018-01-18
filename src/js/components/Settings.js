@@ -17,9 +17,19 @@ class Settings extends EasyInputComponent {
 
         this.handleClientNameChange = this.handleClientNameChange.bind(this);
         this.handleSendToClientNameChange = this.handleSendToClientNameChange.bind(this);
+    }
 
+    componentDidMount() {
         document.addEventListener("maestro-remote-client-list-updated", (event) => {
-            this.setState({"remoteClients": event.ids});
+            this.setState({"remoteClients": event.detail.ids});
+        });
+
+        this.setState({
+            remoteControl: this.props.settingsManager.get("remoteControl") == "true",
+            remoteClients: [],
+            myClientName: this.props.settingsManager.get("myClientName") || "",
+            remoteClients: this.props.webSocketSender.getDevices(),
+            playToRemoteClient: this.props.settingsManager.get("playToRemoteClient")
         });
     }
 
@@ -35,6 +45,15 @@ class Settings extends EasyInputComponent {
         this.handleInputChange(event);
 
         this.props.webSocketSender.setClient(value);
+    }
+
+    switchProfile() {
+        this.props.router.push("/profile");
+    }
+
+    logout() {
+        document.cookie = "";
+        this.props.router.push("/login");
     }
    
     render() {
@@ -67,6 +86,12 @@ class Settings extends EasyInputComponent {
             <div className="form-group">
                 <label htmlFor="playToRemoteClient">Play videos on which device</label>
                 {otherOptions}
+            </div>
+            <div className="form-group">
+                <button className="btn btn-primary" onClick={this.switchProfile.bind(this)}>Switch Profile</button>
+            </div>
+            <div className="form-group">
+                <button className="btn btn-primary" onClick={this.logout.bind(this)}>Logout</button>
             </div>
         </div>;
         return (

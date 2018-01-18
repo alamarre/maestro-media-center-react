@@ -1,12 +1,14 @@
 class WebSocketRemoteController {
   constructor(host, clientName, webSocketPort) {
-      this.webSocketUrl = "ws://" + host +":"+webSocketPort;
+      const protocol = (webSocketPort == 443) ? "wss" : "ws";
+      this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
       this.clientName = clientName;
       this.updateFunctions = {};
   }
 
   updateSettings(host, clientName, webSocketPort) {
-    this.webSocketUrl = "ws://" + host +":"+webSocketPort
+    const protocol = (webSocketPort == 443) ? "wss" : "ws";
+    this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
     this.clientName = clientName;
     this.guid = clientName;
   }

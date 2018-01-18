@@ -15,6 +15,8 @@ class EpisodeLoader {
                     return file.indexOf(".mp4") == (file.length-".mp4".length);
                 });
 
+                result.files = result.files.sort(tvShowSort);
+
                 good(result);
             }, function(error) {
                 bad(error);

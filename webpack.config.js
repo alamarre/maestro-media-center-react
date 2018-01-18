@@ -1,4 +1,5 @@
 var debug = process.env.NODE_ENV !== "production";
+const appId = process.env.CHROMECAST_DEBUG ? "D8828ECA" : "C3639C8B";
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -19,6 +20,11 @@ new webpack.ProvidePlugin({
   jquery: 'jquery',
   'window.jQuery': 'jquery',
   Popper: ['popper.js', 'default']
+}),
+new webpack.DefinePlugin({
+  'process.env': {
+    'CHROMECAST_APP_ID': JSON.stringify(appId)
+  },
 }),
 new ExtractTextPlugin({
       filename: "style.css",
@@ -85,8 +91,7 @@ module.exports = {
   plugins: debug ? alwaysPlugins.concat([
     new webpack.DefinePlugin({
         'process.env': {
-          'PORT': 3000
-        }
+        },
       })
   ]): alwaysPlugins.concat([
     new webpack.optimize.DedupePlugin(),

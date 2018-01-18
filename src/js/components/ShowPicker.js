@@ -55,7 +55,7 @@ class ShowPicker extends React.Component {
             return <div></div>;
         }
 
-        let seasons = Object.keys(this.props.showCache.folders).map((season) => {
+        let seasons = Object.keys(this.props.showCache.folders).sort(tvShowSort).map((season) => {
             return <option key={season} value={season}>{season}</option>;
         });
 

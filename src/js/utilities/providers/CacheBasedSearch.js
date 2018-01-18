@@ -2,11 +2,16 @@ let elasticlunr = require("elasticlunr");
 
 function addFilesInFolder(index, currentCache, path) {
     if(currentCache && currentCache.files) {
-        for(let file in currentCache.files) {
-            path += "/" + file;
+        let fileNames = Object.keys(currentCache.files).sort(tvShowSort).filter((f) => {
+            return f.endsWith(".mp4");
+        });
+        let episodeCount = 0;
+        for(let file of fileNames) {
+            let filePath = path + "/" + file;
             let doc = {
-                path: path,
+                path: filePath,
                 type: "movie",
+                index: episodeCount++,
                 title: file.substring(0, file.lastIndexOf("."))
             }
             
@@ -38,6 +43,7 @@ class CacheBasedSearch {
                 let index = elasticlunr(function () {
                     this.addField('title');
                     this.addField('type');
+                    this.addField('index');
                     this.setRef('path');
                 }); 
                 
@@ -53,7 +59,8 @@ class CacheBasedSearch {
                                 let doc = {
                                     path: folder.name + "/" + showName,
                                     title: showName,
-                                    type: "tv"
+                                    type: "tv",
+                                    index: 0
                                 }
                                 
                                 index.addDoc(doc);
@@ -92,8 +99,13 @@ class CacheBasedSearch {
                     return {
                         type: doc.type,
                         path: item.ref,
+                        index: doc.index,
                         name: item.ref.substring(item.ref.lastIndexOf("/")+1)
                     };
+                })
+
+                results = results.sort((a,b) => {
+                    return tvShowSort(a.name, b.name);
                 })
                 success(results);
             }, fail);
@@ -110,8 +122,10 @@ class CacheBasedSearch {
                     expand: true
                 });
                 let results = result.map((item) => {
+                    let doc = this.cacheIndex.documentStore.getDoc(item.ref);
                     return {
                         path: item.ref,
+                        index: doc.index,
                         name: item.ref.substring(item.ref.lastIndexOf("/")+1)
                     };
                 })

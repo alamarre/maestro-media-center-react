@@ -30,16 +30,29 @@ let showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider)
 
 var webSocketRemoteController = new WebSocketRemoteController(host, "Desktop Test Client", wsPort);
 
-let chromecastListener = new ChromecastListener(apiRequester, authTokenManager, webSocketRemoteController);
+let chromecastListener = new ChromecastListener(apiRequester, authTokenManager, webSocketRemoteController, cacheProvider);
 chromecastListener.initialize();
 
 var div = document.createElement("div");
 document.body.appendChild(div);
 
+window.tvShowSort = function(a, b) {
+  if(a.lastIndexOf(".") > -1) {
+    a = a.substring(0, a.lastIndexOf("."));
+  }
+  if(b.lastIndexOf(".") > -1) {
+    b = b.substring(0, b.lastIndexOf("."));
+  }
+  return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
+}
+
+let VideoLoader = require("../utilities/VideoLoader");
+const videoLoader = new VideoLoader();
+
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} chromecastListener={chromecastListener} />)} >
-      <Route path="view"component={(props) => (<VideoPlayer {...props} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+      <Route path="view"component={(props) => (<VideoPlayer {...props} videoLoader={videoLoader} isChromecast={true} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
     </Route>
   </Router>
 ), div)

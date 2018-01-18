@@ -25,7 +25,7 @@ class Home extends React.Component {
         let info = null;
 
         if(this.state.ip) {
-            info = <div class="server-info">{this.state.clientName} ({this.state.ip})</div>
+            info = <div className="server-info">{this.state.clientName} ({this.state.ip})</div>
         }
         var body = this.props.children || <div>
            Cool image background goes here

@@ -10,7 +10,7 @@ class Home extends EasyInputComponent {
 
     constructor(props) {
         super(props);
-        this.state = {showSettings: false, hideSettings: true};
+        this.state = {showSettings: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS)};
     }
 
     componentWillMount() {
@@ -33,6 +33,9 @@ class Home extends EasyInputComponent {
     }
 
     showSettingsTemporarily() {
+        if(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS) {
+            return;
+        }
         this.setState({hideSettings: false});
         if(this.hideSettingsTimeout) {
             window.clearTimeout(this.hideSettingsTimeout);
@@ -42,23 +45,36 @@ class Home extends EasyInputComponent {
             this.setState({hideSettings: true});
         }, 5000);
     }
+
+    goHome() {
+        this.props.router.push("/");
+    }
           
     render() {
         let settingsView = this.state.showSettings ? 
-            <SettingsComponent remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender}  settingsManager={this.props.settingsManager}  /> 
+            <SettingsComponent router={this.props.router} remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender}  settingsManager={this.props.settingsManager}  /> 
             : null;
-        let settingsSection = this.state.hideSettings ? null : <div className="settings">
-            <div style={{textAlign: "right"}}>
+        let settingsDisplay = this.state.hideSettings ? "none" : "block";
+        
+        let homeButton = null;
+        if(["/login", "/profile", "/remote"].includes(this.props.router.location.pathname)) {
+            settingsDisplay = "none";
+        } else if(!["/"].includes(this.props.router.location.pathname)) {
+            homeButton = <button className="maestroButton fa fa-home" onClick={evt => this.goHome()}></button>;
+        }
+        
+        
+        let settingsSection = <div style={{display: settingsDisplay}} className="settings">
+            <div style={{textAlign: "right", zIndex: 10}}>
                 <button class="cast-button" is="google-cast-button"></button>
+                {homeButton}
                 <button className="maestroButton fa fa-cog" onClick={this.toggleSetting} name="showSettings"></button>
             </div>
            
             {settingsView}
         </div>;
 
-        if(["/login", "/profile", "/remote"].includes(this.props.router.location.pathname)) {
-            settingsSection = null;
-        }
+        
     
         let remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") !="") ? 
             <Link className="nostyle" to="remote">Remote Control</Link>
@@ -67,8 +83,8 @@ class Home extends EasyInputComponent {
             <div>
                 <SearchResults router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider}  /> 
             </div>
-            <Link className="nostyle" to="videos">Browse the collection</Link>
-            {remoteLink}
+            <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
+            <div>{remoteLink}</div>
         </div>;
         return (
             <div>{settingsSection}{body}</div>

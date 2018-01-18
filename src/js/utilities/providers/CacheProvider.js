@@ -3,8 +3,8 @@ class CacheProvider {
         this.apiRequester = apiRequester;
         this.cachePromise = null;
         this.rootFoldersPromise = null;
-        this.getCache();
-        this.getRootFolders();
+        this.getCache().catch(() => {});
+        this.getRootFolders().catch(() => {});
     }
     
     getCache() {
@@ -50,6 +50,14 @@ class CacheProvider {
                 let current = cache;
                 for(var i=0; i<parts.length; i++) {
                     current = current.folders[parts[i]];
+                }
+
+                if(current && current.folders  && current.folders.sort) {
+                    current.folders = current.folders.sort(tvShowSort);
+                }
+
+                if(current && current.files  && current.files.sort) {
+                    current.files = current.files.sort(tvShowSort);
                 }
 
                 s(current);

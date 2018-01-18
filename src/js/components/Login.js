@@ -33,7 +33,7 @@ class Login extends React.Component {
                     {errorMessage}
                     <div style={{textAlign: "center"}} className="form-group">
                         <label style={{textAlign: "left", width: "50%"}}>Username</label>
-                        <div><input type="text" style={{display:"inline-block", width: "50%"}} className="form-control" ref={(input) => { this.usernameInput = input; }} />
+                        <div><input autoCorrect="off" autoCapitalize="none" type="text" style={{display:"inline-block", width: "50%"}} className="form-control" ref={(input) => { this.usernameInput = input; }} />
                         </div>
                     </div>
                     <div style={{textAlign: "center"}} className="form-group" >

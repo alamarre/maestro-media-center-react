@@ -6,11 +6,14 @@ import { Router, Route, Link, hashHistory } from 'react-router'
 
 require("../style.scss");
 
-var host = window.location.hostname;
+var host = (window.maestroSettings && window.maestroSettings.HOST) || window.location.hostname;
 
 // this could also have been done with substring, but was simple
-var scheme = window.location.protocol == "http:" ? "http": "https";
-var port = process.env.PORT || window.location.port;
+var scheme = (window.maestroSettings && window.maestroSettings.PROTOCOL) || (window.location.protocol == "http:" ? "http": "https");
+var port = (window.maestroSettings && window.maestroSettings.PORT) 
+  || process.env.PORT 
+  || window.location.port 
+  || (scheme == "http" ? 80 : 443);
 var wsPort = port;
 var jquery = require("jquery");
 
@@ -34,7 +37,13 @@ let RemoteControllerComponent = require("../components/RemoteController");
 let settingsManager = new SettingsManager();
 let authTokenManager = new AuthTokenManger(new QueryStringReader());
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host+":"+port);
-let chromecastManager = new ChromecastManager(apiRequester, authTokenManager, settingsManager, scheme, port);
+
+const WebSocketSender = require("../utilities/WebSocketSender");
+let webSocketSender = new WebSocketSender(host, wsPort);
+webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
+webSocketSender.connect();
+
+let chromecastManager = new ChromecastManager(apiRequester, authTokenManager, settingsManager, webSocketSender, scheme, host, port);
 var episodeLoader = new EpisodeLoader(apiRequester);
 let cacheProvider = new CacheProvider(apiRequester);
 let showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
@@ -58,19 +67,24 @@ let cacheBasedSearch = new CachedBasedSearch(cacheProvider);
 
 let searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
 
-const WebSocketSender = require("../utilities/WebSocketSender");
-let webSocketSender = new WebSocketSender(host, wsPort);
-webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
-webSocketSender.connect();
-
 let videoLoader = new VideoLoader(webSocketSender);
+
+window.tvShowSort = function(a, b) {
+  if(a.lastIndexOf(".") > -1) {
+    a = a.substring(0, a.lastIndexOf("."));
+  }
+  if(b.lastIndexOf(".") > -1) {
+    b = b.substring(0, b.lastIndexOf("."));
+  }
+  return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
+}
 
 //episodeLoader = searchBasedShowProvider;
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
       <Route path="videos" component={(props) => (<VideosListing {...props} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
-      <Route path="view"component={(props) => (<VideoPlayer {...props} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+      <Route path="view"component={(props) => (<VideoPlayer {...props} videoLoader={videoLoader} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider}  />)} />
       <Route path="profile" component={(props) => (<ChooseProfile {...props} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider}  />)} />
       <Route path="remote" component={(props) => (<RemoteControllerComponent {...props} remote={webSocketSender} />)} />
@@ -78,4 +92,4 @@ render((
   </Router>
 ), div)
 
-webSocketRemoteController.connect()
+webSocketRemoteController.connect();

@@ -1,12 +1,15 @@
 class WebSocketSender {
     constructor(host, webSocketPort) {
-        this.webSocketUrl = "ws://" + host +":"+webSocketPort;
+        this.protocol = protocol;
+        const protocol = (webSocketPort == 443) ? "wss" : "ws";
+        this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
         this.updateFunctions = {};
         this.devices = [];
     }
   
     updateSettings(host, webSocketPort) {
-      this.webSocketUrl = "ws://" + host +":"+webSocketPort;
+        const protocol = (webSocketPort == 443) ? "wss" : "ws";
+        this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
     }
 
     getDevices() {
@@ -34,7 +37,7 @@ class WebSocketSender {
           var message = JSON.parse(received_msg);
           if(message.action == "list") {
               this.devices = message.ids;
-              let event = new CustomEvent("maestro-remote-client-list-updated", message);
+              let event = new CustomEvent("maestro-remote-client-list-updated", {detail:message});
               document.dispatchEvent(event);
           }
         }

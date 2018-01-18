@@ -24,6 +24,9 @@ class SearchResults extends React.Component {
             let cachePath = values[1];
             if(isTvShow) {
                 this.setState({showName: item.name, showPath: item.path, cachePath: cachePath})
+            } else {
+                let folder = item.path.substring(0, item.path.lastIndexOf("/"));
+                this.props.videoLoader.loadVideo(item.type, folder, item.index)
             }
         })
     }

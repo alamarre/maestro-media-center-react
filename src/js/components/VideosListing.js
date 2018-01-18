@@ -42,7 +42,7 @@ class VideosListing extends React.Component {
 			return <div key={folder} onClick={this.fetchFolder.bind(this, folder)}>{folder}</div>
 		});
 
-		var index = 0;
+		//var index = 0;
 		var files = this.state.files.map((file) => {
 			let fileName = (file.name) ? file.name : file;
 			let folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
@@ -50,9 +50,9 @@ class VideosListing extends React.Component {
 			
 			if(file.type && file.type == "tv") {
 				return <div key={fileName} onClick={evt => this.selectSource(file)} >{fileName}</div>
-            }
+			}
             
-			return <div key={fileName} onClick={this.loadVideo.bind(this, file.type, folder, index++)} >{fileName}</div>
+			return <div key={fileName} onClick={this.loadVideo.bind(this, file.type, folder, file.index)} >{fileName}</div>
 		});
 
 		let showPicker = null;

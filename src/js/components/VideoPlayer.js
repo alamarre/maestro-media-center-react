@@ -22,17 +22,23 @@ class VideoPlayer extends React.Component {
               toggleVisibility: this.toggleVisibility.bind(this),
               seek: this.seek.bind(this)
           })
-      }
-      if(this.props.location.query.folder) {
+      }  
+  }
+
+  componentWillMount() {
+    
+  }
+
+  componentDidMount() {
+    this.props.videoLoader.setRouter(this.props.router);
+    if(this.props.location.query.folder) {
         var path = this.props.location.query.folder;
         var parentPath = path.substring(0, path.lastIndexOf('/'));
         var subdirectory = path.substring(path.lastIndexOf('/')+1);
         
         this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
-      }
-  }
+    }
 
-  componentWillMount() {
     document.addEventListener("maestro-load-video", (event) => {
         event = event.detail;
         var path = event.folder;
@@ -41,6 +47,26 @@ class VideoPlayer extends React.Component {
         this.type = event.type;
         this.setSourcePath(parentPath, subdirectory, event.index);
     });
+
+      if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        player.addEventListener(cast.framework.events.EventType.PLAY,
+            event => {
+                this.hideEpisodeInfo();
+            });
+
+            player.addEventListener(cast.framework.events.EventType.PAUSE,
+                event => {
+                    this.showEpisodeInfo();
+                });
+
+            player.addEventListener(cast.framework.events.EventType.ENDED,
+                event => {
+                    this.goToNextEpisode();
+                });
+        //player.setMediaElement(this.refs.video);
+      }
   }
 
   render() {
@@ -67,23 +93,27 @@ class VideoPlayer extends React.Component {
         width: "100%",
         height: "100%",
         zIndex: 10000,
-        opacity: 0
     }
 
+    let overlay = null;
     if(this.state.overlayVisibility) {
-        overlayStyle.opacity = 1;
+        overlay = <div style={overlayStyle}></div>;
     }
 
     if(this.state.showEpisodeInfo) {
         currentEpisodeStyle["opacity"] = 1;
     }
+    let videoSource = null;
+    if(!this.props.isChromecast) {
+        videoSource = <video onEnded={this.goToNextEpisode.bind(this)} onPlay={this.hideEpisodeInfo.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
+        <source src={this.state.source} type="video/mp4" />
+     </video>;
+    }
     return (
         <div>
-         <video onEnded={this.goToNextEpisode.bind(this)} onPlay={this.hideEpisodeInfo.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls autoPlay={true}>
-            <source src={this.state.source} type="video/mp4" />
-         </video>
+         {videoSource}
          <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.episodeInfo}</div>
-         <div style={overlayStyle}></div>
+         {overlay}
         </div>
     )
   }
@@ -93,15 +123,16 @@ class VideoPlayer extends React.Component {
   }
 
   setSourcePath(parentPath, subdirectory, index) {
-    this.state = {"parentPath": parentPath, "subdirectory": subdirectory, "index": index};
-    this.getEpisodes();
-    this.getSeasons();
+    this.setState({"parentPath": parentPath, "subdirectory": subdirectory, "index": index}, () => {
+        this.getEpisodes();
+        this.getSeasons();
+    });
   }
 
   getEpisodes() {
     var self = this;
     if(this.state.episodes) {
-        this.setState({"parentFolders": null, "episodes": null});
+        this.setState({"episodes": null});
     }
     this.episodeLoader.getListingPromise(this.state.parentPath +"/" +this.state.subdirectory).then(function(listing) {
         self.setState({"episodes": listing.files});
@@ -115,6 +146,7 @@ class VideoPlayer extends React.Component {
   getSeasons() {
     var self = this;
     this.episodeLoader.getListingPromise(this.state.parentPath).then(function(listing) {
+        listing.folders.sort(tvShowSort);
         self.setState({"parentFolders": listing.folders});
     });
   }
@@ -130,28 +162,84 @@ class VideoPlayer extends React.Component {
         "source": source,
         "episodeInfo": this.state.episodes[this.state.index]
     });
-    this.refs.video.load();
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        var mediaInfo = new  cast.framework.messages.MediaInformation();
+        
+        //mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+        //mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
+        //mediaInfo.metadata.title = ;
+        
+        mediaInfo.contentId = source;
+        mediaInfo.contentType = "video/mp4";
+        let request = new cast.framework.messages.LoadRequestData();
+        request.media = mediaInfo;
+        request.autoplay = true;
+
+        player.load(request);
+    } else {
+        this.refs.video.load();
+    }
+
+    this.props.videoLoader.setUrl(this.type, parentPath + "/"+this.state.subdirectory, this.state.index);
 
     this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started");
   }
 
   pause() {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        player.pause();
+        return;
+    }
+
     this.refs.video.pause();
   }
 
   play() {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        player.play();
+        return;
+    }
+
     this.refs.video.play();
   }
 
   skipForward() {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        player.seek(player.getCurrentTimeSec()+15);
+        return;
+    }
+
     this.refs.video.currentTime += 15;
   }
 
   skipBack() {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        let seekTime = player.getCurrentTimeSec()-15;
+        player.seek(seekTime >= 0 ? seekTime : 0);
+        return;
+    }
+
     this.refs.video.currentTime -= 15;
   }
 
   seek(percent) {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        player.seek((player.getDurationSec() * percent) / 100);
+        return;
+    }
+
       this.refs.video.currentTime = (this.refs.video.duration * percent) / 100;
   }
 
@@ -177,8 +265,10 @@ class VideoPlayer extends React.Component {
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {
             if(this.state.parentFolders[i]== this.state.subdirectory) {
-                this.setState({"subdirectory": this.state.parentFolders[i +1], "index": 1});
-                this.getEpisodes();
+                this.setState({"subdirectory": this.state.parentFolders[i +1], "index": 0}, () => {
+                    this.getEpisodes();
+                });
+                break;
             }
         }
     }
@@ -198,8 +288,11 @@ class VideoPlayer extends React.Component {
     } else {
         for(var i=0; i + 1< this.state.parentFolders.length; i++) {
             if(this.state.parentFolders[i + 1]== this.state.subdirectory) {
-                this.setState({"subdirectory": this.state.parentFolders[i], "index": null});
-                this.getEpisodes();
+                this.setState({"subdirectory": this.state.parentFolders[i], "index": null}, () => {
+                    this.getEpisodes();
+                });
+                
+                break;
             }
         }
     }
