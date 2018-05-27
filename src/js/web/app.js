@@ -92,4 +92,6 @@ render((
   </Router>
 ), div)
 
+window.onerror = function(err) { alert(err); }
+
 webSocketRemoteController.connect();

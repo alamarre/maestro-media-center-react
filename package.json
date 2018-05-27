@@ -10,7 +10,6 @@
     "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch",
     "build": "export NODE_ENV=production; ./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "devbuild": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors"
-    
   },
   "author": "Al Lamarre",
   "license": "AGPL-3.0",

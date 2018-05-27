@@ -91,6 +91,7 @@ module.exports = {
   plugins: debug ? alwaysPlugins.concat([
     new webpack.DefinePlugin({
         'process.env': {
+          'PORT': 3000
         },
       })
   ]): alwaysPlugins.concat([

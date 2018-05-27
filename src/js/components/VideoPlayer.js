@@ -8,7 +8,8 @@ class VideoPlayer extends React.Component {
       let episodeLoader = this.props.episodeLoader;
       
       this.episodeLoader = episodeLoader;
-      this.type = this.props.location.query.type
+      this.type = this.props.location.query.type;
+      this.preventIdleTimer = null;
       this.state={"overlayVisibility": false};
       if(this.props.remoteController) {
           this.props.remoteController.mapUpdateFunctions({
@@ -54,11 +55,13 @@ class VideoPlayer extends React.Component {
         player.addEventListener(cast.framework.events.EventType.PLAY,
             event => {
                 this.hideEpisodeInfo();
+                this.onPlay();
             });
 
             player.addEventListener(cast.framework.events.EventType.PAUSE,
                 event => {
                     this.showEpisodeInfo();
+                    this.onPause();
                 });
 
             player.addEventListener(cast.framework.events.EventType.ENDED,
@@ -105,7 +108,7 @@ class VideoPlayer extends React.Component {
     }
     let videoSource = null;
     if(!this.props.isChromecast) {
-        videoSource = <video onEnded={this.goToNextEpisode.bind(this)} onPlay={this.hideEpisodeInfo.bind(this)} onPause={this.showEpisodeInfo.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
+        videoSource = <video onEnded={this.goToNextEpisode.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
         <source src={this.state.source} type="video/mp4" />
      </video>;
     }
@@ -187,6 +190,49 @@ class VideoPlayer extends React.Component {
     this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started");
   }
 
+  onPause() {
+    this.showEpisodeInfo();
+    if(this.preventingIdle) {
+        this.preventingIdle = false;
+        if(this.props.isChromecast) {
+            const context = cast.framework.CastReceiverContext.getInstance();
+            const player = context.getPlayerManager();
+            player.seek(this.currentTime);
+            return;
+        }
+    
+        this.refs.video.currentTime = this.currentTime;
+    }
+    else if(!this.preventIdleTimer) {
+        // this unfortunately doesn't stop the chromecast but keeping for posterity
+        return;
+        this.preventIdleTimer = setInterval(() => {
+            this.preventingIdle = true;
+            let time = 0;
+            if(this.props.isChromecast) {
+                const context = cast.framework.CastReceiverContext.getInstance();
+                const player = context.getPlayerManager();
+                time = player.getCurrentTimeSec() - 2;
+            } else {
+                time = this.refs.video.currentTime;
+            }
+            this.currentTime = time; 
+            this.play();
+        }, 10*60*1000);
+    }
+  }
+
+  onPlay() {
+    this.hideEpisodeInfo();
+    if(this.preventIdleTimer && !this.preventingIdle) {
+        clearInterval(this.preventIdleTimer);
+    }
+
+    if(this.preventingIdle) {
+        setTimeout(this.pause.bind(this), 1000);
+    }
+  }
+
   pause() {
     if(this.props.isChromecast) {
         const context = cast.framework.CastReceiverContext.getInstance();
@@ -220,16 +266,17 @@ class VideoPlayer extends React.Component {
     this.refs.video.currentTime += 15;
   }
 
-  skipBack() {
+  skipBack(time) {
+    time = time || 15;
     if(this.props.isChromecast) {
         const context = cast.framework.CastReceiverContext.getInstance();
         const player = context.getPlayerManager();
-        let seekTime = player.getCurrentTimeSec()-15;
+        let seekTime = player.getCurrentTimeSec()-time;
         player.seek(seekTime >= 0 ? seekTime : 0);
         return;
     }
 
-    this.refs.video.currentTime -= 15;
+    this.refs.video.currentTime -= time;
   }
 
   seek(percent) {
