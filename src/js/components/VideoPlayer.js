@@ -11,6 +11,7 @@ class VideoPlayer extends React.Component {
       this.type = this.props.location.query.type;
       this.preventIdleTimer = null;
       this.state={"overlayVisibility": false};
+      this.progressTimer = null;
       if(this.props.remoteController) {
           this.props.remoteController.mapUpdateFunctions({
               setSource: this.setSourcePath.bind(this),
@@ -185,9 +186,19 @@ class VideoPlayer extends React.Component {
         this.refs.video.load();
     }
 
-    this.props.videoLoader.setUrl(this.type, parentPath + "/"+this.state.subdirectory, this.state.index);
+    this.props.showProgressProvider.getShowInfo(parentPath + "/"+this.state.subdirectory+"/"+ episode).then(showInfo => {
+        if(showInfo && showInfo.show) {
+            this.props.showProgressProvider.getShowProgress(showInfo.show).then(progress => {
+                if(progress && progress.episode == showInfo.episode && progress.season == showInfo.season) {
+                    this.seekToTime(progress.progress);
+                } else {
+                    this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started", 0);
+                }
+            });
+        }
+    });
 
-    this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started");
+    this.props.videoLoader.setUrl(this.type, parentPath + "/"+this.state.subdirectory, this.state.index);
   }
 
   onPause() {
@@ -223,6 +234,13 @@ class VideoPlayer extends React.Component {
   }
 
   onPlay() {
+    if(!this.progressTimer) {
+        this.progressTimer = setInterval(() => {
+            let parentPath = this.state.parentPath.startsWith("/") ? this.state.parentPath : "/" +this.state.parentPath;
+            let episode = this.state.episodes[this.state.index];
+            this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "in progress", this.getCurrentTime());
+        }, 10*1000);
+    }
     this.hideEpisodeInfo();
     if(this.preventIdleTimer && !this.preventingIdle) {
         clearInterval(this.preventIdleTimer);
@@ -277,6 +295,27 @@ class VideoPlayer extends React.Component {
     }
 
     this.refs.video.currentTime -= time;
+  }
+
+  seekToTime(time) {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        player.seek(time);
+        return;
+    }
+
+    this.refs.video.currentTime = time;
+  }
+
+  getCurrentTime() {
+    if(this.props.isChromecast) {
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const player = context.getPlayerManager();
+        return player.getCurrentTimeSec();
+    }
+    
+    return this.refs.video.currentTime;
   }
 
   seek(percent) {
