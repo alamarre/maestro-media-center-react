@@ -59,16 +59,35 @@ class VideoPlayer extends React.Component {
                 this.onPlay();
             });
 
-            player.addEventListener(cast.framework.events.EventType.PAUSE,
+        player.addEventListener(cast.framework.events.EventType.PAUSE,
+            event => {
+                this.showEpisodeInfo();
+                this.onPause();
+            });
+
+            player.addEventListener(cast.framework.events.EventType.PLAYER_LOAD_COMPLETE,
                 event => {
-                    this.showEpisodeInfo();
-                    this.onPause();
+                    const textTracksManager = player.getTextTracksManager();
+
+                    // Create track 1 for English text
+                    const track = textTracksManager.createTrack();
+                    track.trackContentType = 'text/vtt';
+                    track.trackContentId = `${this.state.source.replace('.mp4', '.vtt')}`;
+                    track.language = 'en';
+
+                    // Add tracks
+                    textTracksManager.addTracks([track]);
+
+                    // Set the first matching language text track to be active
+                    textTracksManager.setActiveByLanguage('en');
                 });
 
-            player.addEventListener(cast.framework.events.EventType.ENDED,
-                event => {
-                    this.goToNextEpisode();
-                });
+        player.addEventListener(cast.framework.events.EventType.ENDED,
+            event => {
+                this.goToNextEpisode();
+            });
+
+
         //player.setMediaElement(this.refs.video);
       }
   }
@@ -108,9 +127,11 @@ class VideoPlayer extends React.Component {
         currentEpisodeStyle["opacity"] = 1;
     }
     let videoSource = null;
+    const subtitles = this.state.source && this.state.source.replace('.mp4', '.vtt');
     if(!this.props.isChromecast) {
-        videoSource = <video onEnded={this.goToNextEpisode.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
+        videoSource = <video crossOrigin="anonymous" onEnded={this.goToNextEpisode.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
         <source src={this.state.source} type="video/mp4" />
+        <track src={subtitles} kind="subtitles" srclang="en" label="English" default />
      </video>;
     }
     return (
