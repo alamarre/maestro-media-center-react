@@ -6,10 +6,10 @@ import { Router, Route, Link, hashHistory } from 'react-router'
 
 require("../style.scss");
 
-var host = (window.maestroSettings && window.maestroSettings.HOST) || window.location.hostname;
+var host = (window.maestroSettings && window.maestroSettings.HOST)  || process.env.HOST || window.location.hostname;
 
 // this could also have been done with substring, but was simple
-var scheme = (window.maestroSettings && window.maestroSettings.PROTOCOL) || (window.location.protocol == "http:" ? "http": "https");
+var scheme = (window.maestroSettings && window.maestroSettings.PROTOCOL) || process.env.SCHEME  || (window.location.protocol == "http:" ? "http": "https");
 var port = (window.maestroSettings && window.maestroSettings.PORT) 
   || process.env.PORT 
   || window.location.port 
@@ -90,8 +90,6 @@ render((
       <Route path="remote" component={(props) => (<RemoteControllerComponent {...props} remote={webSocketSender} />)} />
     </Route>
   </Router>
-), div)
-
-window.onerror = function(err) { alert(err); }
+), div);
 
 webSocketRemoteController.connect();

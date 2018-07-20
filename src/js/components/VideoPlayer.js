@@ -131,7 +131,7 @@ class VideoPlayer extends React.Component {
     if(!this.props.isChromecast) {
         videoSource = <video crossOrigin="anonymous" onEnded={this.goToNextEpisode.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
         <source src={this.state.source} type="video/mp4" />
-        <track src={subtitles} kind="subtitles" srclang="en" label="English" default />
+        <track src={subtitles} kind="subtitles" srcLang="en" label="English" default />
      </video>;
     }
     return (

@@ -1,0 +1,20 @@
+language: generic
+
+stages:
+  - name: deploy
+    if: branch = master AND type = push
+
+jobs:
+  include:
+    - stage: deploy
+      language: generic
+      env:
+        - AWS_ACCESS_KEY_ID=AKIAJBI4IIHBDET57CQA
+        - secure: "f77GoHXhVx4nceFe50AgihDgCiYRVYI5P1TAxPhuAbrhx9fexM4nCUIwHeAklKrBez7mgpgFgnw953IhcFjBLDknj+qIbISrfIb/TNWd2gDXYgYcXR6mgxl6AbSmqHLQ4+4prB4I2JPHRc+rtf2TMyWGOXuovzItw8UymqjZSN8LdozL99zRDyjr1mjVrt8r4HKcrWSyVAOgJ2iiNhvJ3aOMAIZdM1eYYJnBiMjg2p1A0QMBCBaZquT3o/c6YgCG0DIrD45tjZZQhzDE9A2ejKYfovklCO18UOSOnPMS4kmMBWlAT1g4Qf9a9Fg1eAZ95u6QLPc+TWASPgrdcB+mR7ZlxD0TzUPIOohwyy45ucvlSfV7iBcpflOrrplGLEoMRBrmQz8DPyML0OG6ud/8m16Oq4NclUbzXvL9xRcgKQvRPsLVFRnmJ3AZGTGVcks/imbVKxm8FOo7PxCLNTLnvJfY3zBMTk8er8pMd5/qA0tXFS/kxAj4Gv54oKpyKxdb6UNGZa/dwjcldWMm0K6AXVi73USum3h1IJMcUXT9r6FEPsI/Ze42opN8a0/n1GWg/kZ8R11UeQqD+sAGbx3Q/mUbLzN4J48cgndrw+P0FayqwAA0ZoaynDL3w9OrvIjhDXWCPf5fWOxt2ZUz+PEFB7acNl7oMZExPadLQMtW+gs="
+      before_install:
+        - pip install --user awscli
+        - export PATH=$PATH:$HOME/.local/bin
+        - npm install
+      script: 
+        - npm run deploy
+        - npm run deploy-chromecast

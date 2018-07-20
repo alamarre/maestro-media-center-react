@@ -91,10 +91,18 @@ module.exports = {
   plugins: debug ? alwaysPlugins.concat([
     new webpack.DefinePlugin({
         'process.env': {
-          'PORT': 3000
+          'PORT': process.env.PORT || 3000,
+          'HOST': JSON.stringify(process.env.HOST),
+          'SCHEME': JSON.stringify(process.env.SCHEME)
         },
       })
   ]): alwaysPlugins.concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        'HOST': JSON.stringify(process.env.HOST),
+        'SCHEME': JSON.stringify(process.env.SCHEME)
+      },
+    }),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: true }),
   ]),
