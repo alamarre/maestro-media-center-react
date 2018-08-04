@@ -3,7 +3,7 @@ import React from 'react'
 import ShowPicker from "./ShowPicker"
 
 function lastWatchedSort(a, b) {
-    return (a.lastUpdated || 0) - (b.lastUpdated || 0);
+    return (b.lastUpdated || 0) - (a.lastUpdated || 0);
 }
 
 class KeepWatching extends React.Component {
