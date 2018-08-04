@@ -10,7 +10,7 @@
     "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch",
     "build": "export NODE_ENV=production; ./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "devbuild": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
-    "deploy": "export HOST=gladiator.omny.ca; export SCHEME=https; ./node_modules/.bin/webpack --config webpack.config.js && aws s3 sync build/ s3://videos.omny.ca/",
+    "deploy": "export HOST=gladiator.omny.ca; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.config.js && aws s3 sync build/ s3://videos.omny.ca/",
     "deploy-chromecast": "./node_modules/.bin/webpack --config webpack.chromecast.config.js && ./node_modules/.bin/webpack --config webpack.config.js && aws s3 sync castbuild/ s3://chromecast.maestromediacenter.com/"
   },
   "author": "Al Lamarre",
