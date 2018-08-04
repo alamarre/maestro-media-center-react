@@ -39,6 +39,19 @@ class CacheProvider {
         })
     }
 
+    async getShowPath(showName) {
+        const cache = await this.getCache();
+        const rootFolders = await this.getRootFolders();
+        for(let folder of rootFolders) {
+            if(folder.type && folder.type.toLowerCase() === "tv") {
+                let rootFolder = cache.folders[folder.name];
+                if(rootFolder.folders[showName]) {
+                    return folder.name + "/" + showName;
+                }
+            }
+        }
+    }
+
     getCacheFromPath(path) {
         return new Promise((s,f) => {
             this.getCache().then(cache => {

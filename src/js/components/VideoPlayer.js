@@ -27,8 +27,10 @@ class VideoPlayer extends React.Component {
       }  
   }
 
-  componentWillMount() {
-    
+  componentWillUnmount() {
+      if(this.preventIdleTimer ) {
+          clearInterval(this.preventIdleTimer);
+      }
   }
 
   componentDidMount() {
@@ -259,7 +261,10 @@ class VideoPlayer extends React.Component {
         this.progressTimer = setInterval(() => {
             let parentPath = this.state.parentPath.startsWith("/") ? this.state.parentPath : "/" +this.state.parentPath;
             let episode = this.state.episodes[this.state.index];
-            this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "in progress", this.getCurrentTime());
+            const time = this.getCurrentTime();
+            if(time) {
+                this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "in progress", time);
+            }
         }, 10*1000);
     }
     this.hideEpisodeInfo();
@@ -335,8 +340,8 @@ class VideoPlayer extends React.Component {
         const player = context.getPlayerManager();
         return player.getCurrentTimeSec();
     }
-    
-    return this.refs.video.currentTime;
+
+    return this.refs.video && this.refs.video.currentTime;
   }
 
   seek(percent) {

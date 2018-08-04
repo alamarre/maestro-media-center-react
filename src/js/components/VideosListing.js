@@ -46,13 +46,23 @@ class VideosListing extends React.Component {
 		var files = this.state.files.map((file) => {
 			let fileName = (file.name) ? file.name : file;
 			let folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
-			//var url = "view?index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(fileName);
 			
+			
+				
 			if(file.type && file.type == "tv") {
-				return <div key={fileName} onClick={evt => this.selectSource(file)} >{fileName}</div>
+				const imageSource = `${this.props.imageRoot}?showName=${file.name}`;
+				return <div style={{margin: "20px"}} key={fileName} onClick={evt => this.selectSource(file)} >
+					<img style={{border: "white 1px solid", marginRight: "10px"}} src={imageSource} width="50px" height="75px" />
+					{fileName}
+				</div>
 			}
+
+			const imageSource = `${this.props.imageRoot}?path=${file.path}`;
             
-			return <div key={fileName} onClick={this.loadVideo.bind(this, file.type, folder, file.index)} >{fileName}</div>
+			return <div style={{margin: "20px"}} key={fileName} onClick={this.loadVideo.bind(this, file.type, folder, file.index)} >
+				<img style ={{border: "white 1px solid", marginRight: "10px"}} src={imageSource} width="50px" height="75px" /> 
+				{fileName}
+			</div>
 		});
 
 		let showPicker = null;

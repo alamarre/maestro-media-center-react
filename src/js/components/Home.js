@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 let EasyInputComponent = require("./EasyInputComponent");
 
 import SearchResults from "./SearchResults";
+import KeepWatching from "./KeepWatching";
 let SettingsComponent = require("./Settings");
 
 class Home extends EasyInputComponent {
@@ -81,7 +82,10 @@ class Home extends EasyInputComponent {
             : null;
         var body = this.props.children || <div>
             <div>
-                <SearchResults router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider}  /> 
+                <SearchResults imageRoot={this.props.imageRoot} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider}  /> 
+            </div>
+            <div>
+                <KeepWatching imageRoot={this.props.imageRoot} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider}  /> 
             </div>
             <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
             <div>{remoteLink}</div>

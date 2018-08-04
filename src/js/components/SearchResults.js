@@ -37,7 +37,13 @@ class SearchResults extends React.Component {
 
     render() {
         let searchResults = this.state.searchResults.map(item => {
-            return <li className="list-group-item" key={item.path} onClick={evt => this.selectSource(item)}>{item.name}</li>
+            const imageSource = this.props.cacheProvider.isTvShow(item.path) ?
+                `${this.props.imageRoot}?showName=${item.name}` :
+                `${this.props.imageRoot}?path=${item.path}`;
+            return <li className="list-group-item" key={item.path} onClick={evt => this.selectSource(item)}>
+            <img style ={{border: "white 1px solid", marginRight: "10px"}} src={imageSource} width="50px" height="75px" />
+            {item.name}
+            </li>
         });
 
         searchResults = <ul style={{position: "absolute"}} className="list-group">{searchResults}</ul>;

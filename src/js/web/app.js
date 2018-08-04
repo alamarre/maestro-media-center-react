@@ -79,11 +79,13 @@ window.tvShowSort = function(a, b) {
   return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
 }
 
+const imageRoot = `${scheme}://${host}:${port}/metadata/image`;
+
 //episodeLoader = searchBasedShowProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
-      <Route path="videos" component={(props) => (<VideosListing {...props} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
+    <Route path="/" component={(props) => (<Home {...props} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+      <Route path="videos" component={(props) => (<VideosListing {...props} imageRoot={imageRoot} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
       <Route path="view"component={(props) => (<VideoPlayer {...props} videoLoader={videoLoader} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider}  />)} />
       <Route path="profile" component={(props) => (<ChooseProfile {...props} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider}  />)} />
