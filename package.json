@@ -4,7 +4,7 @@
   "description": "React UI for Maestro Media Center",
   "main": "index.js",
   "scripts": {
-    "devrun": "export NODE_ENV=debug; ./node_modules/.bin/webpack-dev-server --config webpack.config.js --progress --colors",
+    "devrun": "export NODE_ENV=debug; ./node_modules/.bin/webpack-dev-server --config webpack.config.js --progress --colors --host 0.0.0.0 ",
     "castrun": "./node_modules/.bin/webpack-dev-server --config webpack.chromecast.config.js --progress --colors --host 0.0.0.0 --port 8088",
     "devcastbuild": "./node_modules/.bin/webpack --config webpack.chromecast.config.js --progress --colors",
     "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch",

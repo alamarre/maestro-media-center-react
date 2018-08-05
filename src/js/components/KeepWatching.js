@@ -36,9 +36,9 @@ class KeepWatching extends React.Component {
     render() {
 		let videos = this.state.videos.slice(0, 5).map((video) => {
             const imageSource = `${this.props.imageRoot}?showName=${video.show}`
-            return <div style={{"display": "inline-block", width: "200px", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px"}}
+            return <div style={{"display": "inline-block", width: "150px", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px"}}
             key={video.show} onClick={this.play.bind(this, video)}>
-            <img style={{display: "block"}} src={imageSource} width="200px" height="300px" />
+            <img style={{display: "block"}} src={imageSource} width="150px" height="225px" />
             {video.show}
             </div>
         });
