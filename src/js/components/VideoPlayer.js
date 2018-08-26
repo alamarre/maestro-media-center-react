@@ -1,413 +1,172 @@
 import React from 'react'
 
-import { Link } from 'react-router'
+const ChromecastPlayer = require('./VideoPlayers/Chromecast');
+const Html5VideoPlayer = require('./VideoPlayers/Html5Video');
 
 class VideoPlayer extends React.Component {
   constructor(props) {
-      super(props);
-      let episodeLoader = this.props.episodeLoader;
-      
-      this.episodeLoader = episodeLoader;
-      this.type = this.props.location.query.type;
-      this.preventIdleTimer = null;
-      this.state={"overlayVisibility": false};
-      this.progressTimer = null;
-      if(this.props.remoteController) {
-          this.props.remoteController.mapUpdateFunctions({
-              setSource: this.setSourcePath.bind(this),
-              next: this.goToNextEpisode.bind(this),
-              previous: this.goToPreviousEpisode.bind(this),
-              play: this.play.bind(this),
-              pause: this.pause.bind(this),
-              skipForward: this.skipForward.bind(this),
-              skipBack: this.skipBack.bind(this),
-              toggleVisibility: this.toggleVisibility.bind(this),
-              seek: this.seek.bind(this)
-          })
-      }  
+    super(props);
+    let episodeLoader = this.props.episodeLoader;
+
+    this.episodeLoader = episodeLoader;
+    this.type = this.props.location.query.type;
+    this.preventIdleTimer = null;
+    this.state = { "overlayVisibility": false, seekTime: -1 };
+    this.progressTimer = null;
+    if (this.props.remoteController) {
+      this.props.remoteController.mapUpdateFunctions({
+        setSource: this.setSourcePath.bind(this),
+        next: () => { this.goToNext(); },
+        previous: () => { this.goToPrevious(); },
+        toggleVisibility: this.toggleVisibility.bind(this)
+      })
+    }
+
+    const TvShowSeriesPlayer = require("../utilities/providers/playertypes/TvShow");
+    const MoviePlayer = require("../utilities/providers/playertypes/Movie");
+    const MovieCollection = require("../utilities/providers/playertypes/MovieCollection");
+
+    this.playerTypeHandlers = {
+      tv: new TvShowSeriesPlayer(this.props.episodeLoader, this.props.showProgressProvider),
+      movie: new MoviePlayer(this.props.episodeLoader, this.props.showProgressProvider),
+      collection: new MovieCollection("Movie Collections", this.props.collectionsManager, this.props.episodeLoader, this.props.showProgressProvider)
+    };
   }
 
   componentWillUnmount() {
-      if(this.preventIdleTimer ) {
-          clearInterval(this.preventIdleTimer);
-      }
+    if (this.preventIdleTimer) {
+      clearInterval(this.preventIdleTimer);
+    }
   }
 
   componentDidMount() {
     this.props.videoLoader.setRouter(this.props.router);
-    if(this.props.location.query.folder) {
-        var path = this.props.location.query.folder;
-        var parentPath = path.substring(0, path.lastIndexOf('/'));
-        var subdirectory = path.substring(path.lastIndexOf('/')+1);
-        
-        this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
+    if (this.props.location.query.folder) {
+      var path = this.props.location.query.folder;
+      var parentPath = path.substring(0, path.lastIndexOf('/'));
+      var subdirectory = path.substring(path.lastIndexOf('/') + 1);
+
+      this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
     }
 
     document.addEventListener("maestro-load-video", (event) => {
-        event = event.detail;
-        var path = event.folder;
-        var parentPath = path.substring(0, path.lastIndexOf('/'));
-        var subdirectory = path.substring(path.lastIndexOf('/')+1);
-        this.type = event.type;
-        this.setSourcePath(parentPath, subdirectory, event.index);
+      event = event.detail;
+      var path = event.folder;
+      var parentPath = path.substring(0, path.lastIndexOf('/'));
+      var subdirectory = path.substring(path.lastIndexOf('/') + 1);
+      this.type = event.type;
+      this.setSourcePath(parentPath, subdirectory, event.index);
     });
-
-      if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        player.addEventListener(cast.framework.events.EventType.PLAY,
-            event => {
-                this.hideEpisodeInfo();
-                this.onPlay();
-            });
-
-        player.addEventListener(cast.framework.events.EventType.PAUSE,
-            event => {
-                this.showEpisodeInfo();
-                this.onPause();
-            });
-
-            player.addEventListener(cast.framework.events.EventType.PLAYER_LOAD_COMPLETE,
-                event => {
-                    const textTracksManager = player.getTextTracksManager();
-
-                    // Create track 1 for English text
-                    const track = textTracksManager.createTrack();
-                    track.trackContentType = 'text/vtt';
-                    track.trackContentId = `${this.state.source.replace('.mp4', '.vtt')}`;
-                    track.language = 'en';
-
-                    // Add tracks
-                    textTracksManager.addTracks([track]);
-
-                    // Set the first matching language text track to be active
-                    textTracksManager.setActiveByLanguage('en');
-                });
-
-        player.addEventListener(cast.framework.events.EventType.ENDED,
-            event => {
-                this.goToNextEpisode();
-            });
-
-
-        //player.setMediaElement(this.refs.video);
-      }
   }
 
   render() {
-      var currentEpisodeStyle = {
-          position: "absolute",
-        left: 100,
-        right: 100,
-        bottom: 20,
-        fontSize: 36,
-        color: "white",
-        backgroundColor: "black",
-        zIndex: 100,
-        transition: "opacity 0.5s",
-        opacity: 0
+    var currentEpisodeStyle = {
+      position: "absolute",
+      left: 100,
+      right: 100,
+      bottom: 20,
+      fontSize: 36,
+      color: "white",
+      backgroundColor: "black",
+      zIndex: 100,
+      transition: "opacity 0.5s",
+      opacity: 0
     }
 
     let overlayStyle = {
-        position: "absolute",
-        left: 0,
-        center: 0,
-        right: 0,
-        top: 0,
-        backgroundColor: "black",
-        width: "100%",
-        height: "100%",
-        zIndex: 10000,
+      position: "absolute",
+      left: 0,
+      center: 0,
+      right: 0,
+      top: 0,
+      backgroundColor: "black",
+      width: "100%",
+      height: "100%",
+      zIndex: 10000,
     }
 
     let overlay = null;
-    if(this.state.overlayVisibility) {
-        overlay = <div style={overlayStyle}></div>;
+    if (this.state.overlayVisibility) {
+      overlay = <div style={overlayStyle}></div>;
     }
 
-    if(this.state.showEpisodeInfo) {
-        currentEpisodeStyle["opacity"] = 1;
+    if (this.state.showEpisodeInfo) {
+      currentEpisodeStyle["opacity"] = 1;
     }
     let videoSource = null;
-    const subtitles = this.state.source && this.state.source.replace('.mp4', '.vtt');
-    if(!this.props.isChromecast) {
-        videoSource = <video crossOrigin="anonymous" onEnded={this.goToNextEpisode.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)} style={{margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.state.source != null ? 'block' : 'none'}} ref='video' data-source={this.state.source} controls={!this.isChromecast} autoPlay={true}>
-        <source src={this.state.source} type="video/mp4" />
-        <track src={subtitles} kind="subtitles" srcLang="en" label="English" default />
-     </video>;
+    if (this.state.seekTime > -1) {
+      if (this.props.isChromecast) {
+        videoSource = <ChromecastPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} source={this.state.source}
+          onEnded={this.goToNext.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
+        />
+
+      } else {
+        videoSource = <Html5VideoPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} source={this.state.source} onEnded={this.goToNext.bind(this)}
+          onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
+        />
+      }
     }
     return (
-        <div>
-         {videoSource}
-         <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.episodeInfo}</div>
-         {overlay}
-        </div>
+      <div>
+        {videoSource}
+        <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.name}</div>
+        {overlay}
+      </div>
     )
   }
 
   toggleVisibility() {
-      this.setState({"overlayVisibility": !this.state.overlayVisibility});
+    this.setState({ "overlayVisibility": !this.state.overlayVisibility });
   }
 
-  setSourcePath(parentPath, subdirectory, index) {
-    this.setState({"parentPath": parentPath, "subdirectory": subdirectory, "index": index}, () => {
-        this.getEpisodes();
-        this.getSeasons();
-    });
-  }
-
-  getEpisodes() {
-    var self = this;
-    if(this.state.episodes) {
-        this.setState({"episodes": null});
-    }
-    this.episodeLoader.getListingPromise(this.state.parentPath +"/" +this.state.subdirectory).then(function(listing) {
-        self.setState({"episodes": listing.files});
-        if(self.state.index == null) {
-            self.state.index = listing.files.length -1;
-        }
-        self.updateSource();
-    });
-  }
-
-  getSeasons() {
-    var self = this;
-    this.episodeLoader.getListingPromise(this.state.parentPath).then(function(listing) {
-        listing.folders.sort(tvShowSort);
-        self.setState({"parentFolders": listing.folders});
-    });
-  }
-
-  updateSource() {
-    let parentPath = this.state.parentPath.startsWith("/") ? this.state.parentPath : "/" +this.state.parentPath;
-    let episode = this.state.episodes[this.state.index];
-    let source = this.episodeLoader.getRootPath() + parentPath + "/"+this.state.subdirectory+"/"+ episode;
-    if(episode.path) {
-        source = this.episodeLoader.getRootPath() + episode.path;
-    }
-    this.setState({
-        "source": source,
-        "episodeInfo": this.state.episodes[this.state.index]
-    });
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        var mediaInfo = new  cast.framework.messages.MediaInformation();
-        
-        //mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
-        //mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
-        //mediaInfo.metadata.title = ;
-        
-        mediaInfo.contentId = source;
-        mediaInfo.contentType = "video/mp4";
-        let request = new cast.framework.messages.LoadRequestData();
-        request.media = mediaInfo;
-        request.autoplay = true;
-
-        player.load(request);
-    } else {
-        this.refs.video.load();
+  async setSourcePath(parentPath, subdirectory, index) {
+    if (typeof index !== "number") {
+      index = parseInt(index);
     }
 
-    this.props.showProgressProvider.getShowInfo(parentPath + "/"+this.state.subdirectory+"/"+ episode).then(showInfo => {
-        if(showInfo && showInfo.show) {
-            this.props.showProgressProvider.getShowProgress(showInfo.show).then(progress => {
-                if(progress && progress.episode == showInfo.episode && progress.season == showInfo.season) {
-                    this.seekToTime(progress.progress);
-                } else {
-                    this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "started", 0);
-                }
-            });
-        }
-    });
-
-    this.props.videoLoader.setUrl(this.type, parentPath + "/"+this.state.subdirectory, this.state.index);
+    if (parentPath === "/" || parentPath === "") {
+      parentPath = subdirectory;
+      subdirectory = "";
+    }
+    const { source, name, seekTime, path } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
+    this.setState({ source, name, seekTime });
+    this.props.videoLoader.setUrl(this.type, path, index);
   }
 
   onPause() {
     this.showEpisodeInfo();
-    if(this.preventingIdle) {
-        this.preventingIdle = false;
-        if(this.props.isChromecast) {
-            const context = cast.framework.CastReceiverContext.getInstance();
-            const player = context.getPlayerManager();
-            player.seek(this.currentTime);
-            return;
-        }
-    
-        this.refs.video.currentTime = this.currentTime;
-    }
-    else if(!this.preventIdleTimer) {
-        // this unfortunately doesn't stop the chromecast but keeping for posterity
-        return;
-        this.preventIdleTimer = setInterval(() => {
-            this.preventingIdle = true;
-            let time = 0;
-            if(this.props.isChromecast) {
-                const context = cast.framework.CastReceiverContext.getInstance();
-                const player = context.getPlayerManager();
-                time = player.getCurrentTimeSec() - 2;
-            } else {
-                time = this.refs.video.currentTime;
-            }
-            this.currentTime = time; 
-            this.play();
-        }, 10*60*1000);
-    }
   }
 
-  onPlay() {
-    if(!this.progressTimer) {
-        this.progressTimer = setInterval(() => {
-            let parentPath = this.state.parentPath.startsWith("/") ? this.state.parentPath : "/" +this.state.parentPath;
-            let episode = this.state.episodes[this.state.index];
-            const time = this.getCurrentTime();
-            if(time) {
-                this.props.showProgressProvider.markStatus(parentPath + "/"+this.state.subdirectory+"/"+ episode, "in progress", time);
-            }
-        }, 10*1000);
+  onPlay(player) {
+    if (!this.progressTimer) {
+      this.progressTimer = setInterval(() => {
+        const time = player.getCurrentTime();
+        if (time) {
+          this.playerTypeHandlers[this.type].recordProgress(time);
+        }
+      }, 10 * 1000);
     }
     this.hideEpisodeInfo();
-    if(this.preventIdleTimer && !this.preventingIdle) {
-        clearInterval(this.preventIdleTimer);
-    }
-
-    if(this.preventingIdle) {
-        setTimeout(this.pause.bind(this), 1000);
-    }
-  }
-
-  pause() {
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        player.pause();
-        return;
-    }
-
-    this.refs.video.pause();
-  }
-
-  play() {
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        player.play();
-        return;
-    }
-
-    this.refs.video.play();
-  }
-
-  skipForward() {
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        player.seek(player.getCurrentTimeSec()+15);
-        return;
-    }
-
-    this.refs.video.currentTime += 15;
-  }
-
-  skipBack(time) {
-    time = time || 15;
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        let seekTime = player.getCurrentTimeSec()-time;
-        player.seek(seekTime >= 0 ? seekTime : 0);
-        return;
-    }
-
-    this.refs.video.currentTime -= time;
-  }
-
-  seekToTime(time) {
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        player.seek(time);
-        return;
-    }
-
-    this.refs.video.currentTime = time;
-  }
-
-  getCurrentTime() {
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        return player.getCurrentTimeSec();
-    }
-
-    return this.refs.video && this.refs.video.currentTime;
-  }
-
-  seek(percent) {
-    if(this.props.isChromecast) {
-        const context = cast.framework.CastReceiverContext.getInstance();
-        const player = context.getPlayerManager();
-        player.seek((player.getDurationSec() * percent) / 100);
-        return;
-    }
-
-      this.refs.video.currentTime = (this.refs.video.duration * percent) / 100;
   }
 
   showEpisodeInfo() {
-    this.setState({"showEpisodeInfo": true});
+    this.setState({ "showEpisodeInfo": true });
   }
 
   hideEpisodeInfo() {
-    this.setState({"showEpisodeInfo": false});
+    this.setState({ "showEpisodeInfo": false });
   }
 
-  goToNextEpisode() {
-    if(this.state.episodes == null) {
-        return;
-    }
-
-    var index = this.state.index;
-    var episodes = this.state.episodes;
-
-    index++;
-    if(index < this.state.episodes.length) {
-        this.setState({"index": index}, () => this.updateSource());
-    } else {
-        for(var i=0; i + 1< this.state.parentFolders.length; i++) {
-            if(this.state.parentFolders[i]== this.state.subdirectory) {
-                this.setState({"subdirectory": this.state.parentFolders[i +1], "index": 0}, () => {
-                    this.getEpisodes();
-                });
-                break;
-            }
-        }
-    }
+  async goToNext() {
+    const { source, name, seekTime, path, index } = await this.playerTypeHandlers[this.type].goToNext();
+    this.setState({ source, name, seekTime });
+    this.props.videoLoader.setUrl(this.type, path, index);
   }
 
-  goToPreviousEpisode() {
-    if(this.state.episodes == null) {
-        return;
-    }
-
-    var index = this.state.index;
-    var episodes = this.state.episodes;
-
-    index--;
-    if(index >= 0) {
-        this.setState({"index": index}, () => this.updateSource());
-    } else {
-        for(var i=0; i + 1< this.state.parentFolders.length; i++) {
-            if(this.state.parentFolders[i + 1]== this.state.subdirectory) {
-                this.setState({"subdirectory": this.state.parentFolders[i], "index": null}, () => {
-                    this.getEpisodes();
-                });
-                
-                break;
-            }
-        }
-    }
+  async goToPrevious() {
+    const { source, name, seekTime, path, index } = await this.playerTypeHandlers[this.type].goToPrevious();
+    this.setState({ source, name, seekTime });
+    this.props.videoLoader.setUrl(this.type, path, index);
   }
 }
 

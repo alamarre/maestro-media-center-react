@@ -1,9 +1,9 @@
 class WebSocketRemoteController {
   constructor(host, clientName, webSocketPort) {
-      const protocol = (webSocketPort == 443) ? "wss" : "ws";
-      this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
-      this.clientName = clientName;
-      this.updateFunctions = {};
+    const protocol = (webSocketPort == 443) ? "wss" : "ws";
+    this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
+    this.clientName = clientName;
+    this.updateFunctions = {};
   }
 
   updateSettings(host, clientName, webSocketPort) {
@@ -18,13 +18,17 @@ class WebSocketRemoteController {
     if(this.webSocket) {
       this.webSocket.send(JSON.stringify({
         "action" : "setId",
-        id : this.clientName
+        id : this.clientName,
       }));
     }
   }
 
   mapUpdateFunctions(functions) {
     this.updateFunctions = functions;
+  }
+
+  mapPartialUpdateFunctions(functions) {
+    this.updateFunctions = Object.assign(this.updateFunctions, functions);
   }
 
   getShortFolderName(folder) {
@@ -53,9 +57,9 @@ class WebSocketRemoteController {
     var ws = this.webSocket;
     ws.onopen = () => {
       if(self.clientName) {
-      ws.send(JSON.stringify({
+        ws.send(JSON.stringify({
           "action" : "setId",
-          id : self.clientName
+          id : self.clientName,
         }));
       }
     };
@@ -85,7 +89,7 @@ class WebSocketRemoteController {
           this.safeRun(self.updateFunctions.play);
           break;
         case "load":
-          let event = new CustomEvent("maestro-load-video", {detail:message});
+          const event = new CustomEvent("maestro-load-video", {detail:message,});
           
           document.dispatchEvent(event);
           break;

@@ -1,34 +1,34 @@
 class EpisodeLoader {
-    constructor(apiRequester) {
-        this.apiRequester = apiRequester;
-    }
+  constructor(apiRequester) {
+    this.apiRequester = apiRequester;
+  }
 
-    getListingPromise(folder) {
-        var self = this;
-        var promise = new Promise(function(good, bad) {
-            self.apiRequester.apiRequestPromise("folders", "", {
-                data: {
-                    path: folder
-                }
-            }).then(function(result) {
-                result.files = result.files.filter(function(file) {
-                    return file.indexOf(".mp4") == (file.length-".mp4".length);
-                });
-
-                result.files = result.files.sort(tvShowSort);
-
-                good(result);
-            }, function(error) {
-                bad(error);
-            });
+  getListingPromise(folder) {
+    var self = this;
+    var promise = new Promise(function(good, bad) {
+      self.apiRequester.apiRequestPromise("folders", "", {
+        data: {
+          path: folder,
+        },
+      }).then(function(result) {
+        result.files = result.files.filter(function(file) {
+          return file.indexOf(".mp4") == (file.length-".mp4".length);
         });
 
-        return promise;
-    }
+        result.files = result.files.sort(tvShowSort);
 
-    getRootPath() {
-        return this.apiRequester.getHost()+"/videos"
-    }
+        good(result);
+      }, function(error) {
+        bad(error);
+      });
+    });
+
+    return promise;
+  }
+
+  getRootPath() {
+    return this.apiRequester.getHost()+"/videos";
+  }
 
 }
 

@@ -6,13 +6,13 @@ import { Router, Route, Link, hashHistory } from 'react-router'
 
 require("../style.scss");
 
-var host = (window.maestroSettings && window.maestroSettings.HOST)  || process.env.HOST || window.location.hostname;
+var host = (window.maestroSettings && window.maestroSettings.HOST) || process.env.HOST || window.location.hostname;
 
 // this could also have been done with substring, but was simple
-var scheme = (window.maestroSettings && window.maestroSettings.PROTOCOL) || process.env.SCHEME  || (window.location.protocol == "http:" ? "http": "https");
-var port = (window.maestroSettings && window.maestroSettings.PORT) 
-  || process.env.PORT 
-  || window.location.port 
+var scheme = (window.maestroSettings && window.maestroSettings.PROTOCOL) || process.env.SCHEME || (window.location.protocol == "http:" ? "http" : "https");
+var port = (window.maestroSettings && window.maestroSettings.PORT)
+  || process.env.PORT
+  || window.location.port
   || (scheme == "http" ? 80 : 443);
 var wsPort = port;
 var jquery = require("jquery");
@@ -29,19 +29,22 @@ let CacheProvider = require("../utilities/providers/CacheProvider");
 let CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
 let SearchBasedShowProvider = require("../utilities/providers/SearchBasedShowProvider");
 let ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
-let ChromecastManager  = require("../utilities/ChromecastManager");
+let ChromecastManager = require("../utilities/ChromecastManager");
 let SettingsManager = require("../utilities/CookiesSettingsManager");
 let VideoLoader = require("../utilities/VideoLoader");
 let RemoteControllerComponent = require("../components/RemoteController");
+const CollectionsManager = require("../utilities/CollectionsManager");
+const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
 
 let settingsManager = new SettingsManager();
 let authTokenManager = new AuthTokenManger(new QueryStringReader());
-var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host+":"+port);
+var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 
 const WebSocketSender = require("../utilities/WebSocketSender");
 let webSocketSender = new WebSocketSender(host, wsPort);
 webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
 webSocketSender.connect();
+
 
 let chromecastManager = new ChromecastManager(apiRequester, authTokenManager, settingsManager, webSocketSender, scheme, host, port);
 var episodeLoader = new EpisodeLoader(apiRequester);
@@ -67,16 +70,19 @@ let cacheBasedSearch = new CachedBasedSearch(cacheProvider);
 
 let searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
 
+const movieInfoProvider = new MovieInfoProvider(cacheProvider);
+const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
+
 let videoLoader = new VideoLoader(webSocketSender);
 
-window.tvShowSort = function(a, b) {
-  if(a.lastIndexOf(".") > -1) {
+window.tvShowSort = function (a, b) {
+  if (a.lastIndexOf(".") > -1) {
     a = a.substring(0, a.lastIndexOf("."));
   }
-  if(b.lastIndexOf(".") > -1) {
+  if (b.lastIndexOf(".") > -1) {
     b = b.substring(0, b.lastIndexOf("."));
   }
-  return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
+  return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 }
 
 const imageRoot = `${scheme}://${host}:${port}/metadata/image`;
@@ -84,11 +90,11 @@ const imageRoot = `${scheme}://${host}:${port}/metadata/image`;
 //episodeLoader = searchBasedShowProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
-      <Route path="videos" component={(props) => (<VideosListing {...props} imageRoot={imageRoot} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider}  />)} />
-      <Route path="view"component={(props) => (<VideoPlayer {...props} videoLoader={videoLoader} chromecastManager={chromecastManager}  showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
-      <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider}  />)} />
-      <Route path="profile" component={(props) => (<ChooseProfile {...props} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider}  />)} />
+    <Route path="/" component={(props) => (<Home {...props} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+      <Route path="videos" component={(props) => (<VideosListing {...props} imageRoot={imageRoot} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider} />)} />
+      <Route path="view" component={(props) => (<VideoPlayer {...props} collectionsManager={collectionsManager} videoLoader={videoLoader} chromecastManager={chromecastManager} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+      <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider} />)} />
+      <Route path="profile" component={(props) => (<ChooseProfile {...props} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider} />)} />
       <Route path="remote" component={(props) => (<RemoteControllerComponent {...props} remote={webSocketSender} />)} />
     </Route>
   </Router>
