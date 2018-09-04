@@ -1,3 +1,5 @@
+import localforage from "localforage";
+
 class CacheProvider {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
@@ -7,17 +9,30 @@ class CacheProvider {
     this.getRootFolders().catch(() => { });
   }
 
-  getCache() {
+  async getCache() {
     if (!this.cachePromise) {
-      this.cachePromise = this.apiRequester.apiRequestPromise("folders", "cache", {});
+      this.cachePromise = this.fetchCache();
+
     }
 
     return this.cachePromise;
   }
 
+  async fetchCache() {
+    try {
+      const result = await this.apiRequester.apiRequestPromise("folders", "cache", {});
+      await localforage.setItem("cache", result);
+      return result;
+    } catch (e) {
+      return await localforage.getItem("cache");
+    }
+  }
+
   reload() {
-    this.cachePromise = this.apiRequester.apiRequestPromise("folders", "cache", {});
-    this.rootFoldersPromise = this.apiRequester.apiRequestPromise("folders", "root", {});
+    this.cachePromise = null;
+    this.getCache();
+    this.rootFoldersPromise = null;
+    this.getRootFolders();
   }
 
   isTvShow(path) {
@@ -80,13 +95,23 @@ class CacheProvider {
 
   getRootFolders() {
     if (!this.rootFoldersPromise) {
-      this.rootFoldersPromise = this.apiRequester.apiRequestPromise("folders", "root", {});
+      this.rootFoldersPromise = this.fetchRootFolders();
     }
     this.rootFoldersPromise.then(rootFolders => {
       this.rootFolders = rootFolders;
     });
 
     return this.rootFoldersPromise;
+  }
+
+  async fetchRootFolders() {
+    try {
+      const result = this.apiRequester.apiRequestPromise("folders", "root", {});
+      await localforage.setItem("rootFolders", result);
+      return result;
+    } catch (e) {
+      return await localforage.getItem("rootFolders");
+    }
   }
 }
 

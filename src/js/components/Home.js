@@ -11,7 +11,7 @@ class Home extends EasyInputComponent {
 
   constructor(props) {
     super(props);
-    this.state = { showSettings: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS) };
+    this.state = { showSettings: false, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS) };
   }
 
   componentWillMount() {
@@ -27,6 +27,12 @@ class Home extends EasyInputComponent {
       event = event.detail;
       //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
       this.props.router.push(`/view?type=${event.type}&index=${event.index}&folder=${event.folder}`);
+    });
+
+    document.addEventListener("maestro-offline-change", (event) => {
+      event = event.detail;
+      //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
+      this.setState({ hasOfflineVideos: event.offline });
     });
 
     document.addEventListener("mousemove", this.showSettingsTemporarily.bind(this));
@@ -75,6 +81,10 @@ class Home extends EasyInputComponent {
       {settingsView}
     </div>;
 
+    let offlineLink = null;
+    if (this.props.offlineStorage.hasOfflineVideos()) {
+      offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
+    }
 
 
     let remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") != "") ?
@@ -82,13 +92,23 @@ class Home extends EasyInputComponent {
       : null;
     var body = this.props.children || <div>
       <div>
-        <SearchResults collectionsManager={this.props.collectionsManager} imageRoot={this.props.imageRoot} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+        <SearchResults
+          episodeLoader={this.props.episodeLoader}
+          offlineStorage={this.props.offlineStorage}
+          collectionsManager={this.props.collectionsManager}
+          imageRoot={this.props.imageRoot}
+          router={this.props.router}
+          videoLoader={this.props.videoLoader}
+          searcher={this.props.searcher}
+          cacheProvider={this.props.cacheProvider}
+          showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
         <KeepWatching imageRoot={this.props.imageRoot} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
       <div>{remoteLink}</div>
+      {offlineLink}
     </div>;
     return (
       <div>{settingsSection}{body}</div>

@@ -1,3 +1,5 @@
+import localforage from "localforage";
+
 class ShowProgressProvider {
   constructor(apiRequester, cacheProvider) {
     this.apiRequester = apiRequester;
@@ -18,6 +20,8 @@ class ShowProgressProvider {
         }
       }
       return null;
+    }).catch(() => {
+      return {};
     });
   }
 

@@ -15,10 +15,10 @@ class WebSocketRemoteController {
 
   updateClientName(clientName) {
     this.clientName = clientName;
-    if(this.webSocket) {
+    if (this.webSocket) {
       this.webSocket.send(JSON.stringify({
-        "action" : "setId",
-        id : this.clientName,
+        "action": "setId",
+        id: this.clientName,
       }));
     }
   }
@@ -43,27 +43,27 @@ class WebSocketRemoteController {
   }
 
   safeRun(func) {
-    if(func) {
+    if (func) {
       func();
     }
   }
 
   connect() {
     var self = this;
-    if(!this.webSocketUrl) {
+    if (!this.webSocketUrl) {
       return;
     }
     this.webSocket = new WebSocket(this.webSocketUrl);
     var ws = this.webSocket;
     ws.onopen = () => {
-      if(self.clientName) {
+      if (self.clientName) {
         ws.send(JSON.stringify({
-          "action" : "setId",
-          id : self.clientName,
+          "action": "setId",
+          id: self.clientName,
         }));
       }
     };
-    
+
     ws.onclose = () => {
       self.connect();
     };
@@ -89,15 +89,15 @@ class WebSocketRemoteController {
           this.safeRun(self.updateFunctions.play);
           break;
         case "load":
-          const event = new CustomEvent("maestro-load-video", {detail:message,});
-          
+          const event = new CustomEvent("maestro-load-video", { detail: message, });
+
           document.dispatchEvent(event);
           break;
         case "pause":
           this.safeRun(self.updateFunctions.pause);
           break;
         case "seek":
-          if(self.updateFunctions.seek) {
+          if (self.updateFunctions.seek) {
             self.updateFunctions.seek(parseInt(message.percent));
           }
           break;
@@ -110,7 +110,7 @@ class WebSocketRemoteController {
     };
   }
 
-  
+
 }
 
 module.exports = WebSocketRemoteController;

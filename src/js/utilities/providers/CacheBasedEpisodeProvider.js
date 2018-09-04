@@ -11,16 +11,16 @@ class CacheBasedEpisodeProvider {
         .then((cache) => {
           let current = cache;
           const folders = folder.split("/");
-          for(let i=0; i< folders.length; i++) {
-            current = current.folders[folder];
+          for (let i = 0; i < folders.length; i++) {
+            current = current.folders[folders[i]];
           }
-                
+
           const result = {};
           result.folders = Object.keys(current.folders);
           result.files = Object.keys(current.files);
-                
+
           result.files = result.files.filter((file) => {
-            return file.indexOf(".mp4") == (file.length-".mp4".length);
+            return file.indexOf(".mp4") == (file.length - ".mp4".length);
           });
 
           good(result);
@@ -29,31 +29,31 @@ class CacheBasedEpisodeProvider {
 
     return promise;
   }
-    
+
   recordProgress(video, status) {
     this.cacheProvider.getRootFolders().then((rootFolders) => {
-      if(video.startsWith("/")) {
+      if (video.startsWith("/")) {
         video = video.substring(1);
       }
-           
+
       const parts = video.split("/");
       const rootFolder = rootFolders[parts[0]];
-      if(rootFolder 
-               && rootFolder.type 
-               && rootFolder.type.toLowerCase() === "tv"
-               && parts.length === 4) {
+      if (rootFolder
+        && rootFolder.type
+        && rootFolder.type.toLowerCase() === "tv"
+        && parts.length === 4) {
         const show = parts[1];
         const season = parts[2];
         const episode = parts[3];
-               
+
         this.showProgressProvider.markEpisodeStatus(show, season, episode, status);
       }
-           
+
     });
   }
 
   getRootPath() {
-    return this.apiRequester.getHost()+"/videos";
+    return this.apiRequester.getHost() + "/videos";
   }
 
 }

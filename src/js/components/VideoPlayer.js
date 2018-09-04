@@ -128,7 +128,13 @@ class VideoPlayer extends React.Component {
       parentPath = subdirectory;
       subdirectory = "";
     }
-    const { source, name, seekTime, path } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
+    let { source, name, seekTime, path } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
+    if (this.props.offlineStorage) {
+      const data = await this.props.offlineStorage.getVideo(source);
+      if (data) {
+        source = URL.createObjectURL(data);
+      }
+    }
     this.setState({ source, name, seekTime });
     this.props.videoLoader.setUrl(this.type, path, index);
   }

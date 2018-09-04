@@ -57,6 +57,8 @@ class SearchResults extends React.Component {
     if (this.state.showName) {
       showPicker = <ShowPicker
         router={this.props.router}
+        episodeLoader={this.props.episodeLoader}
+        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         showPath={this.state.showPath}
@@ -67,6 +69,8 @@ class SearchResults extends React.Component {
     } else if (this.state.collectionName) {
       showPicker = <CollectionPicker
         router={this.props.router}
+        episodeLoader={this.props.episodeLoader}
+        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         collectionsManager={this.props.collectionsManager}
         showProgressProvider={this.props.showProgressProvider}

@@ -17,24 +17,24 @@ class ApiRequester {
 
   ajaxRequest(request) {
     var url = request.url;
-    if(this.host != null) {
+    if (this.host != null) {
       url = this.scheme + "://" + this.host + url;
     }
     var requestInfo = {
       url: url,
       type: "GET",
-      success: function(data) {
+      success: function (data) {
         if (typeof data == "string") {
           try {
             data = JSON.parse(data);
           } catch (error) {
-
+            console.log(error);
           }
         }
-            
+
         request.success(data);
-            
-      }, error: function(data, t, e) {
+
+      }, error: function (data, t, e) {
         if (typeof request.error == "function") {
           request.error(data);
         } else {
@@ -54,7 +54,7 @@ class ApiRequester {
     }
     if (typeof request.contentType != "undefined") {
       requestInfo.contentType = request.contentType;
-    }            
+    }
 
     this.jQuery.ajax(requestInfo);
   }
@@ -64,8 +64,8 @@ class ApiRequester {
     var self = this;
     var promise = new Promise(function (fulfill, reject) {
       var url = "/api/v1.0/" + module;
-      if(path!="") {
-        url +="/"+path;
+      if (path != "") {
+        url += "/" + path;
       }
       if (url.indexOf("?") == -1) {
         url += "?access_token=" + authTokenManager.getToken();
@@ -73,15 +73,15 @@ class ApiRequester {
         url += "&access_token=" + authTokenManager.getToken();
       }
 
-      if(authTokenManager.isProfileSet()) {
+      if (authTokenManager.isProfileSet()) {
         url += "&profile=" + authTokenManager.getProfile();
       }
-        
+
       request.url = url;
-      request.success = function() {
+      request.success = function () {
         fulfill.apply(this, arguments);
       };
-      request.error=function() {
+      request.error = function () {
         reject.apply(this, arguments);
       };
       self.ajaxRequest(request);
