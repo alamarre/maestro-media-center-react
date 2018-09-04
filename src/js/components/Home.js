@@ -82,7 +82,7 @@ class Home extends EasyInputComponent {
     </div>;
 
     let offlineLink = null;
-    if (this.props.offlineStorage.hasOfflineVideos()) {
+    if (this.props.offlineStorage.canStoreOffline()) {
       offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
     }
 
