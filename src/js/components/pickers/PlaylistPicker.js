@@ -1,39 +1,40 @@
 import React from 'react'
 import { Modal } from 'react-bootstrap';
 
-class ShowPicker extends React.Component {
+class PlaylistPicker extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { "collection": null };
-    this.loadCollectionData();
+    this.state = { "playlist": null };
+    this.loadPlaylistData();
   }
 
-  async loadCollectionData() {
-    const collectionInfo = await this.props.collectionsManager.getCollection(this.props.collectionName);
-    const collection = collectionInfo.movies;
-    let keepWatchingData = await this.props.showProgressProvider.getShowProgress("collection");
-    if (!keepWatchingData || keepWatchingData.season !== this.props.collectionName) {
+  async loadPlaylistData() {
+    const playlistInfo = await this.props.playlistManager.getPlaylist(this.props.playlistName);
+    const playlist = playlistInfo.playlist;
+    let keepWatchingData = await this.props.showProgressProvider.getShowProgress("playlist");
+    if (!keepWatchingData || keepWatchingData.season !== this.props.playlistName) {
       keepWatchingData = null;
     }
-    this.setState({ collection, keepWatchingData });
+    this.setState({ playlist, keepWatchingData });
   }
 
   play(video) {
-    const index = this.state.collection.indexOf(video);
-    let folder = this.props.collectionName;
-    this.props.videoLoader.loadVideo("collection", folder, index);
+    const index = this.state.playlist.indexOf(video);
+    let folder = this.props.playlistName;
+    this.props.videoLoader.loadVideo("playlist", folder, index);
   }
 
   render() {
-    if (!this.state.collection) {
+    if (!this.state.playlist) {
       return <div></div>;
     }
 
-    const videos = this.state.collection.map(video => {
-      return <div key={video}>
+    const videos = this.state.playlist.map(video => {
+      const index = this.state.playlist.indexOf(video);
+      return <div key={index}>
         <button className="maestroButton roundedButton fa fa-play" onClick={evt => this.play(video)}></button>
-        <span>{video}</span>
+        <span>{video.file}</span>
       </div>;
 
     });
@@ -41,17 +42,17 @@ class ShowPicker extends React.Component {
     let keepWatchingView = null;
     if (this.state.keepWatchingData) {
       let index = this.state.keepWatchingData.episode;
-      let video = this.state.collection[index];
+      let video = this.state.playlist[index];
       keepWatchingView = <div>
         <button className="maestroButton roundedButton fa fa-play c" onClick={evt => this.play(video)}></button>
-        <span>Keep watching: {video}</span>
+        <span>Keep watching: {video.file}</span>
       </div>;
     }
 
     let body = <div>
       <Modal show={true} animation={false} onHide={evt => this.props.cancelFunction()}>
         <Modal.Header>
-          <Modal.Title>{this.props.collectionName}</Modal.Title>
+          <Modal.Title>{this.props.playlistName}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -72,4 +73,4 @@ class ShowPicker extends React.Component {
   }
 }
 
-module.exports = ShowPicker;
+module.exports = PlaylistPicker;

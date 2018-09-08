@@ -1,12 +1,12 @@
 const elasticlunr = require("elasticlunr");
 
 function addFilesInFolder(index, currentCache, path) {
-  if(currentCache && currentCache.files) {
+  if (currentCache && currentCache.files) {
     const fileNames = Object.keys(currentCache.files).sort(tvShowSort).filter((f) => {
       return f.endsWith(".mp4");
     });
     let episodeCount = 0;
-    for(const file of fileNames) {
+    for (const file of fileNames) {
       const filePath = path + "/" + file;
       const doc = {
         path: filePath,
@@ -14,23 +14,24 @@ function addFilesInFolder(index, currentCache, path) {
         index: episodeCount++,
         title: file.substring(0, file.lastIndexOf(".")),
       };
-            
+
       index.addDoc(doc);
     }
   }
-    
-  if(currentCache.folders) {
-    for(const folder in currentCache.folders) {
-      addFilesInFolder(index, currentCache.folders[folder], path + "/" +folder);
+
+  if (currentCache.folders) {
+    for (const folder in currentCache.folders) {
+      addFilesInFolder(index, currentCache.folders[folder], path + "/" + folder);
     }
   }
 }
 
 class CacheBasedSearch {
-  constructor(cacheProvider) {
+  constructor(cacheProvider, playlistProvider) {
     this.cacheProvider = cacheProvider;
     this.cacheIndex = null;
     this.indexPromise = null;
+    this.playlistProvider = playlistProvider;
 
     this.createIndex();
   }
@@ -45,38 +46,38 @@ class CacheBasedSearch {
           this.addField("type");
           this.addField("index");
           this.setRef("path");
-        }); 
-                
+        });
+
         this.cacheIndex = index;
 
         elasticlunr.clearStopWords();
-                
-        for(const folder of rootFolders) {
-          if(folder.type && folder.type.toLowerCase() === "tv") {
+
+        for (const folder of rootFolders) {
+          if (folder.type && folder.type.toLowerCase() === "tv") {
             const rootFolder = cache.folders[folder.name];
-            if(rootFolder) {
-              for(const showName in rootFolder.folders) {
+            if (rootFolder) {
+              for (const showName in rootFolder.folders) {
                 const doc = {
                   path: folder.name + "/" + showName,
                   title: showName,
                   type: "tv",
                   index: 0,
                 };
-                                
+
                 index.addDoc(doc);
               }
             }
-          } else if(folder.type && folder.type.toLowerCase() === "collection") {
+          } else if (folder.type && folder.type.toLowerCase() === "collection") {
             const rootFolder = cache.folders[folder.name];
 
-            for(const collection of rootFolder.files) {
+            for (const collection of rootFolder.files) {
               const filePath = folder.name + "/" + collection;
               const doc = {
                 path: filePath,
                 type: "collection",
                 title: collection,
               };
-                            
+
               index.addDoc(doc);
             }
           } else {
@@ -84,10 +85,22 @@ class CacheBasedSearch {
             addFilesInFolder(index, cache.folders[folder.name], folder.name);
           }
         }
-        s();
+        this.playlistProvider.getPlaylists().then(playlists => {
+          for (const playlist of playlists) {
+            const doc = {
+              type: "playlist",
+              title: playlist.name,
+              path: "playlists/" + playlist.name,
+            };
+
+            index.addDoc(doc);
+          }
+          s();
+        });
       }, f);
     });
   }
+
 
   getTvShows() {
     return this.getByType("tv");
@@ -100,37 +113,37 @@ class CacheBasedSearch {
   getByType(contentType) {
     return new Promise((success, fail) => {
       this.indexPromise.then(() => {
-        const result = this.cacheIndex.search(contentType,  {
+        const result = this.cacheIndex.search(contentType, {
           fields: {
-            type: {boost: 2,},
+            type: { boost: 2, },
           },
           expand: true,
         });
-                
+
         let results = result.map((item) => {
           const doc = this.cacheIndex.documentStore.getDoc(item.ref);
           return {
             type: doc.type,
             path: item.ref,
             index: doc.index,
-            name: item.ref.substring(item.ref.lastIndexOf("/")+1),
+            name: item.ref.substring(item.ref.lastIndexOf("/") + 1),
           };
         });
 
-        results = results.sort((a,b) => {
+        results = results.sort((a, b) => {
           return tvShowSort(a.name, b.name);
         });
         success(results);
       }, fail);
     });
   }
-    
+
   getResults(value) {
     return new Promise((success, fail) => {
       this.indexPromise.then(() => {
-        const result = this.cacheIndex.search(value,  {
+        const result = this.cacheIndex.search(value, {
           fields: {
-            title: {boost: 2,},
+            title: { boost: 2, },
           },
           expand: true,
         });
@@ -140,13 +153,13 @@ class CacheBasedSearch {
             path: item.ref,
             index: doc.index,
             type: doc.type,
-            name: item.ref.substring(item.ref.lastIndexOf("/")+1),
+            name: item.ref.substring(item.ref.lastIndexOf("/") + 1),
           };
         });
         success(results);
       }, fail);
     });
-  }   
+  }
 }
 
 module.exports = CacheBasedSearch;

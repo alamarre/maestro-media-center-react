@@ -67,8 +67,11 @@ import ProfileProvider from "../utilities/providers/ProfileProvider";
 import ChooseProfile from "../components/ChooseProfile";
 let profileProvider = new ProfileProvider(apiRequester);
 
+const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
+const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
+
 let CachedBasedSearch = require("../utilities/providers/CacheBasedSearch");
-let cacheBasedSearch = new CachedBasedSearch(cacheProvider);
+let cacheBasedSearch = new CachedBasedSearch(cacheProvider, playlistProvider);
 
 let searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
 
@@ -94,9 +97,9 @@ const imageRoot = `${scheme}://${host}:${port}/metadata/image`;
 episodeLoader = cacheBasedEpisodeProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} offlineStorage={offlineStorage} episodeLoader={cacheBasedEpisodeProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
-      <Route path="videos" component={(props) => (<VideosListing {...props} imageRoot={imageRoot} videoLoader={videoLoader} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={episodeLoader} />)} />
-      <Route path="view" component={(props) => (<VideoPlayer {...props} offlineStorage={offlineStorage} collectionsManager={collectionsManager} videoLoader={videoLoader} chromecastManager={chromecastManager} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+    <Route path="/" component={(props) => (<Home {...props} offlineStorage={offlineStorage} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+      <Route path="videos" component={(props) => (<VideosListing {...props} imageRoot={imageRoot} videoLoader={videoLoader} playlistManager={playlistProvider} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={episodeLoader} />)} />
+      <Route path="view" component={(props) => (<VideoPlayer {...props} offlineStorage={offlineStorage} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} chromecastManager={chromecastManager} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider} />)} />
       <Route path="profile" component={(props) => (<ChooseProfile {...props} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider} />)} />
       <Route path="remote" component={(props) => (<RemoteControllerComponent {...props} remote={webSocketSender} />)} />

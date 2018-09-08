@@ -1,6 +1,7 @@
 import React from 'react'
 import ShowPicker from "./ShowPicker"
 const CollectionPicker = require("./pickers/CollectionStartPicker");
+const PlaylistPicker = require("./pickers/PlaylistPicker");
 
 class SearchResults extends React.Component {
 
@@ -19,6 +20,10 @@ class SearchResults extends React.Component {
   }
 
   selectSource(item) {
+    if (item.type == "playlist") {
+      this.setState({ playlistName: item.name });
+      return;
+    }
     Promise.all([this.props.cacheProvider.isTvShow(item.path), this.props.cacheProvider.getCacheFromPath(item.path)])
       .then(values => {
         let isTvShow = values[0];
@@ -36,7 +41,7 @@ class SearchResults extends React.Component {
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null });
+    this.setState({ "showName": null, "collectionName": null, "playlistName": null });
   }
 
   render() {
@@ -77,6 +82,17 @@ class SearchResults extends React.Component {
         collectionName={this.state.collectionName}
         cancelFunction={this.cancelShowChooser.bind(this)}>
       </CollectionPicker>;
+    } else if (this.state.playlistName) {
+      showPicker = <PlaylistPicker
+        router={this.props.router}
+        episodeLoader={this.props.episodeLoader}
+        offlineStorage={this.props.offlineStorage}
+        videoLoader={this.props.videoLoader}
+        playlistManager={this.props.playlistManager}
+        showProgressProvider={this.props.showProgressProvider}
+        playlistName={this.state.playlistName}
+        cancelFunction={this.cancelShowChooser.bind(this)}>
+      </PlaylistPicker>;
     }
     var body = <div>
       <div>

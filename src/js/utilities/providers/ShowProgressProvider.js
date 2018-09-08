@@ -45,6 +45,8 @@ class ShowProgressProvider {
             return { show, season, episode, };
           } else if (folder.type && folder.type.toLowerCase() === "collection") {
             return { show: "collection", episode: parts[0], };
+          } else if (folder.type && folder.type.toLowerCase() === "playlist") {
+            return { show: "playlist", episode: parts[0], };
           } else if (!folder.type || folder.type.toLowerCase() !== "tv") {
             return { show: "movie", episode: path, };
           }
@@ -64,6 +66,19 @@ class ShowProgressProvider {
 
       const parts = path.split("/");
       const rootFolderName = parts.shift();
+      if (rootFolderName == "Playlist") {
+        return this.apiRequester.apiRequestPromise("shows", "keep-watching", {
+          data: JSON.stringify({
+            show: "playlist",
+            season: parts[0],
+            episode: parts[1],
+            status: status,
+            progress: progress,
+          }),
+          type: "POST",
+          contentType: "application/json",
+        });
+      }
       for (const folder of rootFolders) {
         if (folder.name == rootFolderName) {
           if (parts.length == 3 && folder.type && folder.type.toLowerCase() === "tv") {

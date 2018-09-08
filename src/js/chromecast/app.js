@@ -28,6 +28,8 @@ let authTokenManager = new AuthTokenManger(new QueryStringReader());
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 var episodeLoader = new EpisodeLoader(apiRequester);
 let cacheProvider = new CacheProvider(apiRequester);
+const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
+const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
 let showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
 const movieInfoProvider = new MovieInfoProvider(cacheProvider);
 const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
@@ -56,7 +58,7 @@ const videoLoader = new VideoLoader();
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} chromecastListener={chromecastListener} />)} >
-      <Route path="view" component={(props) => (<VideoPlayer {...props} collectionsManager={collectionsManager} videoLoader={videoLoader} isChromecast={true} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+      <Route path="view" component={(props) => (<VideoPlayer {...props} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} isChromecast={true} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
     </Route>
   </Router>
 ), div)

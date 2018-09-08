@@ -25,11 +25,13 @@ class VideoPlayer extends React.Component {
     const TvShowSeriesPlayer = require("../utilities/providers/playertypes/TvShow");
     const MoviePlayer = require("../utilities/providers/playertypes/Movie");
     const MovieCollection = require("../utilities/providers/playertypes/MovieCollection");
+    const Playlist = require("../utilities/providers/playertypes/Playlist");
 
     this.playerTypeHandlers = {
       tv: new TvShowSeriesPlayer(this.props.episodeLoader, this.props.showProgressProvider),
       movie: new MoviePlayer(this.props.episodeLoader, this.props.showProgressProvider),
-      collection: new MovieCollection("Movie Collections", this.props.collectionsManager, this.props.episodeLoader, this.props.showProgressProvider)
+      collection: new MovieCollection("Movie Collections", this.props.collectionsManager, this.props.episodeLoader, this.props.showProgressProvider),
+      playlist: new Playlist("Playlist", this.props.playlistManager, this.props.episodeLoader, this.props.showProgressProvider)
     };
   }
 

@@ -96,6 +96,7 @@ class Home extends EasyInputComponent {
           episodeLoader={this.props.episodeLoader}
           offlineStorage={this.props.offlineStorage}
           collectionsManager={this.props.collectionsManager}
+          playlistManager={this.props.playlistManager}
           imageRoot={this.props.imageRoot}
           router={this.props.router}
           videoLoader={this.props.videoLoader}

@@ -117,6 +117,9 @@ class OfflineVideoStorage {
 
   async getVideo(url) {
     const data = await this.movieStore.getItem(`metadata-${url}`);
+    if (!data) {
+      return null;
+    }
     const numSlices = data.numSlices;
     const slices = [];
     for (let i = 0; i < numSlices; i++) {
