@@ -28,7 +28,7 @@ class MoviePlayerManager {
     if (showInfo && showInfo.show) {
       const progress = await this.showProgressProvider.getShowProgress(showInfo.show);
       if (progress && progress.episode == showInfo.episode && progress.season == showInfo.season) {
-        seekTime = progress.progress;
+        seekTime = progress.progress || 0;
       } else {
         this.showProgressProvider.markStatus(parentPath + "/" + this.subdirectory + "/" + episode, "started", 0);
       }

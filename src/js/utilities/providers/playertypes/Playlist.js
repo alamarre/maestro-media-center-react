@@ -18,7 +18,7 @@ class PlaylistManager {
     let seekTime = 0;
     const progress = await this.showProgressProvider.getShowProgress("playlist");
     if (progress && progress.episode == this.index && progress.season == this.playlist) {
-      seekTime = progress.progress;
+      seekTime = progress.progress || 0;
     } else {
       this.showProgressProvider.markStatus(this.rootFolder + "/" + this.playlist + "/" + this.index, "started", 0);
     }

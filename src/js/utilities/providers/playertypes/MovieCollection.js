@@ -18,7 +18,7 @@ class MovieCollectionManager {
     let seekTime = 0;
     const progress = await this.showProgressProvider.getShowProgress("collection");
     if (progress && progress.episode == this.index && progress.season == this.collection) {
-      seekTime = progress.progress;
+      seekTime = progress.progress || 0;
     } else {
       this.showProgressProvider.markStatus(this.rootFolder + "/" + this.collection + "/" + this.index, "started", 0);
     }

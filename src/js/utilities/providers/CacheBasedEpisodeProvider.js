@@ -10,6 +10,9 @@ class CacheBasedEpisodeProvider {
       this.cacheProvider.getCache()
         .then((cache) => {
           let current = cache;
+          if(folder.startsWith("/")) {
+            folder = folder.substring(1);
+          }
           const folders = folder.split("/");
           for (let i = 0; i < folders.length; i++) {
             current = current.folders[folders[i]];
