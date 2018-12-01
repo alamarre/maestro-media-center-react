@@ -15,7 +15,9 @@ class CacheBasedEpisodeProvider {
           }
           const folders = folder.split("/");
           for (let i = 0; i < folders.length; i++) {
-            current = current.folders[folders[i]];
+            if(folders[i]) {
+              current = current.folders[folders[i]];
+            }
           }
 
           const result = {};
@@ -25,6 +27,8 @@ class CacheBasedEpisodeProvider {
           result.files = result.files.filter((file) => {
             return file.indexOf(".mp4") == (file.length - ".mp4".length);
           });
+
+          result.files = result.files.sort(window.tvShowSort);
 
           good(result);
         }, bad);

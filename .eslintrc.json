@@ -5,7 +5,13 @@
         "sourceType": "module"
     },
     "env" : {
-        "node" : false
+        "node" : false,
+        "browser": true
+    },
+    "globals": {
+        "Promise": true,
+        "require": true,
+        "module": true
     },
     "rules": {
         "linebreak-style": ["error", "unix"],
