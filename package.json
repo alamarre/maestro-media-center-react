@@ -25,14 +25,13 @@
     "popper.js": "^1.12.6",
     "rc-slider": "^8.6.4",
     "react": "^15.3.1",
+    "react-alice-carousel": "^1.13.0",
     "react-bootstrap": "^0.31.5",
     "react-dom": "^15.3.1",
     "react-modal": "^3.0.4",
     "react-router": "^3.0.2",
-    "react-slick": "^0.23.2",
     "require-globify": "^1.4.1",
-    "scriptjs": "^2.5.8",
-    "slick-carousel": "^1.8.1"
+    "scriptjs": "^2.5.8"
   },
   "devDependencies": {
     "babel-loader": "^6.3.2",

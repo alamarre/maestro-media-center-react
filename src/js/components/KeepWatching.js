@@ -1,7 +1,10 @@
-import React from 'react'
+import React from 'react';
 
-import ShowPicker from "./ShowPicker"
-import Slider from "react-slick";
+import ShowPicker from "./ShowPicker";
+import AliceCarousel from 'react-alice-carousel';
+import "react-alice-carousel/lib/alice-carousel.css";
+
+const Carousel = require("./generic/Carousel");
 
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
@@ -45,7 +48,7 @@ class KeepWatching extends React.Component {
   }
 
   render() {
-    let videos = this.state.videos.slice(0, 30).map((video) => {
+    const videos = this.state.videos.slice(0, 30).map((video) => {
       //const imageSource = `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`
       const imageSource = video.show === "movie" ?
       `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
@@ -57,51 +60,19 @@ class KeepWatching extends React.Component {
       video.show === "collection" ?
         video.season:
         video.show;    
-      return <div style={{ "display": "inline-block", width: "150px", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px" }}
+      return <div style={{ "display": "inline-block", width: "200px", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px" }}
         key={video.show} onClick={this.play.bind(this, video)}>
         <img style={{ display: "block" }} src={imageSource} width="150px" height="225px" />
         {name}
       </div>
     });
 
-    const settings = {
-      dots: false,
-      infinite: true,
-      slidesToShow: 5,
-      slidesToScroll: 5,
-      initialSlide: 0,
-      responsive: [
-        {
-          breakpoint: 1024,
-          settings: {
-            slidesToShow: 3,
-            slidesToScroll: 3
-          }
-        },
-        {
-          breakpoint: 600,
-          settings: {
-            slidesToShow: 2,
-            slidesToScroll: 2,
-            initialSlide: 2
-          }
-        },
-        {
-          breakpoint: 480,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1
-          }
-        }
-      ]
-    };
-
-    videos = <Slider {...settings}>{videos}</Slider>
+    let videosView = <Carousel itemWidth={210}>{videos}</Carousel>
 
     if (this.state.videos.length > 0) {
-      videos = <div>
+      videosView = <div>
         <div>Keep Watching</div>
-        {videos}
+        {videosView}
       </div>;
     }
 
@@ -120,7 +91,7 @@ class KeepWatching extends React.Component {
     }
     return (
       <div>
-        {videos}
+        {videosView}
         {showPicker}
       </div>
     )
