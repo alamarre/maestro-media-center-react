@@ -89,6 +89,25 @@ a.nostyle:visited {
     display: table;
 }
 
+/*.slick-prev:before {
+    font-size: 100px;
+    width: 100px;
+    
+}
+  
+.slick-next:before {
+    font-size: 100px;
+    width: 100px;
+}
+
+.slick-list {
+    margin-left: 110px;
+}
+
+.slick-slider {
+    width: 90%;
+}*/
+
 @import "custom";
 
 @import "~bootstrap/scss/bootstrap";

@@ -1,6 +1,6 @@
-import React from 'react'
-
-import { Link } from 'react-router'
+import React from 'react';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 module.exports = class RemoteController extends React.Component {
 
@@ -19,7 +19,7 @@ module.exports = class RemoteController extends React.Component {
                         <button className="remoteButton" onClick={this.props.remote.skipForward.bind(this.props.remote)}><i className="fa fa-forward fa-3x"></i></button>
                         <button className="remoteButton" onClick={this.props.remote.playNext.bind(this.props.remote)}><i className="fa fa-step-forward fa-3x"></i></button>
                         
-                        <input style={{width: "100%"}} type="range" min="0" max="100" defaultValue="0" step="1" onClick={(event) => this.props.remote.seek(event.target.value)} />
+                        <Slider style={{width: "80%", margin: "0 auto"}} min={0} max={100} step={1} onAfterChange={(value) => this.props.remote.seek(value)} ></Slider>
                     </div>
                 </div>
                 <div style={{display: "table-row"}}>

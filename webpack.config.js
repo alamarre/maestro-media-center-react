@@ -66,7 +66,7 @@ module.exports = {
         use: "file-loader",
       },
       {
-        test: /\.(scss)$/,
+        test: /\.(s?css)$/,
         use: [{
           loader: "style-loader", // inject CSS to page
         }, {

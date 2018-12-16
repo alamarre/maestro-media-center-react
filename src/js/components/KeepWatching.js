@@ -1,6 +1,7 @@
 import React from 'react'
 
 import ShowPicker from "./ShowPicker"
+import Slider from "react-slick";
 
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
@@ -44,7 +45,7 @@ class KeepWatching extends React.Component {
   }
 
   render() {
-    let videos = this.state.videos.slice(0, 5).map((video) => {
+    let videos = this.state.videos.slice(0, 30).map((video) => {
       //const imageSource = `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`
       const imageSource = video.show === "movie" ?
       `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
@@ -62,6 +63,40 @@ class KeepWatching extends React.Component {
         {name}
       </div>
     });
+
+    const settings = {
+      dots: false,
+      infinite: true,
+      slidesToShow: 5,
+      slidesToScroll: 5,
+      initialSlide: 0,
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 3,
+            slidesToScroll: 3
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 2,
+            initialSlide: 2
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1
+          }
+        }
+      ]
+    };
+
+    videos = <Slider {...settings}>{videos}</Slider>
 
     if (this.state.videos.length > 0) {
       videos = <div>
