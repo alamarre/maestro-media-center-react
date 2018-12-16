@@ -5,43 +5,34 @@ class MoviePlayerManager {
   }
 
   async load(parentPath, subdirectory, index, file) {
-    this.parentPath = parentPath;
-    this.subdirectory = subdirectory;
+    this.movieName = parentPath;
     this.index = index;
     this.file = file;
     return await this.updateSource();
   }
 
   async updateSource() {
-    const parentPath = this.parentPath.startsWith("/") ? this.parentPath : "/" + this.parentPath;
-    const listing = await this.episodeLoader.getListingPromise(this.parentPath + "/" + this.subdirectory);
-    this.episodes = listing.files;
-    const episode = this.episodes[this.index];
-    let source = this.episodeLoader.getRootPath() + parentPath + "/" + this.subdirectory + "/" + episode;
-    if (episode.path) {
-      source = this.episodeLoader.getRootPath() + episode.path;
-    }
-    const name = this.episodes[this.index];
+    const sourceInfo = await this.episodeLoader.getVideoSource("Movies/" + this.movieName);
+    const {sources, subtitles,} =  sourceInfo;
+    const name = this.movieName;
 
     let seekTime = 0;
-    const showInfo = await this.showProgressProvider.getShowInfo(parentPath + "/" + this.subdirectory + "/" + episode);
+    const showInfo = await this.showProgressProvider.getShowInfo("Movies/" + name);
     if (showInfo && showInfo.show) {
       const progress = await this.showProgressProvider.getShowProgress(showInfo.show);
       if (progress && progress.episode == showInfo.episode && progress.season == showInfo.season) {
         seekTime = progress.progress || 0;
       } else {
-        this.showProgressProvider.markStatus(parentPath + "/" + this.subdirectory + "/" + episode, "started", 0);
+        this.showProgressProvider.markStatus("Movies/" + name, "started", 0);
       }
     }
 
-    const path = parentPath + "/" + this.subdirectory;
-    return { source, name, seekTime, path, index: this.index, };
+    const path = "Movies";
+    return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
   recordProgress(time) {
-    const parentPath = this.parentPath.startsWith("/") ? this.parentPath : "/" + this.parentPath;
-    const episode = this.episodes[this.index];
-    this.showProgressProvider.markStatus(parentPath + "/" + this.subdirectory + "/" + episode, "in progress", time);
+    this.showProgressProvider.markStatus("Movies/" + this.movieName, "in progress", time);
   }
 
   async goToNext() {

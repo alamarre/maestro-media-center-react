@@ -11,7 +11,7 @@ class KeepWatching extends React.Component {
     super(props);
     this.state = { root: "", videos: [] };
     props.showProgressProvider.getShowsInProgress().then(videos => {
-      this.setState({ videos: videos.filter(v => !["movie", "collection"].includes(v.show)).sort(lastWatchedSort) });
+      this.setState({ videos: videos.sort(lastWatchedSort) });
     });
   }
 
@@ -20,11 +20,21 @@ class KeepWatching extends React.Component {
   }
 
   async play(video) {
+    if(video.show === "movie") {
+      return this.props.videoLoader.loadVideo(video.show, video.episode.substring("Movies/".length), 0);
+    }
+
+    if(video.show === "collection") {
+      return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
+    }
+
     const showPath = await this.props.cacheProvider.getShowPath(video.show);
-    const showName = video.show;
     const cachePath = await this.props.cacheProvider.getCacheFromPath(showPath);
     //this.setState({showName, showPath, cachePath});
     const folder = `${showPath}/${video.season}`;
+    if(video.episode.endsWith(".mp4")) {
+      video.episode = video.episode.substring(0, video.episode.indexOf(".mp4"));
+    }
     const episode = Object.keys(cachePath.folders[video.season].files).sort(window.tvShowSort).indexOf(video.episode);
     this.props.videoLoader.loadVideo("tv", folder, episode);
   }
@@ -35,11 +45,21 @@ class KeepWatching extends React.Component {
 
   render() {
     let videos = this.state.videos.slice(0, 5).map((video) => {
-      const imageSource = `${this.props.imageRoot}?showName=${video.show}`
+      //const imageSource = `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`
+      const imageSource = video.show === "movie" ?
+      `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
+        video.show === "collection" ?
+          `${this.props.imageRoot}/150x225/collections/${video.season}.jpg` :
+          `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`;
+
+      const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
+      video.show === "collection" ?
+        video.season:
+        video.show;    
       return <div style={{ "display": "inline-block", width: "150px", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px" }}
         key={video.show} onClick={this.play.bind(this, video)}>
         <img style={{ display: "block" }} src={imageSource} width="150px" height="225px" />
-        {video.show}
+        {name}
       </div>
     });
 

@@ -24,8 +24,10 @@ class MovieCollectionManager {
     }
 
     const path = this.collection;
-    const source = this.episodeLoader.getRootPath() + "/" + await this.collectionsManager.getPath(name);
-    return { source, name, seekTime, path, index: this.index, };
+    const collectionPath =  await this.collectionsManager.getPath(name);
+    const sourceInfo = await this.episodeLoader.getVideoSource(collectionPath);
+    const {sources, subtitles,} =  sourceInfo;
+    return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
   recordProgress(time) {

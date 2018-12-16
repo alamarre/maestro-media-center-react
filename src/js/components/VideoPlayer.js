@@ -98,12 +98,12 @@ class VideoPlayer extends React.Component {
     let videoSource = null;
     if (this.state.seekTime > -1) {
       if (this.props.isChromecast) {
-        videoSource = <ChromecastPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} source={this.state.source}
+        videoSource = <ChromecastPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles}
           onEnded={this.goToNext.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
         />
 
       } else {
-        videoSource = <Html5VideoPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} source={this.state.source} onEnded={this.goToNext.bind(this)}
+        videoSource = <Html5VideoPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles}  onEnded={this.goToNext.bind(this)}
           onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
         />
       }
@@ -130,14 +130,14 @@ class VideoPlayer extends React.Component {
       parentPath = subdirectory;
       subdirectory = "";
     }
-    let { source, name, seekTime, path } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
+    let { sources, subtitles,  name, seekTime, path } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
     if (this.props.offlineStorage) {
-      const data = await this.props.offlineStorage.getVideo(source);
+      const data = await this.props.offlineStorage.getVideo(sources[0]);
       if (data) {
-        source = URL.createObjectURL(data);
+        sources[0] = URL.createObjectURL(data);
       }
     }
-    this.setState({ source, name, seekTime });
+    this.setState({ sources, subtitles,  name, seekTime });
     this.props.videoLoader.setUrl(this.type, path, index);
   }
 
@@ -166,14 +166,14 @@ class VideoPlayer extends React.Component {
   }
 
   async goToNext() {
-    const { source, name, seekTime, path, index } = await this.playerTypeHandlers[this.type].goToNext();
-    this.setState({ source, name, seekTime });
+    const { sources, subtitles, name, seekTime, path, index } = await this.playerTypeHandlers[this.type].goToNext();
+    this.setState({ sources, subtitles, name, seekTime });
     this.props.videoLoader.setUrl(this.type, path, index);
   }
 
   async goToPrevious() {
-    const { source, name, seekTime, path, index } = await this.playerTypeHandlers[this.type].goToPrevious();
-    this.setState({ source, name, seekTime });
+    const { sources, subtitles,  name, seekTime, path, index } = await this.playerTypeHandlers[this.type].goToPrevious();
+    this.setState({ sources, subtitles,  name, seekTime });
     this.props.videoLoader.setUrl(this.type, path, index);
   }
 }

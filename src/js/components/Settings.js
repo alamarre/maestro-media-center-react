@@ -15,6 +15,7 @@ class Settings extends EasyInputComponent {
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient")
     };
 
+    this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
     this.handleClientNameChange = this.handleClientNameChange.bind(this);
     this.handleSendToClientNameChange = this.handleSendToClientNameChange.bind(this);
   }
@@ -45,6 +46,10 @@ class Settings extends EasyInputComponent {
     this.handleInputChange(event);
 
     this.props.webSocketSender.setClient(value);
+  }
+
+  handleCheckBoxChange(event) {
+    this.handleInputChange(event);
   }
 
   switchProfile() {
@@ -81,7 +86,7 @@ class Settings extends EasyInputComponent {
     var body = <div>
       <div className="form-check">
         <label className="form-check-label">
-          <input type="checkbox" className="form-check-input" name="remoteControl" defaultChecked={this.state.remoteControl} onChange={this.handleInputChange} />
+          <input type="checkbox" className="form-check-input" name="remoteControl" defaultChecked={this.state.remoteControl} onChange={this.handleCheckBoxChange} />
           Allow remote control
                 </label>
       </div>

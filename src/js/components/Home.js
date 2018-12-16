@@ -102,10 +102,11 @@ class Home extends EasyInputComponent {
           videoLoader={this.props.videoLoader}
           searcher={this.props.searcher}
           cacheProvider={this.props.cacheProvider}
+          metadataProvider={this.props.metadataProvider}
           showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
-        <KeepWatching imageRoot={this.props.imageRoot} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+        <KeepWatching imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
       <div>{remoteLink}</div>

@@ -2,6 +2,7 @@ import React from 'react'
 import ShowPicker from "./ShowPicker"
 const CollectionPicker = require("./pickers/CollectionStartPicker");
 const PlaylistPicker = require("./pickers/PlaylistPicker");
+const MoviePicker = require("./pickers/MovieDetails");
 
 class SearchResults extends React.Component {
 
@@ -34,23 +35,23 @@ class SearchResults extends React.Component {
           //this.props.videoLoader.loadVideo("collection", item.name, 0);
           this.setState({ collectionName: item.name })
         } else {
-          let folder = item.path.substring(0, item.path.lastIndexOf("/"));
-          this.props.videoLoader.loadVideo(item.type, folder, item.index)
+          this.setState({movieName: item.name});
+         // this.props.videoLoader.loadVideo(item.type, item.name, 0);
         }
       })
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null, "collectionName": null, "playlistName": null });
+    this.setState({ "showName": null, "collectionName": null, "playlistName": null, movieName: null });
   }
 
   render() {
     let searchResults = this.state.searchResults.map(item => {
       const imageSource = item.type === "tv" ?
-        `${this.props.imageRoot}?showName=${item.name}` :
+        `${this.props.imageRoot}/50x75/tv/show/${item.name}.jpg` :
         item.type === "collection" ?
-          `${this.props.imageRoot}?collectionName=${item.name}` :
-          `${this.props.imageRoot}?path=${item.path}`;
+          `${this.props.imageRoot}/50x75/collections/${item.name}.jpg` :
+          `${this.props.imageRoot}/50x75/movies/${item.name}.jpg`;
       return <li className="list-group-item" key={item.path} onClick={evt => this.selectSource(item)}>
         <img style={{ border: "white 1px solid", marginRight: "10px" }} src={imageSource} width="50px" height="75px" />
         {item.name}
@@ -93,6 +94,18 @@ class SearchResults extends React.Component {
         playlistName={this.state.playlistName}
         cancelFunction={this.cancelShowChooser.bind(this)}>
       </PlaylistPicker>;
+    } else if (this.state.movieName) {
+      showPicker = <MoviePicker
+        router={this.props.router}
+        episodeLoader={this.props.episodeLoader}
+        offlineStorage={this.props.offlineStorage}
+        videoLoader={this.props.videoLoader}
+        playlistManager={this.props.playlistManager}
+        showProgressProvider={this.props.showProgressProvider}
+        metadataProvider={this.props.metadataProvider}
+        movieName={this.state.movieName}
+        cancelFunction={this.cancelShowChooser.bind(this)}>
+      </MoviePicker>;
     }
     var body = <div>
       <div>

@@ -48,11 +48,15 @@ class Html5VideoPlayer extends React.Component {
   }
 
   render() {
-    const subtitles = this.props.source && this.props.source.replace('.mp4', '.vtt');
+    const subtitles = this.props.subtitles ? 
+      <track src={this.props.subtitles[0]} kind="subtitles" srcLang="en" label="English" default></track> : null;
+    const sources = this.props.sources.map(s => {
+      return <source src={s} key={s} type="video/mp4"></source>;
+    });
 
-    return <video key={this.props.source} crossOrigin="anonymous" onLoadedMetadata={() => { this.seekToTime(this.props.startTime) }} onEnded={() => this.props.onEnded(this)} onPlay={() => this.props.onPlay(this)} onPause={() => this.props.onPause(this)} style={{ margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.props.source != null ? 'block' : 'none' }} ref='video' data-source={this.props.source} controls={true} autoPlay={true}>
-      <source src={this.props.source} type="video/mp4" />
-      <track src={subtitles} kind="subtitles" srcLang="en" label="English" default />
+    return <video key={this.props.source} crossOrigin="anonymous" onLoadedMetadata={() => { this.seekToTime(this.props.startTime) }} onEnded={() => this.props.onEnded(this)} onPlay={() => this.props.onPlay(this)} onPause={() => this.props.onPause(this)} style={{ margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.props.sources != null ? 'block' : 'none' }} ref='video' data-source={this.props.source} controls={true} autoPlay={true}>
+      {sources}
+      {subtitles}
     </video>
   }
 

@@ -4,7 +4,7 @@ import { Router, Route, Link, hashHistory } from 'react-router'
 
 require("./style.scss");
 
-var host = "localhost";
+var host = process.env.HOST;
 var scheme = "http";
 var port = 3000;
 var wsPort = port + 1;
@@ -27,12 +27,13 @@ const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
 let authTokenManager = new AuthTokenManger(new QueryStringReader());
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 var episodeLoader = new EpisodeLoader(apiRequester);
-let cacheProvider = new CacheProvider(apiRequester);
+let cacheProvider = new CacheProvider(apiRequester, {noPreload: true});
 const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
 const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
 let showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
 const movieInfoProvider = new MovieInfoProvider(cacheProvider);
 const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
+const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
 
 var webSocketRemoteController = new WebSocketRemoteController(host, "Desktop Test Client", wsPort);
 
@@ -55,10 +56,11 @@ window.tvShowSort = function (a, b) {
 let VideoLoader = require("../utilities/VideoLoader");
 const videoLoader = new VideoLoader();
 
+const episodeProvider = cacheBasedEpisodeProvider;
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} chromecastListener={chromecastListener} />)} >
-      <Route path="view" component={(props) => (<VideoPlayer {...props} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} isChromecast={true} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
+      <Route path="view" component={(props) => (<VideoPlayer {...props} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} isChromecast={true} showProgressProvider={showProgressProvider} episodeLoader={episodeProvider} remoteController={webSocketRemoteController} />)} />
     </Route>
   </Router>
 ), div)

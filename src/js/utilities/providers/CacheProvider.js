@@ -1,12 +1,14 @@
 import localforage from "localforage";
 
 class CacheProvider {
-  constructor(apiRequester) {
+  constructor(apiRequester, options = {}) {
     this.apiRequester = apiRequester;
     this.cachePromise = null;
     this.rootFoldersPromise = null;
-    this.getCache().catch(() => { });
-    this.getRootFolders().catch(() => { });
+    if(options.noPreload) {
+      this.getCache().catch(() => { });
+      this.getRootFolders().catch(() => { });
+    }
   }
 
   async getCache() {

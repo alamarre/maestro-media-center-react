@@ -12,6 +12,9 @@ class ShowPicker extends React.Component {
       let seasonSet = false;
       for (let show of shows) {
         if (show.show === props.showName) {
+          if(show.episode.endsWith(".mp4")) {
+            show.episode = show.episode.substring(0, show.episode.indexOf(".mp4"));
+          }
           this.setState({
             "season": show.season,
             "episode": show.episode,

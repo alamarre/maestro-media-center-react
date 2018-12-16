@@ -1,5 +1,3 @@
-import localforage from "localforage";
-
 class ShowProgressProvider {
   constructor(apiRequester, cacheProvider) {
     this.apiRequester = apiRequester;
@@ -27,7 +25,6 @@ class ShowProgressProvider {
 
   getShowInfo(path) {
     return Promise.all([this.cacheProvider.getCache(), this.cacheProvider.getRootFolders(),]).then((values) => {
-      const cache = values[0];
       const rootFolders = values[1];
       while (path.startsWith("/")) {
         path = path.substring(1);
@@ -58,7 +55,6 @@ class ShowProgressProvider {
 
   markStatus(path, status, progress) {
     Promise.all([this.cacheProvider.getCache(), this.cacheProvider.getRootFolders(),]).then((values) => {
-      const cache = values[0];
       const rootFolders = values[1];
       while (path.startsWith("/")) {
         path = path.substring(1);

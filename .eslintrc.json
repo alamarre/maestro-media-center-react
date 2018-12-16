@@ -11,7 +11,8 @@
     "globals": {
         "Promise": true,
         "require": true,
-        "module": true
+        "module": true,
+        "process": true
     },
     "rules": {
         "linebreak-style": ["error", "unix"],

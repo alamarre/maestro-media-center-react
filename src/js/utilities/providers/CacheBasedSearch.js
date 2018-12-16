@@ -2,9 +2,7 @@ const elasticlunr = require("elasticlunr");
 
 function addFilesInFolder(index, currentCache, path) {
   if (currentCache && currentCache.files) {
-    const fileNames = Object.keys(currentCache.files).sort(tvShowSort).filter((f) => {
-      return f.endsWith(".mp4");
-    });
+    const fileNames = Object.keys(currentCache.files).sort(window.tvShowSort);
     let episodeCount = 0;
     for (const file of fileNames) {
       const filePath = path + "/" + file;
@@ -12,7 +10,7 @@ function addFilesInFolder(index, currentCache, path) {
         path: filePath,
         type: "movie",
         index: episodeCount++,
-        title: file.substring(0, file.lastIndexOf(".")),
+        title: file,
       };
 
       index.addDoc(doc);
@@ -131,7 +129,7 @@ class CacheBasedSearch {
         });
 
         results = results.sort((a, b) => {
-          return tvShowSort(a.name, b.name);
+          return window.tvShowSort(a.name, b.name);
         });
         success(results);
       }, fail);

@@ -45,10 +45,6 @@ class SearchBasedShowProvider {
     });
   }
 
-  getRootPath() {
-    return this.apiRequester.getHost()+"/videos";
-  }
-
 }
 
 module.exports = SearchBasedShowProvider;

@@ -23,17 +23,16 @@ class TvShowPlayerManager {
 
   async getSeasons() {
     const listing = await this.episodeLoader.getListingPromise(this.parentPath);
-    listing.folders.sort(tvShowSort);
+    listing.folders.sort(window.tvShowSort);
     this.parentFolders = listing.folders;
   }
 
   async updateSource() {
     const parentPath = this.parentPath.startsWith("/") ? this.parentPath : "/" + this.parentPath;
     const episode = this.episodes[this.index];
-    let source = this.episodeLoader.getRootPath() + parentPath + "/" + this.subdirectory + "/" + episode;
-    if (episode.path) {
-      source = this.episodeLoader.getRootPath() + episode.path;
-    }
+    const path = parentPath + "/" + this.subdirectory;
+    const sourceInfo = await this.episodeLoader.getVideoSource(parentPath + "/" + this.subdirectory + "/" + episode);
+    const {sources, subtitles,} =  sourceInfo;
     const name = this.episodes[this.index];
 
     let seekTime = 0;
@@ -47,8 +46,8 @@ class TvShowPlayerManager {
       }
     }
 
-    const path = parentPath + "/" + this.subdirectory;
-    return { source, name, seekTime, path, index: this.index, };
+    
+    return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
   recordProgress(time) {

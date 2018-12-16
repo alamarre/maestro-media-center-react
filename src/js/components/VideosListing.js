@@ -1,19 +1,34 @@
 import React from 'react'
 
-import { Link } from 'react-router'
 import ShowPicker from "./ShowPicker"
+const MoviePicker = require("./pickers/MovieDetails");
 
 class VideosListing extends React.Component {
   constructor(props) {
     super(props);
     this.state = { root: "", folders: [], files: [] };
-    if (this.props.episodeLoader) {
+    
+
+    if(this.props.router.params && this.props.router.params.videoType) {
+      this.fetchFolder(this.props.router.params.videoType);
+    } else if (this.props.episodeLoader) {
       this.props.episodeLoader.getListingPromise("").then(this.loadFolder.bind(this));
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.router.params) {
+      const newRoot = nextProps.router.params.videoType || "";
+      this.setState({ root: newRoot });
+      this.props.episodeLoader.getListingPromise(newRoot).then(this.loadFolder.bind(this));
     }
   }
 
   fetchFolder(folder) {
     var newRoot = this.state.root + "/" + folder;
+    if(this.props.router.params && this.props.router.params.videoType != folder) {
+      this.props.router.push(`/videos${newRoot}`);
+    }
     this.setState({ root: newRoot });
     this.props.episodeLoader.getListingPromise(newRoot).then(this.loadFolder.bind(this));
   }
@@ -30,11 +45,11 @@ class VideosListing extends React.Component {
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null });
+    this.setState({ "showName": null, movieName: null });
   }
 
-  loadVideo(type, folder, index) {
-    this.props.videoLoader.loadVideo(type, folder, index);
+  loadVideo(movieName) {
+    this.setState({movieName});
   }
 
   render() {
@@ -47,19 +62,17 @@ class VideosListing extends React.Component {
       let fileName = (file.name) ? file.name : file;
       let folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
 
-
-
       if (file.type && file.type == "tv") {
-        const imageSource = `${this.props.imageRoot}?showName=${file.name}`;
+        const imageSource = `${this.props.imageRoot}/50x75/tv/show/${file.name}.jpg`;
         return <div style={{ margin: "20px" }} key={fileName} onClick={evt => this.selectSource(file)} >
           <img style={{ border: "white 1px solid", marginRight: "10px" }} src={imageSource} width="50px" height="75px" />
           {fileName}
         </div>
       }
 
-      const imageSource = `${this.props.imageRoot}?path=${file.path}`;
+      const imageSource = `${this.props.imageRoot}/50x75/movies/${file.name}.jpg`;
 
-      return <div style={{ margin: "20px" }} key={fileName} onClick={this.loadVideo.bind(this, file.type, folder, file.index)} >
+      return <div style={{ margin: "20px" }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
         <img style={{ border: "white 1px solid", marginRight: "10px" }} src={imageSource} width="50px" height="75px" />
         {fileName}
       </div>
@@ -77,7 +90,17 @@ class VideosListing extends React.Component {
         showPath={this.state.showPath}
         cancelFunction={this.cancelShowChooser.bind(this)}
         showCache={this.state.cachePath}>
-      </ShowPicker>
+      </ShowPicker>;
+    } else if (this.state.movieName) {
+      showPicker = <MoviePicker
+        router={this.props.router}
+        metadataProvider={this.props.metadataProvider}
+        videoLoader={this.props.videoLoader}
+        showProgressProvider={this.props.showProgressProvider}
+        offlineStorage={this.props.offlineStorage}
+        movieName={this.state.movieName}
+        cancelFunction={this.cancelShowChooser.bind(this)}>
+      </MoviePicker>;
     }
     return (
       <div>
