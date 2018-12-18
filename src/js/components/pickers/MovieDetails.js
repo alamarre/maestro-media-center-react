@@ -1,18 +1,19 @@
-import React from 'react'
-import { Modal } from 'react-bootstrap';
+import React from "react";
+import { Modal, } from "react-bootstrap";
+
+const MetadataImage = require("../generic/MetadataImage");
 
 class MovieDetails extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { "movie": null };
+    this.state = { "movie": null, };
     this.loadData();
   }
 
   async loadData() {
     const movieInfo = await this.props.metadataProvider.getMovieMetadata(this.props.movieName);
-    const movieImage = await this.props.metadataProvider.getMoviePoster(this.props.movieName, 150, 225);
-    this.setState({ movieInfo, movieImage });
+    this.setState({ movieInfo, });
   }
 
   play() {
@@ -24,16 +25,18 @@ class MovieDetails extends React.Component {
       return <div></div>;
     }
 
-    const videoView = <div>
-        <img src={this.state.movieImage} />
-        <button className="maestroButton roundedButton fa fa-play" onClick={evt => this.play()}></button>
+    const videoView = <div style={{display: "table",}}>
+      <MetadataImage style={{display: "inline",}} type="movies" width={150} height={225} name={this.props.movieName} ></MetadataImage>
+      <div style={{display: "table-cell", verticalAlign: "top",}}>
+        <button className="maestroButton roundedButton fa fa-play" onClick={() => this.play()}></button>
         <span>{this.props.movieName} </span>
         <hr />
-        <div>{this.state.movieInfo.overview}</div>
-      </div>;
+        <div style={{marginLeft: "20",}}>{this.state.movieInfo.overview}</div>
+      </div>
+    </div>;
 
-    let body = <div>
-      <Modal show={true} animation={false} onHide={evt => this.props.cancelFunction()}>
+    const body = <div>
+      <Modal show={true} animation={false} onHide={() => this.props.cancelFunction()}>
         <Modal.Header>
           <Modal.Title>{this.props.movieName}</Modal.Title>
         </Modal.Header>
@@ -43,14 +46,14 @@ class MovieDetails extends React.Component {
           {videoView}
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={evt => this.props.cancelFunction()}>Cancel</button>
+          <button className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
         </Modal.Footer>
       </Modal>
     </div>;
 
     return (
       <div>{body}</div>
-    )
+    );
   }
 }
 

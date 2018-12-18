@@ -1,12 +1,12 @@
-import React from 'react'
+import React from "react";
 
-import ShowPicker from "./ShowPicker"
+import ShowPicker from "./ShowPicker";
 const MoviePicker = require("./pickers/MovieDetails");
 
 class VideosListing extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { root: "", folders: [], files: [] };
+    this.state = { root: "", folders: [], files: [], };
     
 
     if(this.props.router.params && this.props.router.params.videoType) {
@@ -19,7 +19,7 @@ class VideosListing extends React.Component {
   componentWillReceiveProps(nextProps) {
     if(nextProps.router.params) {
       const newRoot = nextProps.router.params.videoType || "";
-      this.setState({ root: newRoot });
+      this.setState({ root: newRoot, });
       this.props.episodeLoader.getListingPromise(newRoot).then(this.loadFolder.bind(this));
     }
   }
@@ -29,53 +29,53 @@ class VideosListing extends React.Component {
     if(this.props.router.params && this.props.router.params.videoType != folder) {
       this.props.router.push(`/videos${newRoot}`);
     }
-    this.setState({ root: newRoot });
+    this.setState({ root: newRoot, });
     this.props.episodeLoader.getListingPromise(newRoot).then(this.loadFolder.bind(this));
   }
 
   loadFolder(folderData) {
-    this.setState({ "folders": folderData.folders, "files": folderData.files });
+    this.setState({ "folders": folderData.folders, "files": folderData.files, });
   }
 
   selectSource(item) {
     this.props.cacheProvider.getCacheFromPath(item.path)
       .then(cachePath => {
-        this.setState({ showName: item.name, showPath: item.path, cachePath: cachePath })
+        this.setState({ showName: item.name, showPath: item.path, cachePath: cachePath, });
       });
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null, movieName: null });
+    this.setState({ "showName": null, movieName: null, });
   }
 
   loadVideo(movieName) {
-    this.setState({movieName});
+    this.setState({movieName,});
   }
 
   render() {
     var folders = this.state.folders.map((folder) => {
-      return <div key={folder} onClick={this.fetchFolder.bind(this, folder)}>{folder}</div>
+      return <div key={folder} onClick={this.fetchFolder.bind(this, folder)}>{folder}</div>;
     });
 
     //var index = 0;
     var files = this.state.files.map((file) => {
-      let fileName = (file.name) ? file.name : file;
-      let folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
+      const fileName = (file.name) ? file.name : file;
+      const folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
 
       if (file.type && file.type == "tv") {
         const imageSource = `${this.props.imageRoot}/50x75/tv/show/${file.name}.jpg`;
-        return <div style={{ margin: "20px" }} key={fileName} onClick={evt => this.selectSource(file)} >
-          <img style={{ border: "white 1px solid", marginRight: "10px" }} src={imageSource} width="50px" height="75px" />
+        return <div style={{ margin: "20px", }} key={fileName} onClick={evt => this.selectSource(file)} >
+          <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
           {fileName}
-        </div>
+        </div>;
       }
 
       const imageSource = `${this.props.imageRoot}/50x75/movies/${file.name}.jpg`;
 
-      return <div style={{ margin: "20px" }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
-        <img style={{ border: "white 1px solid", marginRight: "10px" }} src={imageSource} width="50px" height="75px" />
+      return <div style={{ margin: "20px", }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
+        <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
         {fileName}
-      </div>
+      </div>;
     });
 
     let showPicker = null;
@@ -108,8 +108,8 @@ class VideosListing extends React.Component {
         {files}
         {showPicker}
       </div>
-    )
+    );
   }
 }
 
-module.exports = VideosListing
+module.exports = VideosListing;

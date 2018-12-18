@@ -1,16 +1,18 @@
-import React from 'react'
-import { Modal } from 'react-bootstrap';
+import React from "react";
+import { Modal, } from "react-bootstrap";
+
+const MetadataImage = require("./generic/MetadataImage");
 
 class ShowPicker extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { "season": null, "episode": null };
+    this.state = { "season": null, "episode": null, };
     this.downloadProgress = {};
 
     props.showProgressProvider.getShowsInProgress().then(shows => {
       let seasonSet = false;
-      for (let show of shows) {
+      for (const show of shows) {
         if (show.show === props.showName) {
           if(show.episode.endsWith(".mp4")) {
             show.episode = show.episode.substring(0, show.episode.indexOf(".mp4"));
@@ -18,38 +20,46 @@ class ShowPicker extends React.Component {
           this.setState({
             "season": show.season,
             "episode": show.episode,
-            "keepWatchingData": show
+            "keepWatchingData": show,
           });
+          this.loadSeasonMetadata(show.season);
           seasonSet = true;
         }
       }
 
       if (!seasonSet) {
-        let firstSeasonName = Object.keys(props.showCache.folders)[0];
-        let firstEpisodeName = Object.keys(props.showCache.folders[firstSeasonName].files)[0];
-        this.setState({ "season": firstSeasonName, "episode": firstEpisodeName });
+        const firstSeasonName = Object.keys(props.showCache.folders)[0];
+        this.setSeason(firstSeasonName);
       }
     });
   }
 
   setSeason(season) {
-    let firstEpisodeName = Object.keys(this.props.showCache.folders[season].files)[0];
-    this.setState({ "season": season, "episode": firstEpisodeName })
+    const firstEpisodeName = Object.keys(this.props.showCache.folders[season].files)[0];
+    this.setState({ "season": season, "episode": firstEpisodeName, });
+    this.loadSeasonMetadata(season);
+  }
+
+  async loadSeasonMetadata(season) {
+    if(this.props.metadataProvider) {
+      const metadata = await this.props.metadataProvider.getTvSeasonMetaData(this.props.showName, season);
+      this.setState({metadata,});
+    }
   }
 
   setEpisode(episode) {
-    this.setState({ "episode": episode })
+    this.setState({ "episode": episode, });
   }
 
   download(episode) {
-    let files = Object.keys(this.props.showCache.folders[this.state.season].files);
+    const files = Object.keys(this.props.showCache.folders[this.state.season].files);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
       if (files[i] == episode) {
         index = i;
       }
     }
-    let folder = this.props.showPath + "/" + this.state.season;
+    const folder = this.props.showPath + "/" + this.state.season;
     const path = `${this.props.episodeLoader.getRootPath()}/${folder}/${episode}`;
     this.props.offlineStorage.saveVideo({
       type: "tv",
@@ -57,22 +67,22 @@ class ShowPicker extends React.Component {
       index,
       episode,
       showName: this.props.showName,
-      name: `${this.props.showName} ${this.state.season} ${episode}`
+      name: `${this.props.showName} ${this.state.season} ${episode}`,
     }, path, (progress) => {
-      this.setState({ downloadProgress$: progress });
+      this.setState({ downloadProgress$: progress, });
       this.downloadProgress[episode] = progress;
     });
   }
 
   play(episode) {
-    let files = Object.keys(this.props.showCache.folders[this.state.season].files);
+    const files = Object.keys(this.props.showCache.folders[this.state.season].files);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
       if (files[i] == episode) {
         index = i;
       }
     }
-    let folder = this.props.showPath + "/" + this.state.season;
+    const folder = this.props.showPath + "/" + this.state.season;
     //let url = "view?type=tv&index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(episode);
     //this.props.router.push(url);
     this.props.videoLoader.loadVideo("tv", folder, index);
@@ -83,40 +93,52 @@ class ShowPicker extends React.Component {
       return <div></div>;
     }
 
-    let seasons = Object.keys(this.props.showCache.folders).sort(tvShowSort).map((season) => {
+    const seasons = Object.keys(this.props.showCache.folders).sort(window.tvShowSort).map((season) => {
       return <option key={season} value={season}>{season}</option>;
     });
-
-    let episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).map(episode => {
+    let count = 0;
+    const episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).map(episode => {
       let downloadButton = null;
       let downloadProgress = null;
+      let overview = "";
+      if(this.state.metadata && count < this.state.metadata.length) {
+        const metadata = this.state.metadata[count++];
+        overview = metadata.overview;
+        
+      }
       if (this.props.offlineStorage.canStoreOffline()) {
-        downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={evt => this.download(episode)}></button>;
+        downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)}></button>;
         const progress = this.downloadProgress[episode];
         if (typeof progress === "number") {
-          downloadProgress = <span>Downloaded: {parseFloat(progress).toFixed(2)}%</span>
+          downloadProgress = <span>Downloaded: {parseFloat(progress).toFixed(2)}%</span>;
         }
       }
-      return <div key={episode}>
-        <button className="maestroButton roundedButton fa fa-play" onClick={evt => this.play(episode)}></button>
-        <span>{episode}</span>
-        {downloadButton}
-        {downloadProgress}
+      return <div style={{display: "table", margin: "20px",}} key={episode}>
+        <MetadataImage style={{display: "table-cell", verticalAlign: "top",}} 
+          width={100} height={150} type="episode" name={episode} show={this.props.showName}
+          season={this.state.season}  ></MetadataImage>
+        <div style={{display: "table-cell", verticalAlign: "top",}}>
+          <button className="maestroButton roundedButton fa fa-play" onClick={() => this.play(episode)}></button>
+          <span>{episode}</span>
+          {downloadButton}
+          {downloadProgress}
+          <div style={{marginLeft: "20px",}}>{overview}</div>
+        </div>
       </div>;
 
     });
 
     let keepWatchingView = null;
     if (this.state.keepWatchingData && this.state.season == this.state.keepWatchingData.season) {
-      let episode = this.state.keepWatchingData.episode;
+      const episode = this.state.keepWatchingData.episode;
       keepWatchingView = <div>
-        <button className="maestroButton roundedButton fa fa-play c" onClick={evt => this.play(episode)}></button>
+        <button className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(episode)}></button>
         <span>Keep watching: {episode}</span>
       </div>;
     }
 
-    let body = <div>
-      <Modal show={true} animation={false} onHide={evt => this.props.cancelFunction()}>
+    const body = <div>
+      <Modal show={true} animation={false} onHide={() => this.props.cancelFunction()}>
         <Modal.Header>
           <Modal.Title>{this.props.showName}</Modal.Title>
         </Modal.Header>
@@ -134,14 +156,14 @@ class ShowPicker extends React.Component {
           {episodes}
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={evt => this.props.cancelFunction()}>Cancel</button>
+          <button className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
         </Modal.Footer>
       </Modal>
     </div>;
 
     return (
       <div>{body}</div>
-    )
+    );
   }
 }
 

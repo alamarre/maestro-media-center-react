@@ -1,64 +1,60 @@
-import React from 'react'
-import ShowPicker from "./ShowPicker"
+import React from "react";
+import ShowPicker from "./ShowPicker";
 const CollectionPicker = require("./pickers/CollectionStartPicker");
 const PlaylistPicker = require("./pickers/PlaylistPicker");
 const MoviePicker = require("./pickers/MovieDetails");
+const MetadataImage = require("./generic/MetadataImage");
 
 class SearchResults extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { "searchResults": [] };
+    this.state = { "searchResults": [], };
   }
 
   search(value) {
     if (!value || value == "") {
-      this.setState({ "searchResults": [] });
+      this.setState({ "searchResults": [], });
     }
     this.props.searcher.getResults(value).then(results => {
-      this.setState({ "searchResults": results });
+      this.setState({ "searchResults": results, });
     });
   }
 
   selectSource(item) {
     if (item.type == "playlist") {
-      this.setState({ playlistName: item.name });
+      this.setState({ playlistName: item.name, });
       return;
     }
-    Promise.all([this.props.cacheProvider.isTvShow(item.path), this.props.cacheProvider.getCacheFromPath(item.path)])
+    Promise.all([this.props.cacheProvider.isTvShow(item.path), this.props.cacheProvider.getCacheFromPath(item.path),])
       .then(values => {
-        let isTvShow = values[0];
-        let cachePath = values[1];
+        const isTvShow = values[0];
+        const cachePath = values[1];
         if (isTvShow) {
-          this.setState({ showName: item.name, showPath: item.path, cachePath: cachePath })
+          this.setState({ showName: item.name, showPath: item.path, cachePath: cachePath, });
         } else if (item.type === "collection") {
           //this.props.videoLoader.loadVideo("collection", item.name, 0);
-          this.setState({ collectionName: item.name })
+          this.setState({ collectionName: item.name, });
         } else {
-          this.setState({movieName: item.name});
-         // this.props.videoLoader.loadVideo(item.type, item.name, 0);
+          this.setState({movieName: item.name,});
+          // this.props.videoLoader.loadVideo(item.type, item.name, 0);
         }
-      })
+      });
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null, "collectionName": null, "playlistName": null, movieName: null });
+    this.setState({ "showName": null, "collectionName": null, "playlistName": null, movieName: null, });
   }
 
   render() {
     let searchResults = this.state.searchResults.map(item => {
-      const imageSource = item.type === "tv" ?
-        `${this.props.imageRoot}/50x75/tv/show/${item.name}.jpg` :
-        item.type === "collection" ?
-          `${this.props.imageRoot}/50x75/collections/${item.name}.jpg` :
-          `${this.props.imageRoot}/50x75/movies/${item.name}.jpg`;
-      return <li className="list-group-item" key={item.path} onClick={evt => this.selectSource(item)}>
-        <img style={{ border: "white 1px solid", marginRight: "10px" }} src={imageSource} width="50px" height="75px" />
+      return <li className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
+        <MetadataImage style={{display: "inline-block",}} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
-      </li>
+      </li>;
     });
 
-    searchResults = <ul style={{ position: "absolute" }} className="list-group">{searchResults}</ul>;
+    searchResults = <ul style={{ position: "absolute", }} className="list-group">{searchResults}</ul>;
     let showPicker = null;
     if (this.state.showName) {
       showPicker = <ShowPicker
@@ -69,9 +65,10 @@ class SearchResults extends React.Component {
         showProgressProvider={this.props.showProgressProvider}
         showPath={this.state.showPath}
         showName={this.state.showName}
+        metadataProvider={this.props.metadataProvider}
         cancelFunction={this.cancelShowChooser.bind(this)}
         showCache={this.state.cachePath}>
-      </ShowPicker>
+      </ShowPicker>;
     } else if (this.state.collectionName) {
       showPicker = <CollectionPicker
         router={this.props.router}
@@ -118,7 +115,7 @@ class SearchResults extends React.Component {
 
     return (
       <div>{body}</div>
-    )
+    );
   }
 }
 

@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 
 import ShowPicker from "./ShowPicker";
-import AliceCarousel from 'react-alice-carousel';
-import "react-alice-carousel/lib/alice-carousel.css";
 
 const Carousel = require("./generic/Carousel");
+const MetadataImage = require("./generic/MetadataImage");
 
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
@@ -13,9 +12,9 @@ function lastWatchedSort(a, b) {
 class KeepWatching extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { root: "", videos: [] };
+    this.state = { root: "", videos: [], };
     props.showProgressProvider.getShowsInProgress().then(videos => {
-      this.setState({ videos: videos.sort(lastWatchedSort) });
+      this.setState({ videos: videos.sort(lastWatchedSort), });
     });
   }
 
@@ -44,30 +43,31 @@ class KeepWatching extends React.Component {
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null });
+    this.setState({ "showName": null, });
   }
 
   render() {
     const videos = this.state.videos.slice(0, 30).map((video) => {
       //const imageSource = `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`
-      const imageSource = video.show === "movie" ?
-      `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
+      /*const imageSource = video.show === "movie" ?
+        `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
         video.show === "collection" ?
           `${this.props.imageRoot}/150x225/collections/${video.season}.jpg` :
-          `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`;
-
+          `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`;*/
+      const type = video.show === "movie" ? "movies" :
+        video.show === "collection" ? "collections": "tv";
       const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
-      video.show === "collection" ?
-        video.season:
-        video.show;    
-      return <div style={{ "display": "inline-block", width: "200px", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px" }}
+        video.show === "collection" ?
+          video.season:
+          video.show;    
+      return <div style={{ "display": "inline-block", width: "200px", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px", }}
         key={video.show} onClick={this.play.bind(this, video)}>
-        <img style={{ display: "block" }} src={imageSource} width="150px" height="225px" />
+        <MetadataImage style={{display: "block",}} width={150} height={225} type={type} name={name} ></MetadataImage>
         {name}
-      </div>
+      </div>;
     });
 
-    let videosView = <Carousel itemWidth={210}>{videos}</Carousel>
+    let videosView = <Carousel itemWidth={210}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>
@@ -87,14 +87,14 @@ class KeepWatching extends React.Component {
         showPath={this.state.showPath}
         cancelFunction={this.cancelShowChooser.bind(this)}
         showCache={this.state.cachePath}>
-      </ShowPicker>
+      </ShowPicker>;
     }
     return (
       <div>
         {videosView}
         {showPicker}
       </div>
-    )
+    );
   }
 }
 

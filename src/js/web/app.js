@@ -1,8 +1,8 @@
 //import 'bootstrap';
-import 'font-awesome/scss/font-awesome.scss';
-import React from 'react'
-import { render } from 'react-dom'
-import { Router, Route, Link, hashHistory } from 'react-router'
+import "font-awesome/scss/font-awesome.scss";
+import React from "react";
+import { render, } from "react-dom";
+import { Router, Route, hashHistory, } from "react-router";
 
 require("../style.scss");
 
@@ -25,33 +25,33 @@ var ApiRequester = require("../utilities/ApiRequester");
 var QueryStringReader = require("../utilities/QueryStringReader");
 var EpisodeLoader = require("../utilities/EpisodeLoader");
 var WebSocketRemoteController = require("../utilities/WebSocketRemoteController");
-let CacheProvider = require("../utilities/providers/CacheProvider");
-let CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
-let SearchBasedShowProvider = require("../utilities/providers/SearchBasedShowProvider");
-let ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
-let ChromecastManager = require("../utilities/ChromecastManager");
-let SettingsManager = require("../utilities/CookiesSettingsManager");
-let VideoLoader = require("../utilities/VideoLoader");
-let RemoteControllerComponent = require("../components/RemoteController");
+const CacheProvider = require("../utilities/providers/CacheProvider");
+const CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
+const SearchBasedShowProvider = require("../utilities/providers/SearchBasedShowProvider");
+const ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
+const ChromecastManager = require("../utilities/ChromecastManager");
+const SettingsManager = require("../utilities/CookiesSettingsManager");
+const VideoLoader = require("../utilities/VideoLoader");
+const RemoteControllerComponent = require("../components/RemoteController");
 const CollectionsManager = require("../utilities/CollectionsManager");
 const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
 const OfflineStorage = require("../utilities/OfflineVideoStorage");
 const OfflineVideos = require("../components/OfflineVideos");
 
-let settingsManager = new SettingsManager();
-let authTokenManager = new AuthTokenManger(new QueryStringReader());
+const settingsManager = new SettingsManager();
+const authTokenManager = new AuthTokenManger(new QueryStringReader());
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 
 const WebSocketSender = require("../utilities/WebSocketSender");
-let webSocketSender = new WebSocketSender(wsHost, wsPort);
+const webSocketSender = new WebSocketSender(wsHost, wsPort);
 webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
 webSocketSender.connect();
 
-let chromecastManager = new ChromecastManager(apiRequester, authTokenManager, settingsManager, webSocketSender, scheme, host, port);
+const chromecastManager = new ChromecastManager(apiRequester, authTokenManager, settingsManager, webSocketSender, scheme, host, port);
 var episodeLoader = new EpisodeLoader(apiRequester);
-let cacheProvider = new CacheProvider(apiRequester);
-let showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
-let cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
+const cacheProvider = new CacheProvider(apiRequester);
+const showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
+const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
 
 var webSocketRemoteController = new WebSocketRemoteController(wsHost, settingsManager.get("myClientName"), wsPort);
 var div = document.createElement("div");
@@ -59,27 +59,30 @@ div.id = "app";
 document.body.appendChild(div);
 
 import LoginProvider from "../utilities/LoginProvider";
-let loginProvider = new LoginProvider(apiRequester);
+const loginProvider = new LoginProvider(apiRequester);
 import LoginComponent from "../components/Login";
 
 import ProfileProvider from "../utilities/providers/ProfileProvider";
 import ChooseProfile from "../components/ChooseProfile";
-let profileProvider = new ProfileProvider(apiRequester);
+const profileProvider = new ProfileProvider(apiRequester);
 
 const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
 const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
 
-let CachedBasedSearch = require("../utilities/providers/CacheBasedSearch");
-let cacheBasedSearch = new CachedBasedSearch(cacheProvider, playlistProvider);
+const CachedBasedSearch = require("../utilities/providers/CacheBasedSearch");
+const cacheBasedSearch = new CachedBasedSearch(cacheProvider, playlistProvider);
 
-let searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
+const searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
 
 const movieInfoProvider = new MovieInfoProvider(cacheProvider);
 const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
 
+const NewMoviesProvider = require("../utilities/providers/NewMoviesProvider");
+const newMoviesProvider = new NewMoviesProvider(apiRequester);
+
 const offlineStorage = new OfflineStorage();
 
-let videoLoader = new VideoLoader(webSocketSender);
+const videoLoader = new VideoLoader(webSocketSender);
 
 window.tvShowSort = function (a, b) {
   if (a.lastIndexOf(".") > -1) {
@@ -88,10 +91,10 @@ window.tvShowSort = function (a, b) {
   if (b.lastIndexOf(".") > -1) {
     b = b.substring(0, b.lastIndexOf("."));
   }
-  return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-}
+  return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base", });
+};
 
-const imageRoot = `https://video-images.omny.ca`;
+const imageRoot = "https://video-images.omny.ca";
 
 const MetadataProvider = require("../utilities/providers/MetadataProvider");
 const metadataProvider = new MetadataProvider(apiRequester);
@@ -99,7 +102,7 @@ const metadataProvider = new MetadataProvider(apiRequester);
 episodeLoader = cacheBasedEpisodeProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+    <Route path="/" component={(props) => (<Home {...props} newMoviesProvider={newMoviesProvider} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
       <Route path="videos(/:videoType)" component={(props) => (<VideosListing {...props} offlineStorage={offlineStorage} metadataProvider={metadataProvider} imageRoot={imageRoot} videoLoader={videoLoader} playlistManager={playlistProvider} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider} />)} />
       <Route path="view" component={(props) => (<VideoPlayer {...props} offlineStorage={offlineStorage} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} chromecastManager={chromecastManager} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider} />)} />
