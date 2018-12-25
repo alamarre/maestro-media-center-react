@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 class Html5VideoPlayer extends React.Component {
   constructor(props) {
@@ -9,8 +9,8 @@ class Html5VideoPlayer extends React.Component {
         pause: this.pause.bind(this),
         skipForward: this.skipForward.bind(this),
         skipBack: this.skipBack.bind(this),
-        seek: this.seek.bind(this)
-      })
+        seek: this.seek.bind(this),
+      });
     }
   }
 
@@ -24,6 +24,14 @@ class Html5VideoPlayer extends React.Component {
 
   play() {
     this.refs.video.play();
+  }
+
+  playPause() {
+    if(this.refs.video.paused) {
+      this.play();
+    } else {
+      this.pause();
+    }
   }
 
   skipForward() {
@@ -47,6 +55,12 @@ class Html5VideoPlayer extends React.Component {
     this.refs.video.currentTime = (this.refs.video.duration * percent) / 100;
   }
 
+  componentDidUpdate(prevProps) {
+    if(prevProps.sources[0] !== this.props.sources[0]) {
+      this.refs.video.load();
+    }
+  }
+
   render() {
     const subtitles = this.props.subtitles ? 
       <track src={this.props.subtitles[0]} kind="subtitles" srcLang="en" label="English" default></track> : null;
@@ -54,10 +68,10 @@ class Html5VideoPlayer extends React.Component {
       return <source src={s} key={s} type="video/mp4"></source>;
     });
 
-    return <video key={this.props.source} crossOrigin="anonymous" onLoadedMetadata={() => { this.seekToTime(this.props.startTime) }} onEnded={() => this.props.onEnded(this)} onPlay={() => this.props.onPlay(this)} onPause={() => this.props.onPause(this)} style={{ margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.props.sources != null ? 'block' : 'none' }} ref='video' data-source={this.props.source} controls={true} autoPlay={true}>
+    return <video key={"video"} crossOrigin="anonymous" onClick={() => this.playPause()} onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }} onEnded={() => this.props.onEnded(this)} onPlay={() => this.props.onPlay(this)} onPause={() => this.props.onPause(this)} style={{ margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.props.sources != null ? "block" : "none", }} ref='video' data-source={this.props.source} controls={true} autoPlay={true}>
       {sources}
       {subtitles}
-    </video>
+    </video>;
   }
 
 }

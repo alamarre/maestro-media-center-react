@@ -10,6 +10,25 @@ class CookieSettingsManager {
 
   getCookie(cname)
   {
+    if(localStorage) {
+      const item = localStorage.getItem(`cookie-${cname}`);
+      if(item) {
+        try {
+          const {value, expires,} = JSON.parse(item);
+          if(expires && expires >= (new Date().getTime())) {
+            return value;
+          }
+        } catch(e) {
+          console.error(e);
+        }
+      }
+    }
+    if(document.cookie === "") {
+      const cookie = (localStorage && localStorage.getItem("cookie"));
+      if(cookie) {
+        document.cookie = cookie;
+      }
+    }
     var name = cname + "=";
     var ca = document.cookie.split(";");
     for (var i = 0; i < ca.length; i++)
@@ -27,6 +46,9 @@ class CookieSettingsManager {
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toGMTString();
     document.cookie = cname + "=" + cvalue + "; " + expires;
+    if(localStorage) {
+      localStorage.setItem(`cookie-${cname}`, JSON.stringify({expires: d.getTime(), value: cvalue,}));
+    }
   }
 }
 

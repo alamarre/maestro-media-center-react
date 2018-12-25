@@ -30,7 +30,7 @@ class MetadataImage extends Component {
         `${type}/${name}`;
     const image = this.state.failed ? failedImage : `${imagePath}.jpg`;
     const src = `${imageRoot}/${width}x${height}/${image}`;
-    const style = Object.assign({display: "block",}, this.props.style);
+    const style = Object.assign({display: "block", width, height,}, this.props.style);
     return <img style={style} src={src} onError={this.errorHandler.bind(this)}></img>;
   }
 }

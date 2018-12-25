@@ -60,7 +60,7 @@ class ShowPicker extends React.Component {
       }
     }
     const folder = this.props.showPath + "/" + this.state.season;
-    const path = `${this.props.episodeLoader.getRootPath()}/${folder}/${episode}`;
+    const path = `${folder}/${episode}`;
     this.props.offlineStorage.saveVideo({
       type: "tv",
       folder,
@@ -104,13 +104,13 @@ class ShowPicker extends React.Component {
       if(this.state.metadata && count < this.state.metadata.length) {
         const metadata = this.state.metadata[count++];
         overview = metadata.overview;
-        
       }
+
       if (this.props.offlineStorage.canStoreOffline()) {
         downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)}></button>;
         const progress = this.downloadProgress[episode];
-        if (typeof progress === "number") {
-          downloadProgress = <span>Downloaded: {parseFloat(progress).toFixed(2)}%</span>;
+        if (progress && progress.state) {
+          downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}%</span>;
         }
       }
       return <div style={{display: "table", margin: "20px",}} key={episode}>

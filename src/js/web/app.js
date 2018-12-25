@@ -36,10 +36,11 @@ const RemoteControllerComponent = require("../components/RemoteController");
 const CollectionsManager = require("../utilities/CollectionsManager");
 const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
 const OfflineStorage = require("../utilities/OfflineVideoStorage");
+const CordovaOfflineStorage = require("../utilities/CordovaOfflineVideoStorage");
 const OfflineVideos = require("../components/OfflineVideos");
 
 const settingsManager = new SettingsManager();
-const authTokenManager = new AuthTokenManger(new QueryStringReader());
+const authTokenManager = new AuthTokenManger(new QueryStringReader(), settingsManager);
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 
 const WebSocketSender = require("../utilities/WebSocketSender");
@@ -80,7 +81,10 @@ const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvide
 const NewMoviesProvider = require("../utilities/providers/NewMoviesProvider");
 const newMoviesProvider = new NewMoviesProvider(apiRequester);
 
-const offlineStorage = new OfflineStorage();
+const cordovaOfflineStorage = new CordovaOfflineStorage(cacheBasedEpisodeProvider);
+const offlineStorage = cordovaOfflineStorage.canStoreOffline() ? 
+  cordovaOfflineStorage : 
+  new OfflineStorage(cacheBasedEpisodeProvider);
 
 const videoLoader = new VideoLoader(webSocketSender);
 

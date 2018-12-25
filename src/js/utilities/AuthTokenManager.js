@@ -1,32 +1,23 @@
 class AuthTokenManager {
-  constructor(queryStringReader) {
+  constructor(queryStringReader, cookieManager) {
     this.queryStringReader = queryStringReader;
+    this.cookieManager = cookieManager;
     this.profile = "";
   }
 
   isAuthenticated() {
-    return this.getToken() != "";
+    const token = this.getToken();
+    return token && token !== "null";
   }
-    
+
   getCookie(cname)
   {
-    var name = cname + "=";
-    var ca = document.cookie.split(";");
-    for (var i = 0; i < ca.length; i++)
-    {
-      var c = ca[i].trim();
-      if (c.indexOf(name) == 0)
-        return c.substring(name.length, c.length);
-    }
-    return "";
+    return this.cookieManager.getCookie(cname);
   }
     
   setCookie(cname, cvalue, exdays)
   {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + d.toGMTString();
-    document.cookie = cname + "=" + cvalue + "; " + expires;
+    return this.cookieManager.setCookie(cname, cvalue, exdays);
   }
 
   getToken() {

@@ -12,7 +12,9 @@ class NewMovies extends React.Component {
   }
 
   async loadMovies() {
-    const videos = (await this.props.newMoviesProvider.getNewMovies()).map(v => v.movie);
+    const videos = (await this.props.newMoviesProvider.getNewMovies())
+      .sort((a,b) => b.time-a.time)
+      .map(v => v.movie);
     this.setState({videos,});
   }
 

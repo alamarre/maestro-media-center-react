@@ -1,16 +1,15 @@
 import localforage from "localforage";
-const $ = require("jquery");
-const sliceSize = 1024 * 1024 * 100;
 
 function getBase64String(data) {
   const chunkSize = 1024;
-  let base64String = "";
+  let binaryString = "";
   for(let i=0; i<data.byteLength; i+= chunkSize) {
     const start = i;
     const end = Math.min(start+chunkSize, data.byteLength);
     const buffer = data.slice(start, end);
-    base64String += btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    binaryString += String.fromCharCode(...new Uint8Array(buffer));
   }
+  const base64String = btoa(binaryString);
   return base64String;
 }
 
@@ -29,17 +28,28 @@ class OfflineVideoStorage {
     });
     await this.dbStore.setDriver(localforage.INDEXEDDB);
 
-    this.movieStore = localforage.createInstance({
-      name: "maestro-movies",
-    });
-    await this.movieStore.setDriver(localforage.INDEXEDDB);
-
-
     this._hasOffline = (await this.dbStore.length()) > 0;
+    const cordova = window.cordova;
+    if(cordova  && cordova.plugins && cordova.plugins.photoLibrary) {
+      cordova.plugins.photoLibrary.requestAuthorization(
+        function () {
+          // User gave us permission to his library, retry reading it!
+        },
+        function (err) {
+          console.error(err);
+          // User denied the access
+        }, // if options not provided, defaults to {read: true}.
+        {
+          read: true,
+          write: true,
+        }
+      );
+    }
   }
 
   canStoreOffline() {
-    return true;
+    const cordova = window.cordova;
+    return cordova && cordova.plugins && cordova.plugins.photoLibrary;
   }
 
   hasOfflineVideos() {
@@ -49,9 +59,9 @@ class OfflineVideoStorage {
   async getVideoList() {
     const keys = await this.dbStore.keys();
     return Promise.all(keys.map(async key => {
-      const data = await this.dbStore.getItem(key);
-      data.url = key;
-      return data;
+      const {videoData,} = await this.dbStore.getItem(key);
+      videoData.url = key;
+      return videoData;
     }));
   }
 
@@ -63,72 +73,46 @@ class OfflineVideoStorage {
     }
     // our URLs aren't always properly encoded so fix it before the cordova code fails
     const url = new URL(sources[0]).href;
-    const chunking = $.ajaxSettings.chunking;
-    try {
-      let data = await $.ajax(url, {
+    progressFunction({state: "Downloading", progress:  0,});
+    /*try {
+      const data = await $.ajax(url, {
         xhr: () => {
           if (typeof progressFunction === "function") {
-            const lastChunkLen = 0;
-
             const xhr = new window.XMLHttpRequest();
             xhr.responseType = "arraybuffer";
             // Download progress listener
             xhr.addEventListener("progress", (e) => {
-
+  
               progressFunction({state: "Downloading", progress: 100 * e.loaded / e.total,});
-            }, false);
+            }, false); 
             return xhr;
           }
           return $.ajaxSettings.xhr();
         },
       });
-
+  
       const base64String = getBase64String(data);
-      console.log(base64String.length);
-      if (typeof data === "string") {
-        data = new Blob([data,]);
-      }
-      const size = data.size;
+      const dataUrl = "data:video/mp4;base64,"+base64String;
+      progressFunction({state: "Saving", progress:  1,});
+      */
+      
+    window.cordova.plugins.photoLibrary.saveVideo(url, "Maestro", async (libraryItem) => {
+      await this.dbStore.setItem(url, {videoData, libraryItem,});
 
-      const numSlices = Math.ceil(size / sliceSize);
-      const slices = [];
-      let start = 0;
-      for (let i = 0; i < numSlices; i++) {
-        let end = start + sliceSize;
-        if (end >= size) {
-          end = undefined;
-        }
-        slices[i] = data.slice(start, end);
-        start = end;
-        await this.movieStore.setItem(`slice-${i}-${url}`, slices[i]);
-      }
-      await this.movieStore.setItem(`metadata-${url}`, { numSlices, });
-      await this.dbStore.setItem(url, videoData);
-      progressFunction(100);
+      progressFunction({state: "Saved", progress: 100,});
 
       this._hasOffline = true;
 
       const event = new CustomEvent("maestro-offline-change", { detail: { offline: this._hasOffline, }, });
-
       document.dispatchEvent(event);
-    } catch (e) {
-      console.log(e);
-    }
+    }, (err) => {
+      throw err;
+    });
+    
 
   }
 
   async delete(url) {
-    const { numSlices, } = await this.movieStore.getItem(`metadata-${url}`);
-    let start = 0;
-    for (let i = 0; i < numSlices; i++) {
-      let end = start + sliceSize;
-      if (end >= size) {
-        end = null;
-      }
-      await this.movieStore.removeItem(`slice-${i}-${url}`);
-      start = end;
-    }
-    await this.movieStore.removeItem(`metadata-${url}`);
     await this.dbStore.removeItem(url);
     this._hasOffline = (await this.dbStore.length()) > 0;
 
@@ -138,16 +122,17 @@ class OfflineVideoStorage {
   }
 
   async getVideo(url) {
-    const data = await this.movieStore.getItem(`metadata-${url}`);
-    if (!data) {
+    const {libraryItem,} = await this.dbStore.getItem(`${url}`);
+    if (!libraryItem) {
       return null;
     }
-    const numSlices = data.numSlices;
-    const slices = [];
-    for (let i = 0; i < numSlices; i++) {
-      slices.push(await this.movieStore.getItem(`slice-${i}-${url}`));
-    }
-    return new Blob(slices, { type: "video/mp4", });
+    return await this._getLibraryItem(libraryItem); 
+  }
+
+  _getLibraryItem(libraryItem) {
+    return new Promise((s, f) => {
+      window.cordova.plugins.photoLibrary.getLibraryItem(libraryItem, s, f);
+    });
   }
 }
 
