@@ -1,16 +1,38 @@
 import localforage from "localforage";
 
-function getBase64String(data) {
-  const chunkSize = 1024;
-  let binaryString = "";
-  for(let i=0; i<data.byteLength; i+= chunkSize) {
-    const start = i;
-    const end = Math.min(start+chunkSize, data.byteLength);
-    const buffer = data.slice(start, end);
-    binaryString += String.fromCharCode(...new Uint8Array(buffer));
+function createDirectoryPromise(dirEntry, directoryName) {
+  return new Promise((s, f) => {
+    dirEntry.getDirectory(directoryName, { create: true, }, s, f);
+  });
+}
+
+async function createDirectoryPath(dirEntry, path) {
+  const parts = path.split("/");
+  if(!parts[0]) {
+    parts.pop();
   }
-  const base64String = btoa(binaryString);
-  return base64String;
+
+  let current = dirEntry;
+  for(let i=0; i<parts.length; i++) {
+    current = await createDirectoryPromise(current, parts[i]);
+  }
+  return current;
+}
+
+async function getFileFromPath(dirEntry, options, path) {
+  const parts = path.split("/");
+  if(!parts[0]) {
+    parts.pop();
+  }
+  const file = parts.splice(-1,1)[0];
+  const dir = await createDirectoryPath(dirEntry, parts.join("/"));
+  return await getFilePromise(dir, options, file);
+}
+
+function getFilePromise(dirEntry, options, fileName) {
+  return new Promise((s, f) => {
+    dirEntry.getFile(fileName, options, s, f);
+  });
 }
 
 class OfflineVideoStorage {
@@ -28,28 +50,18 @@ class OfflineVideoStorage {
     });
     await this.dbStore.setDriver(localforage.INDEXEDDB);
 
+    window.resolveLocalFileSystemURL(window.cordova.file.documentsDirectory, dirEntry => {
+      dirEntry.getDirectory("NoCloud", {}, noSyncDir => {
+        this.noSyncDir = noSyncDir;
+      });
+    });
+
     this._hasOffline = (await this.dbStore.length()) > 0;
-    const cordova = window.cordova;
-    if(cordova  && cordova.plugins && cordova.plugins.photoLibrary) {
-      cordova.plugins.photoLibrary.requestAuthorization(
-        function () {
-          // User gave us permission to his library, retry reading it!
-        },
-        function (err) {
-          console.error(err);
-          // User denied the access
-        }, // if options not provided, defaults to {read: true}.
-        {
-          read: true,
-          write: true,
-        }
-      );
-    }
   }
 
   canStoreOffline() {
     const cordova = window.cordova;
-    return cordova && cordova.plugins && cordova.plugins.photoLibrary;
+    return cordova && cordova.file;
   }
 
   hasOfflineVideos() {
@@ -74,42 +86,49 @@ class OfflineVideoStorage {
     // our URLs aren't always properly encoded so fix it before the cordova code fails
     const url = new URL(sources[0]).href;
     progressFunction({state: "Downloading", progress:  0,});
-    /*try {
-      const data = await $.ajax(url, {
-        xhr: () => {
-          if (typeof progressFunction === "function") {
-            const xhr = new window.XMLHttpRequest();
-            xhr.responseType = "arraybuffer";
-            // Download progress listener
-            xhr.addEventListener("progress", (e) => {
-  
-              progressFunction({state: "Downloading", progress: 100 * e.loaded / e.total,});
-            }, false); 
-            return xhr;
-          }
-          return $.ajaxSettings.xhr();
-        },
-      });
-  
-      const base64String = getBase64String(data);
-      const dataUrl = "data:video/mp4;base64,"+base64String;
-      progressFunction({state: "Saving", progress:  1,});
-      */
+    const headers = {};
+    let start = 0;
+    const fetchSize = 1024 * 1024;
+    headers["Range"] = `bytes=0-${fetchSize}`;
+    try {
       
-    window.cordova.plugins.photoLibrary.saveVideo(url, "Maestro", async (libraryItem) => {
-      await this.dbStore.setItem(url, {videoData, libraryItem,});
+      let response = await fetch(url, {headers,});
+      let data = await response.blob();
+      const total = parseInt(response.headers.get("Content-Range").split("/")[1]);
+      
+      progressFunction({state: "Downloading", progress:  0.0,});
+      
+      const fileEntry = await getFileFromPath(this.noSyncDir, {create: true,}, videoData.path+".mp4");
+      fileEntry.createWriter(fileWriter => {
+        fileWriter.onwriteend = async () => {
+          start += fetchSize +1;
+          
+          if(start < total) {
+            progressFunction({state: "Downloading", progress: 100 * start / total,});
+            headers["Range"] = `bytes=${start}-${start+fetchSize}`;
+            response = await fetch(url, {headers,});
+            data = await response.blob();
+            fileWriter.write(data);
+          } else {
+            console.log("Successful file read...");
+            progressFunction({state: "Saved", progress: 100,});
+            this._hasOffline = true;
+            const event = new CustomEvent("maestro-offline-change", { detail: { offline: this._hasOffline, }, });
+            document.dispatchEvent(event);
+            await this.dbStore.setItem(url, videoData);
+          }
+        };
+        
+        fileWriter.onerror = function (e) {
+          console.log("Failed file read: " + e.toString());
+          progressFunction({state: "Error "+ e.toString(), progress: null,});
+        };
 
-      progressFunction({state: "Saved", progress: 100,});
-
-      this._hasOffline = true;
-
-      const event = new CustomEvent("maestro-offline-change", { detail: { offline: this._hasOffline, }, });
-      document.dispatchEvent(event);
-    }, (err) => {
-      throw err;
-    });
-    
-
+        fileWriter.write(data);
+      });
+    }catch(e) {
+      progressFunction({state: "Error "+e.toString(),});
+    }
   }
 
   async delete(url) {
@@ -122,17 +141,17 @@ class OfflineVideoStorage {
   }
 
   async getVideo(url) {
-    const {libraryItem,} = await this.dbStore.getItem(`${url}`);
-    if (!libraryItem) {
+    const {videoData,} = await this.dbStore.getItem(`${url}`);
+    if (!videoData) {
       return null;
     }
-    return await this._getLibraryItem(libraryItem); 
-  }
 
-  _getLibraryItem(libraryItem) {
-    return new Promise((s, f) => {
-      window.cordova.plugins.photoLibrary.getLibraryItem(libraryItem, s, f);
-    });
+    const file = await getFileFromPath(this.noSyncDir, {create: false,}, videoData.path);
+    if(!file) {
+      return;
+    }
+
+
   }
 }
 

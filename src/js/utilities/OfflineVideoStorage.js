@@ -2,23 +2,10 @@ import localforage from "localforage";
 const $ = require("jquery");
 const sliceSize = 1024 * 1024 * 100;
 
-function getBase64String(data) {
-  const chunkSize = 1024;
-  let base64String = "";
-  for(let i=0; i<data.byteLength; i+= chunkSize) {
-    const start = i;
-    const end = Math.min(start+chunkSize, data.byteLength);
-    const buffer = data.slice(start, end);
-    base64String += btoa(String.fromCharCode(...new Uint8Array(buffer)));
-  }
-  return base64String;
-}
-
 class OfflineVideoStorage {
 
-  constructor(episodeLoader) {
+  constructor() {
     this._hasOffline = false;
-    this.episodeLoader = episodeLoader;
     this._load();
   }
 
@@ -55,14 +42,7 @@ class OfflineVideoStorage {
     }));
   }
 
-  async saveVideo(videoData, path, progressFunction) {
-    const sourceInfo = await this.episodeLoader.getVideoSource(path);
-    const {sources,} =  sourceInfo;
-    if(sources.length < 1) {
-      return;
-    }
-    // our URLs aren't always properly encoded so fix it before the cordova code fails
-    const url = new URL(sources[0]).href;
+  async saveVideo(videoData, url, progressFunction) {
     const chunking = $.ajaxSettings.chunking;
     try {
       let data = await $.ajax(url, {
@@ -71,11 +51,11 @@ class OfflineVideoStorage {
             const lastChunkLen = 0;
 
             const xhr = new window.XMLHttpRequest();
-            xhr.responseType = "arraybuffer";
+            xhr.responseType = "blob";
             // Download progress listener
             xhr.addEventListener("progress", (e) => {
 
-              progressFunction({state: "Downloading", progress: 100 * e.loaded / e.total,});
+              progressFunction(100 * e.loaded / e.total);
             }, false);
             return xhr;
           }
@@ -83,8 +63,6 @@ class OfflineVideoStorage {
         },
       });
 
-      const base64String = getBase64String(data);
-      console.log(base64String.length);
       if (typeof data === "string") {
         data = new Blob([data,]);
       }

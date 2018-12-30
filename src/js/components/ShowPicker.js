@@ -67,6 +67,7 @@ class ShowPicker extends React.Component {
       index,
       episode,
       showName: this.props.showName,
+      path: `TV Shows/${this.props.showName}/${this.state.season}/${episode}`,
       name: `${this.props.showName} ${this.state.season} ${episode}`,
     }, path, (progress) => {
       this.setState({ downloadProgress$: progress, });

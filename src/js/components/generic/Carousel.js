@@ -3,7 +3,7 @@ import React, { Component, } from "react";
 class Carousel extends Component {
   constructor(props) {
     super(props);
-    this.state = { current: 0, xOffset: 0, noButtons: "ontouchstart" in document.documentElement, };
+    this.state = { current: 0, xOffset: 0, noButtons: "ontouchstart" in document.documentElement, showArrows: false, };
     this.touchEnd = this.touchEnd.bind(this);
     this.touchStart = this.touchStart.bind(this);
     this.touchMove = this.touchMove.bind(this);
@@ -63,19 +63,18 @@ class Carousel extends Component {
     }
     const maxWidth = this.props.width || window.innerWidth;
     const itemWidth = this.props.itemWidth || 200;
-    let workingWidth = maxWidth - 250;
+    const workingWidth = maxWidth - 150;
     
-    let leftArrow = <div style={{display: "table-cell", verticalAlign: "middle",}}>
-      <button  className="remoteButton" onClick={this.goPrevious.bind(this)}><i className="fa fa-arrow-left fa-3x"></i></button>    
+    let leftArrow = <div style={{position: "absolute", top: 0, bottom: 0, backgroundColor: "rgba(128,128,128,0.5)", zIndex: 10,}}>
+      <button style={{border: "none", backgroundColor: "transparent", color: "white", padding: 10, display:"table-cell", height: "100%", verticalAlign: "middle",}} onClick={this.goPrevious.bind(this)}><i className="fa fa-arrow-left"></i></button>    
     </div>;
-    let rightArrow = <div style={{display: "table-cell", verticalAlign: "middle",}}>
-      <button style={{display: "table-cell", verticalAlign: "middle",}}  className="remoteButton" onClick={this.goNext.bind(this)}><i className="fa fa-arrow-right fa-3x"></i></button>  
+    let rightArrow = <div style={{position: "absolute", top: 0, bottom: 0, right: 0, backgroundColor: "rgba(128,128,128,0.5)", verticalAlign: "middle",}}>
+      <button style={{border: "none", backgroundColor: "transparent", color: "white", padding: 10, display:"table-cell", height: "100%", verticalAlign: "middle",}} onClick={this.goNext.bind(this)}><i className="fa fa-arrow-right"></i></button>    
     </div>;
     let horizantalAlignment = "center";
-    if (this.state.noButtons) {
+    if (this.state.noButtons || !this.state.showArrows) {
       leftArrow = null;
       rightArrow = null;
-      workingWidth = maxWidth;
     }
     let itemCount = workingWidth <= itemWidth ? 1 : Math.trunc(workingWidth / itemWidth);
     if(itemCount >= this.props.children.length) {
@@ -94,7 +93,7 @@ class Carousel extends Component {
       children.push(this.props.children[itemNumber]);
     }
     return (
-      <div onTouchStart={this.touchStart} onTouchEnd={this.touchEnd} onTouchMove={this.touchMove} style={{display: "table", width:"100%",}}>
+      <div onMouseEnter={() => this.setState({showArrows: true,})} onMouseLeave={() => this.setState({showArrows: false,})} onTouchStart={this.touchStart} onTouchEnd={this.touchEnd} onTouchMove={this.touchMove} style={{display: "table", position:"relative", width:"100%",}}>
         {leftArrow}
         <div style={{display: "table-cell", verticalAlign: "middle", paddingLeft: this.state.xOffset, textAlign: horizantalAlignment,}}>
           {children}
