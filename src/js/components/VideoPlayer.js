@@ -152,7 +152,7 @@ class VideoPlayer extends React.Component {
         if (time) {
           this.playerTypeHandlers[this.type].recordProgress(time);
         }
-      }, 10 * 1000);
+      }, 30 * 1000);
     }
     this.hideEpisodeInfo();
   }

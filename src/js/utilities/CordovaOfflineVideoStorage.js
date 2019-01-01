@@ -44,12 +44,14 @@ class OfflineVideoStorage {
   }
 
   async _load() {
-
+    if(!this.canStoreOffline()) {
+      return;
+    }
     this.dbStore = localforage.createInstance({
       name: "maestro-metadata",
     });
     await this.dbStore.setDriver(localforage.INDEXEDDB);
-
+    
     window.resolveLocalFileSystemURL(window.cordova.file.documentsDirectory, dirEntry => {
       dirEntry.getDirectory("NoCloud", {}, noSyncDir => {
         this.noSyncDir = noSyncDir;

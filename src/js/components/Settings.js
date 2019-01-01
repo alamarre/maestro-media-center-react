@@ -1,6 +1,5 @@
 import React from "react";
 
-import { Link, } from "react-router";
 const EasyInputComponent = require("./EasyInputComponent");
 
 class Settings extends EasyInputComponent {
@@ -9,7 +8,6 @@ class Settings extends EasyInputComponent {
     super(props);
     this.state = {
       remoteControl: this.props.settingsManager.get("remoteControl") == "true",
-      remoteClients: [],
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
@@ -27,7 +25,6 @@ class Settings extends EasyInputComponent {
 
     this.setState({
       remoteControl: this.props.settingsManager.get("remoteControl") == "true",
-      remoteClients: [],
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
@@ -69,8 +66,6 @@ class Settings extends EasyInputComponent {
         <input type="text" className="form-control" name="myClientName" onChange={this.handleClientNameChange} value={this.state.myClientName} />
       </div>;
     }
-
-    const remoteControlOtherSettings = null;
 
     const options = this.state.remoteClients.map((client) => {
       return <option key={client}>{client}</option>;

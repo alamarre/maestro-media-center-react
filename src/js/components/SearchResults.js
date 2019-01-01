@@ -54,7 +54,7 @@ class SearchResults extends React.Component {
       </li>;
     });
 
-    searchResults = <ul style={{ position: "absolute", }} className="list-group">{searchResults}</ul>;
+    searchResults = <ul style={{ position: "absolute", zIndex: 1000, }} className="list-group">{searchResults}</ul>;
     let showPicker = null;
     if (this.state.showName) {
       showPicker = <ShowPicker
