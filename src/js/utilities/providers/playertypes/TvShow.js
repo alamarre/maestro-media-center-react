@@ -14,7 +14,7 @@ class TvShowPlayerManager {
 
   async getEpisodes() {
     const listing = await this.episodeLoader.getListingPromise(this.parentPath + "/" + this.subdirectory);
-    this.episodes = listing.files;
+    this.episodes = listing.files.sort(window.tvShowSort);
     if (this.index == null) {
       this.index = listing.files.length - 1;
     }

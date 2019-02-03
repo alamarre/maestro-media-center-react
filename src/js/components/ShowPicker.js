@@ -98,7 +98,7 @@ class ShowPicker extends React.Component {
       return <option key={season} value={season}>{season}</option>;
     });
     let count = 0;
-    const episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).map(episode => {
+    const episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).sort(window.tvShowSort).map(episode => {
       let downloadButton = null;
       let downloadProgress = null;
       let overview = "";
@@ -116,7 +116,7 @@ class ShowPicker extends React.Component {
       }
       return <div style={{display: "table", margin: "20px",}} key={episode}>
         <MetadataImage style={{display: "table-cell", verticalAlign: "top",}} 
-          width={100} height={150} type="episode" name={episode} show={this.props.showName}
+          width={227} height={127} type="episode" name={episode} show={this.props.showName}
           season={this.state.season}  ></MetadataImage>
         <div style={{display: "table-cell", verticalAlign: "top",}}>
           <button className="maestroButton roundedButton fa fa-play" onClick={() => this.play(episode)}></button>

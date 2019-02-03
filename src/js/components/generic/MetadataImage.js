@@ -1,7 +1,7 @@
 import React,{ Component, } from "react";
 
-const imageRoot = process.env.IMAGE_ROOT || "https://video-images.omny.ca";
-const failedImage = "placeholder.png";
+const imageRoot = process.env.IMAGE_ROOT || "https://maestro-images.omny.ca";
+const failedImage = "fallback.png";
 class MetadataImage extends Component {
   constructor(props) {
     super(props);
@@ -28,8 +28,8 @@ class MetadataImage extends Component {
       type === "tv" ?
         `tv/show/${name}` :
         `${type}/${name}`;
-    const image = this.state.failed ? failedImage : `${imagePath}.jpg`;
-    const src = `${imageRoot}/${width}x${height}/${image}`;
+    const image = this.state.failed ? failedImage : `${imagePath}.png`;
+    const src = `${imageRoot}/${window.accountId}/${width}x${height}/${image}`;
     const style = Object.assign({display: "block", width, height,}, this.props.style);
     return <img style={style} src={src} onError={this.errorHandler.bind(this)}></img>;
   }

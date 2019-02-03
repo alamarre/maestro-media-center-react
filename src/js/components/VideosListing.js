@@ -63,14 +63,14 @@ class VideosListing extends React.Component {
       //const folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
 
       if (file.type && file.type == "tv") {
-        const imageSource = `${this.props.imageRoot}/50x75/tv/show/${file.name}.jpg`;
+        const imageSource = `${this.props.imageRoot}/${window.accountId}/50x75/tv/show/${file.name}.png`;
         return <div style={{ margin: "20px", }} key={fileName} onClick={() => this.selectSource(file)} >
           <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
           {fileName}
         </div>;
       }
 
-      const imageSource = `${this.props.imageRoot}/50x75/movies/${file.name}.jpg`;
+      const imageSource = `${this.props.imageRoot}/${window.accountId}/50x75/movies/${file.name}.png`;
 
       return <div style={{ margin: "20px", }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
         <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />

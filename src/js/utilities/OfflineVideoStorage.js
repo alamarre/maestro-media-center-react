@@ -117,7 +117,8 @@ class OfflineVideoStorage {
     for (let i = 0; i < numSlices; i++) {
       slices.push(await this.movieStore.getItem(`slice-${i}-${url}`));
     }
-    return new Blob(slices, { type: "video/mp4", });
+    const blob = new Blob(slices, { type: "video/mp4", });
+    return URL.createObjectURL(blob);
   }
 }
 

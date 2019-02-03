@@ -18,6 +18,7 @@ var wsPort = process.env.WEBSOCKET_PORT || port;
 var jquery = require("jquery");
 
 var Home = require("../components/Home");
+
 var VideoPlayer = require("../components/VideoPlayer");
 var VideosListing = require("../components/VideosListing");
 var AuthTokenManger = require("../utilities/AuthTokenManager");
@@ -25,6 +26,7 @@ var ApiRequester = require("../utilities/ApiRequester");
 var QueryStringReader = require("../utilities/QueryStringReader");
 var EpisodeLoader = require("../utilities/EpisodeLoader");
 var WebSocketRemoteController = require("../utilities/WebSocketRemoteController");
+const AccountProvider = require("../utilities/providers/AccountProvider");
 const CacheProvider = require("../utilities/providers/CacheProvider");
 const CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
 const SearchBasedShowProvider = require("../utilities/providers/SearchBasedShowProvider");
@@ -42,6 +44,7 @@ const OfflineVideos = require("../components/OfflineVideos");
 const settingsManager = new SettingsManager();
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), settingsManager);
 var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
+const accountProvider = new AccountProvider(apiRequester);
 
 const WebSocketSender = require("../utilities/WebSocketSender");
 const webSocketSender = new WebSocketSender(wsHost, wsPort);
@@ -98,7 +101,7 @@ window.tvShowSort = function (a, b) {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base", });
 };
 
-const imageRoot = "https://video-images.omny.ca";
+const imageRoot = "https://maestro-images.omny.ca";
 
 const MetadataProvider = require("../utilities/providers/MetadataProvider");
 const metadataProvider = new MetadataProvider(apiRequester);
@@ -106,7 +109,7 @@ const metadataProvider = new MetadataProvider(apiRequester);
 episodeLoader = cacheBasedEpisodeProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} newMoviesProvider={newMoviesProvider} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+    <Route path="/" component={(props) => (<Home {...props} accountProvider={accountProvider} newMoviesProvider={newMoviesProvider} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
       <Route path="videos(/:videoType)" component={(props) => (<VideosListing {...props} offlineStorage={offlineStorage} metadataProvider={metadataProvider} imageRoot={imageRoot} videoLoader={videoLoader} playlistManager={playlistProvider} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider} />)} />
       <Route path="view" component={(props) => (<VideoPlayer {...props} offlineStorage={offlineStorage} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} chromecastManager={chromecastManager} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} login={loginProvider} />)} />

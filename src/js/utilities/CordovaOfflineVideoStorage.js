@@ -73,7 +73,7 @@ class OfflineVideoStorage {
   async getVideoList() {
     const keys = await this.dbStore.keys();
     return Promise.all(keys.map(async key => {
-      const {videoData,} = await this.dbStore.getItem(key);
+      const videoData = await this.dbStore.getItem(key);
       videoData.url = key;
       return videoData;
     }));
@@ -143,17 +143,13 @@ class OfflineVideoStorage {
   }
 
   async getVideo(url) {
-    const {videoData,} = await this.dbStore.getItem(`${url}`);
+    url = new URL(url).href;
+    const videoData = await this.dbStore.getItem(`${url}`);
     if (!videoData) {
       return null;
     }
-
-    const file = await getFileFromPath(this.noSyncDir, {create: false,}, videoData.path);
-    if(!file) {
-      return;
-    }
-
-
+    const file = await getFileFromPath(this.noSyncDir, {create: false,}, videoData.path + ".mp4");
+    return file.toURL();
   }
 }
 

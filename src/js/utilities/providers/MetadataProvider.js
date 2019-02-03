@@ -1,4 +1,4 @@
-const imageRoot = process.env.IMAGE_ROOT || "https://video-images.omny.ca";
+const imageRoot = process.env.IMAGE_ROOT || "https://maestro-images.omny.ca";
 
 class MetadataProvider {
   constructor(apiRequester) {
@@ -21,16 +21,23 @@ class MetadataProvider {
     return await this.apiRequester.apiRequestPromise("metadata", `tv/${show}/${season}/${episode}`, {});
   }
 
+  async getAccountId() {
+    return await this.apiRequester.apiRequestPromise("account", "", {});
+  }
+
   async getMoviePoster(movieName, width, height) {
-    return `${imageRoot}/${width}x${height}/movies/${movieName}.jpg`;
+    const accountId = await this.getAccountId();
+    return `${imageRoot}/${accountId}/${width}x${height}/movies/${movieName}.jpg`;
   }
 
   async getTvShowPoster(show, width, height) {
-    return `${imageRoot}/${width}x${height}/tv/show/${show}.jpg`;
+    const accountId = await this.getAccountId();
+    return `${imageRoot}/${accountId}/${width}x${height}/tv/show/${show}.jpg`;
   }
 
   async getTvEpisodePoster(show, season, episode, width, height) {
-    return `${imageRoot}/${width}x${height}/tv/episode/${show}/${season}/${episode}.jpg`;
+    const accountId = await this.getAccountId();
+    return `${imageRoot}/${accountId}/${width}x${height}/tv/episode/${show}/${season}/${episode}.jpg`;
   }
 
 }

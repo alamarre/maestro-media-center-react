@@ -134,7 +134,7 @@ class VideoPlayer extends React.Component {
     if (this.props.offlineStorage) {
       const data = await this.props.offlineStorage.getVideo(sources[0]);
       if (data) {
-        sources[0] = URL.createObjectURL(data);
+        sources[0] = data;
       }
     }
     this.setState({ sources, subtitles,  name, seekTime, });

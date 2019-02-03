@@ -33,14 +33,14 @@ class NewMovies extends React.Component {
     const videos = this.state.videos.slice(0, 30).map((video) => {
 
       const name = video;  
-      return <div style={{ "display": "inline-block", width: "200px", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px", }}
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video} onClick={this.play.bind(this, video)}>
-        <MetadataImage width={150} height={225} type="movies" name={video}></MetadataImage>
+        <MetadataImage style={{display: "block", margin: "0 0 0 0", padding: "0 0 0 0",}} width={150} height={225} type="movies" name={video}></MetadataImage>
         {name}
       </div>;
     });
 
-    let videosView = <Carousel itemWidth={210}>{videos}</Carousel>;
+    let videosView = <Carousel itemWidth={150}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

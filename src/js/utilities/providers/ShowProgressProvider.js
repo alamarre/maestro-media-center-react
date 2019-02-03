@@ -19,7 +19,7 @@ class ShowProgressProvider {
       }
       return null;
     }).catch(() => {
-      return {};
+      return null;
     });
   }
 

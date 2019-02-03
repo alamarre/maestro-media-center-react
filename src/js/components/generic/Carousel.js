@@ -61,9 +61,9 @@ class Carousel extends Component {
     if(!this.props.children) {
       return <div></div>;
     }
-    const maxWidth = this.props.width || window.innerWidth;
     const itemWidth = this.props.itemWidth || 200;
-    const workingWidth = maxWidth - 150;
+    const maxWidth = this.props.width || (this.refs.root && this.refs.root.clientWidth) || (window.innerWidth - itemWidth);
+    const workingWidth = maxWidth;
     
     let leftArrow = <div style={{position: "absolute", top: 0, bottom: 0, backgroundColor: "rgba(128,128,128,0.5)", zIndex: 10,}}>
       <button style={{border: "none", backgroundColor: "transparent", color: "white", padding: 10, display:"table-cell", height: "100%", verticalAlign: "middle",}} onClick={this.goPrevious.bind(this)}><i className="fa fa-arrow-left"></i></button>    
@@ -93,9 +93,9 @@ class Carousel extends Component {
       children.push(this.props.children[itemNumber]);
     }
     return (
-      <div onMouseEnter={() => this.setState({showArrows: true,})} onMouseLeave={() => this.setState({showArrows: false,})} onTouchStart={this.touchStart} onTouchEnd={this.touchEnd} onTouchMove={this.touchMove} style={{display: "table", position:"relative", width:"100%",}}>
+      <div ref="root" onMouseEnter={() => this.setState({showArrows: true,})} onMouseLeave={() => this.setState({showArrows: false,})} onTouchStart={this.touchStart} onTouchEnd={this.touchEnd} onTouchMove={this.touchMove} style={{display: "table", position:"relative", width:"100%",}}>
         {leftArrow}
-        <div style={{display: "table-cell", verticalAlign: "middle", paddingLeft: this.state.xOffset, textAlign: horizantalAlignment,}}>
+        <div style={{display: "table-cell", width: "100%", verticalAlign: "middle", paddingLeft: this.state.xOffset, textAlign: horizantalAlignment,}}>
           {children}
         </div>
         {rightArrow}

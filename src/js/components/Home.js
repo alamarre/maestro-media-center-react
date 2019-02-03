@@ -20,6 +20,11 @@ class Home extends EasyInputComponent {
       this.props.router.push("/login");
     } else if (!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profile") {
       this.props.router.push("/profile");
+    } else {
+      this.props.accountProvider.getAccountId().then(accountInfo => {
+        window.accountId = accountInfo.accountId;
+        this.forceUpdate();
+      }); 
     }
 
     this.props.videoLoader.setRouter(this.props.router);
@@ -59,6 +64,7 @@ class Home extends EasyInputComponent {
   }
 
   render() {
+    
     const settingsView = this.state.showSettings ?
       <SettingsComponent router={this.props.router} remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender} settingsManager={this.props.settingsManager} />
       : null;
@@ -82,11 +88,16 @@ class Home extends EasyInputComponent {
       {settingsView}
     </div>;
 
+    if(this.props.router.location.pathname !== "/login" 
+      && this.props.router.location.pathname != "/profile"
+      && !window.accountId) {
+      return <div>{settingsSection}</div>;
+    }
+
     let offlineLink = null;
     if (this.props.offlineStorage.canStoreOffline()) {
       offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
     }
-
 
     const remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") != "") ?
       <Link className="nostyle" to="remote">Remote Control</Link>

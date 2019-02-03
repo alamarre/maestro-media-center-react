@@ -60,14 +60,14 @@ class KeepWatching extends React.Component {
         video.show === "collection" ?
           video.season:
           video.show;    
-      return <div style={{ "display": "inline-block", width: "200px", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px", }}
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video.show} onClick={this.play.bind(this, video)}>
-        <MetadataImage style={{display: "block",}} width={150} height={225} type={type} name={name} ></MetadataImage>
+        <MetadataImage style={{display: "block", margin: "0 0 0 0", padding: "0 0 0 0",}} width={150} height={225} type={type} name={name} ></MetadataImage>
         {name}
       </div>;
     });
 
-    let videosView = <Carousel itemWidth={210}>{videos}</Carousel>;
+    let videosView = <Carousel itemWidth={150}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>
