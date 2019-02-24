@@ -11,11 +11,7 @@ class EpisodeLoader {
           path: folder,
         },
       }).then(function(result) {
-        result.files = result.files.filter(function(file) {
-          return file.indexOf(".mp4") == (file.length-".mp4".length);
-        });
-
-        result.files = result.files.sort(tvShowSort);
+        result.files = result.files.sort(window.tvShowSort);
 
         good(result);
       }, function(error) {

@@ -34,7 +34,7 @@ class ApiRequester {
 
         request.success(data);
 
-      }, error: function (data, t, e) {
+      }, error: function (data) {
         if (typeof request.error == "function") {
           request.error(data);
         } else {
@@ -59,11 +59,11 @@ class ApiRequester {
     this.jQuery.ajax(requestInfo);
   }
 
-  apiRequestPromise(module, path, request, version) {
+  apiRequestPromise(module, path, request = {}, version = "v1.0") {
     var authTokenManager = this.authTokenManager;
     var self = this;
     var promise = new Promise(function (fulfill, reject) {
-      var url = "/api/v1.0/" + module;
+      var url = `/api/${version}/${module}`;
       if (path != "") {
         url += "/" + path;
       }

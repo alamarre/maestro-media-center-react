@@ -24,8 +24,9 @@ class PlaylistManager {
     }
     const name = video.file;
     const path = this.playlist;
-    const source = this.episodeLoader.getRootPath() + "/" + video.path;
-    return { source, name, seekTime, path, index: this.index, };
+    const sourceInfo = await this.episodeLoader.getVideoSource(video.path);
+    const {sources, subtitles,} =  sourceInfo;
+    return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
   recordProgress(time) {

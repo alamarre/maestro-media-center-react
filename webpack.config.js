@@ -66,7 +66,7 @@ module.exports = {
         use: "file-loader",
       },
       {
-        test: /\.(scss)$/,
+        test: /\.(s?css)$/,
         use: [{
           loader: "style-loader", // inject CSS to page
         }, {
@@ -94,6 +94,8 @@ module.exports = {
         "PORT": process.env.PORT || 3000,
         "HOST": JSON.stringify(process.env.HOST),
         "SCHEME": JSON.stringify(process.env.SCHEME),
+        "WEBSOCKET_HOST": JSON.stringify(process.env.WEBSOCKET_HOST),
+        "WEBSOCKET_PORT": JSON.stringify(process.env.WEBSOCKET_PORT),
       },
     }),
   ]) : alwaysPlugins.concat([
@@ -101,6 +103,8 @@ module.exports = {
       "process.env": {
         "HOST": JSON.stringify(process.env.HOST),
         "SCHEME": JSON.stringify(process.env.SCHEME),
+        "WEBSOCKET_HOST": JSON.stringify(process.env.WEBSOCKET_HOST),
+        "WEBSOCKET_PORT": JSON.stringify(process.env.WEBSOCKET_PORT),
       },
     }),
     new webpack.optimize.DedupePlugin(),

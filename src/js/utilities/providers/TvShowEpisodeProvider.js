@@ -43,12 +43,8 @@ class TvShowEpisodeProvider {
           const result = {};
           result.folders = Object.keys(current.folders);
           result.files = Object.keys(current.files);
-                
-          result.files = result.files.filter((file) => {
-            return file.indexOf(".mp4") == (file.length-".mp4".length);
-          });
 
-          result.files = result.files.sort(tvShowSort);
+          result.files = result.files.sort(window.tvShowSort);
 
           good(result);
         }, bad);
@@ -78,11 +74,6 @@ class TvShowEpisodeProvider {
            
     });
   }
-
-  getRootPath() {
-    return this.apiRequester.getHost()+"/videos";
-  }
-
 }
 
-module.exports = CacheBasedEpisodeProvider;
+module.exports = TvShowEpisodeProvider;

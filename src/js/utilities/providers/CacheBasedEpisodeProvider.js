@@ -24,10 +24,6 @@ class CacheBasedEpisodeProvider {
           result.folders = Object.keys(current.folders);
           result.files = Object.keys(current.files);
 
-          result.files = result.files.filter((file) => {
-            return file.indexOf(".mp4") == (file.length - ".mp4".length);
-          });
-
           result.files = result.files.sort(window.tvShowSort);
 
           good(result);
@@ -59,8 +55,8 @@ class CacheBasedEpisodeProvider {
     });
   }
 
-  getRootPath() {
-    return this.apiRequester.getHost() + "/videos";
+  async getVideoSource(path) {
+    return await this.apiRequester.apiRequestPromise("folders", `sources?path=${encodeURIComponent(path)}`, {});
   }
 
 }

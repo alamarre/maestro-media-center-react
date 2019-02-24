@@ -1,6 +1,9 @@
-import React from 'react'
+import React from "react";
 
-import ShowPicker from "./ShowPicker"
+import ShowPicker from "./ShowPicker";
+
+const Carousel = require("./generic/Carousel");
+const MetadataImage = require("./generic/MetadataImage");
 
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
@@ -9,9 +12,9 @@ function lastWatchedSort(a, b) {
 class KeepWatching extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { root: "", videos: [] };
+    this.state = { root: "", videos: [], };
     props.showProgressProvider.getShowsInProgress().then(videos => {
-      this.setState({ videos: videos.filter(v => !["movie", "collection"].includes(v.show)).sort(lastWatchedSort) });
+      this.setState({ videos: videos.sort(lastWatchedSort), });
     });
   }
 
@@ -20,33 +23,56 @@ class KeepWatching extends React.Component {
   }
 
   async play(video) {
+    if(video.show === "movie") {
+      return this.props.videoLoader.loadVideo(video.show, video.episode.substring("Movies/".length), 0);
+    }
+
+    if(video.show === "collection") {
+      return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
+    }
+
     const showPath = await this.props.cacheProvider.getShowPath(video.show);
-    const showName = video.show;
     const cachePath = await this.props.cacheProvider.getCacheFromPath(showPath);
     //this.setState({showName, showPath, cachePath});
     const folder = `${showPath}/${video.season}`;
+    if(video.episode.endsWith(".mp4")) {
+      video.episode = video.episode.substring(0, video.episode.indexOf(".mp4"));
+    }
     const episode = Object.keys(cachePath.folders[video.season].files).sort(window.tvShowSort).indexOf(video.episode);
     this.props.videoLoader.loadVideo("tv", folder, episode);
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null });
+    this.setState({ "showName": null, });
   }
 
   render() {
-    let videos = this.state.videos.slice(0, 5).map((video) => {
-      const imageSource = `${this.props.imageRoot}?showName=${video.show}`
-      return <div style={{ "display": "inline-block", width: "150px", verticalAlign: "top", wordWrap: "break-word", margin: "10px 10px" }}
+    const videos = this.state.videos.slice(0, 30).map((video) => {
+      //const imageSource = `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`
+      /*const imageSource = video.show === "movie" ?
+        `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
+        video.show === "collection" ?
+          `${this.props.imageRoot}/150x225/collections/${video.season}.jpg` :
+          `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`;*/
+      const type = video.show === "movie" ? "movies" :
+        video.show === "collection" ? "collections": "tv";
+      const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
+        video.show === "collection" ?
+          video.season:
+          video.show;    
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video.show} onClick={this.play.bind(this, video)}>
-        <img style={{ display: "block" }} src={imageSource} width="150px" height="225px" />
-        {video.show}
-      </div>
+        <MetadataImage style={{display: "block", margin: "0 0 0 0", padding: "0 0 0 0",}} width={150} height={225} type={type} name={name} ></MetadataImage>
+        {name}
+      </div>;
     });
 
+    let videosView = <Carousel itemWidth={150}>{videos}</Carousel>;
+
     if (this.state.videos.length > 0) {
-      videos = <div>
+      videosView = <div>
         <div>Keep Watching</div>
-        {videos}
+        {videosView}
       </div>;
     }
 
@@ -61,14 +87,14 @@ class KeepWatching extends React.Component {
         showPath={this.state.showPath}
         cancelFunction={this.cancelShowChooser.bind(this)}
         showCache={this.state.cachePath}>
-      </ShowPicker>
+      </ShowPicker>;
     }
     return (
       <div>
-        {videos}
+        {videosView}
         {showPicker}
       </div>
-    )
+    );
   }
 }
 

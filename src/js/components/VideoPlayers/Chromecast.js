@@ -1,5 +1,5 @@
 import React from "react";
-
+const cast = window.cast;
 class ChromecastPlayer extends React.Component {
   constructor(props) {
     super(props);
@@ -18,41 +18,44 @@ class ChromecastPlayer extends React.Component {
     const context = cast.framework.CastReceiverContext.getInstance();
     const player = context.getPlayerManager();
     player.addEventListener(cast.framework.events.EventType.PLAY,
-      event => {
+      () => {
         this.props.onPlay(this);
       });
 
     player.addEventListener(cast.framework.events.EventType.PAUSE,
-      event => {
+      () => {
         this.props.onPause(this);
       });
 
     player.addEventListener(cast.framework.events.EventType.PLAYER_LOAD_COMPLETE,
-      event => {
+      () => {
         this.seekToTime(this.props.startTime);
         const textTracksManager = player.getTextTracksManager();
 
-        // Create track 1 for English text
-        const track = textTracksManager.createTrack();
-        track.trackContentType = "text/vtt";
-        track.trackContentId = `${this.props.source.replace(".mp4", ".vtt")}`;
-        track.language = "en";
+        if(this.props.subtitles) {
+          // Create track 1 for English text
+          const track = textTracksManager.createTrack();
+          track.trackContentType = "text/vtt";
+          track.trackContentId = this.props.subtitles[0];
+          track.language = "en";
 
-        // Add tracks
-        textTracksManager.addTracks([track,]);
+          // Add tracks
+          textTracksManager.addTracks([track,]);
+        }
 
         // Set the first matching language text track to be active
         textTracksManager.setActiveByLanguage("en");
       });
 
     player.addEventListener(cast.framework.events.EventType.ENDED,
-      event => {
+      () => {
         this.props.onEnded(this);
       });
 
     var mediaInfo = new cast.framework.messages.MediaInformation();
-    this.source = this.props.source;
-    mediaInfo.contentId = this.props.source;
+    const source = this.props.sources ? this.props.sources[0] : null;
+    this.source = source;
+    mediaInfo.contentId = source;
     mediaInfo.contentType = "video/mp4";
     const request = new cast.framework.messages.LoadRequestData();
     request.media = mediaInfo;
@@ -62,12 +65,13 @@ class ChromecastPlayer extends React.Component {
   }
 
   render() {
-    if (this.source && this.source !== this.props.source) {
+    const source = this.props.sources ? this.props.sources[0] : null;
+    if (this.source && this.source !== source) {
       const context = cast.framework.CastReceiverContext.getInstance();
       const player = context.getPlayerManager();
       var mediaInfo = new cast.framework.messages.MediaInformation();
-      this.source = this.props.source;
-      mediaInfo.contentId = this.props.source;
+      this.source = source;
+      mediaInfo.contentId = source;
       mediaInfo.contentType = "video/mp4";
       const request = new cast.framework.messages.LoadRequestData();
       request.media = mediaInfo;

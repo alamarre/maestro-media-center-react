@@ -2,7 +2,10 @@
     "extends": "eslint:recommended",
     "parserOptions": {
         "ecmaVersion": 8,
-        "sourceType": "module"
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
     },
     "env" : {
         "node" : false,
@@ -11,8 +14,12 @@
     "globals": {
         "Promise": true,
         "require": true,
-        "module": true
+        "module": true,
+        "process": true
     },
+    "plugins": [
+        "react"
+    ],
     "rules": {
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "double"],
@@ -22,6 +29,8 @@
         "no-cond-assign": ["error", "always"],
         "no-console": "off",
         "prefer-const": "error",
-        "strict": ["error", "global"]
+        "strict": ["error", "global"],
+        "react/jsx-uses-react": "error",
+        "react/jsx-uses-vars": "error"
     }
 }

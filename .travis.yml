@@ -18,3 +18,4 @@ jobs:
       script: 
         - npm run deploy
         - npm run deploy-chromecast
+        - npm run deploy-admin

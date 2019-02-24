@@ -1,17 +1,18 @@
-import React from 'react'
-
-import { Link } from 'react-router'
-let EasyInputComponent = require("./EasyInputComponent");
+import React from "react";
+import { Link, } from "react-router";
+const EasyInputComponent = require("./EasyInputComponent");
 
 import SearchResults from "./SearchResults";
 import KeepWatching from "./KeepWatching";
-let SettingsComponent = require("./Settings");
+const SettingsComponent = require("./Settings");
+
+const NewMovies = require("./NewMovies");
 
 class Home extends EasyInputComponent {
 
   constructor(props) {
     super(props);
-    this.state = { showSettings: false, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS) };
+    this.state = { showSettings: false, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS), };
   }
 
   componentWillMount() {
@@ -19,6 +20,11 @@ class Home extends EasyInputComponent {
       this.props.router.push("/login");
     } else if (!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profile") {
       this.props.router.push("/profile");
+    } else {
+      this.props.accountProvider.getAccountId().then(accountInfo => {
+        window.accountId = accountInfo.accountId;
+        this.forceUpdate();
+      }); 
     }
 
     this.props.videoLoader.setRouter(this.props.router);
@@ -32,24 +38,24 @@ class Home extends EasyInputComponent {
     document.addEventListener("maestro-offline-change", (event) => {
       event = event.detail;
       //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
-      this.setState({ hasOfflineVideos: event.offline });
+      this.setState({ hasOfflineVideos: event.offline, });
     });
 
     document.addEventListener("mousemove", this.showSettingsTemporarily.bind(this));
-    document.body.addEventListener('click', this.showSettingsTemporarily.bind(this), true);
+    document.body.addEventListener("click", this.showSettingsTemporarily.bind(this), true);
   }
 
   showSettingsTemporarily() {
     if (window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS) {
       return;
     }
-    this.setState({ hideSettings: false });
+    this.setState({ hideSettings: false, });
     if (this.hideSettingsTimeout) {
       window.clearTimeout(this.hideSettingsTimeout);
     }
 
     this.hideSettingsTimeout = window.setTimeout(() => {
-      this.setState({ hideSettings: true });
+      this.setState({ hideSettings: true, });
     }, 5000);
   }
 
@@ -58,21 +64,22 @@ class Home extends EasyInputComponent {
   }
 
   render() {
-    let settingsView = this.state.showSettings ?
+    
+    const settingsView = this.state.showSettings ?
       <SettingsComponent router={this.props.router} remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender} settingsManager={this.props.settingsManager} />
       : null;
     let settingsDisplay = this.state.hideSettings ? "none" : "block";
 
     let homeButton = null;
-    if (["/login", "/profile", "/remote"].includes(this.props.router.location.pathname)) {
+    if (["/login", "/profile", "/remote",].includes(this.props.router.location.pathname)) {
       settingsDisplay = "none";
-    } else if (!["/"].includes(this.props.router.location.pathname)) {
-      homeButton = <button className="maestroButton fa fa-home" onClick={evt => this.goHome()}></button>;
+    } else if (!["/",].includes(this.props.router.location.pathname)) {
+      homeButton = <button className="maestroButton fa fa-home" onClick={() => this.goHome()}></button>;
     }
 
 
-    let settingsSection = <div style={{ display: settingsDisplay }} className="settings">
-      <div style={{ textAlign: "right", zIndex: 10 }}>
+    const settingsSection = <div style={{ display: settingsDisplay, }} className="settings">
+      <div style={{ textAlign: "right", zIndex: 10, }}>
         <button class="cast-button" is="google-cast-button"></button>
         {homeButton}
         <button className="maestroButton fa fa-cog" onClick={this.toggleSetting} name="showSettings"></button>
@@ -81,13 +88,18 @@ class Home extends EasyInputComponent {
       {settingsView}
     </div>;
 
+    if(this.props.router.location.pathname !== "/login" 
+      && this.props.router.location.pathname != "/profile"
+      && !window.accountId) {
+      return <div>{settingsSection}</div>;
+    }
+
     let offlineLink = null;
     if (this.props.offlineStorage.canStoreOffline()) {
       offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
     }
 
-
-    let remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") != "") ?
+    const remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") != "") ?
       <Link className="nostyle" to="remote">Remote Control</Link>
       : null;
     var body = this.props.children || <div>
@@ -102,10 +114,14 @@ class Home extends EasyInputComponent {
           videoLoader={this.props.videoLoader}
           searcher={this.props.searcher}
           cacheProvider={this.props.cacheProvider}
+          metadataProvider={this.props.metadataProvider}
           showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
-        <KeepWatching imageRoot={this.props.imageRoot} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+        <KeepWatching imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+      </div>
+      <div>
+        <NewMovies {...this.props} ></NewMovies>
       </div>
       <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
       <div>{remoteLink}</div>
@@ -113,8 +129,8 @@ class Home extends EasyInputComponent {
     </div>;
     return (
       <div>{settingsSection}{body}</div>
-    )
+    );
   }
 }
 
-module.exports = Home
+module.exports = Home;

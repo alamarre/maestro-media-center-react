@@ -10,7 +10,7 @@ class MovieInfoProvider {
     const [cache, rootFolders,] = await Promise.all([this.cacheProvider.getCache(), this.cacheProvider.getRootFolders(),]);
     for (const rootFolder of rootFolders) {
       if (!rootFolder.type || rootFolder.type.toLowerCase() === "movie") {
-        const path = await this.findInFolder(cache.folders[rootFolder.name], rootFolder.name, movieName + ".mp4");
+        const path = await this.findInFolder(cache.folders[rootFolder.name], rootFolder.name, movieName);
         if (path) {
           return path;
         }

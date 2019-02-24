@@ -43,12 +43,10 @@ class OfflineVideoStorage {
   }
 
   async saveVideo(videoData, url, progressFunction) {
-    const chunking = $.ajaxSettings.chunking;
     try {
       let data = await $.ajax(url, {
         xhr: () => {
           if (typeof progressFunction === "function") {
-            const lastChunkLen = 0;
 
             const xhr = new window.XMLHttpRequest();
             xhr.responseType = "blob";
@@ -97,14 +95,8 @@ class OfflineVideoStorage {
 
   async delete(url) {
     const { numSlices, } = await this.movieStore.getItem(`metadata-${url}`);
-    let start = 0;
     for (let i = 0; i < numSlices; i++) {
-      let end = start + sliceSize;
-      if (end >= size) {
-        end = null;
-      }
       await this.movieStore.removeItem(`slice-${i}-${url}`);
-      start = end;
     }
     await this.movieStore.removeItem(`metadata-${url}`);
     await this.dbStore.removeItem(url);
@@ -125,7 +117,8 @@ class OfflineVideoStorage {
     for (let i = 0; i < numSlices; i++) {
       slices.push(await this.movieStore.getItem(`slice-${i}-${url}`));
     }
-    return new Blob(slices, { type: "video/mp4", });
+    const blob = new Blob(slices, { type: "video/mp4", });
+    return URL.createObjectURL(blob);
   }
 }
 
