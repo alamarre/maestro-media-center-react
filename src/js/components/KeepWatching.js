@@ -31,14 +31,16 @@ class KeepWatching extends React.Component {
       return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
     }
 
+    const latest = await this.props.showProgressProvider.getShowProgress(video.show);
+
     const showPath = await this.props.cacheProvider.getShowPath(video.show);
     const cachePath = await this.props.cacheProvider.getCacheFromPath(showPath);
     //this.setState({showName, showPath, cachePath});
-    const folder = `${showPath}/${video.season}`;
-    if(video.episode.endsWith(".mp4")) {
-      video.episode = video.episode.substring(0, video.episode.indexOf(".mp4"));
+    const folder = `${showPath}/${latest.season}`;
+    if(latest.episode.endsWith(".mp4")) {
+      latest.episode = latest.episode.substring(0, latest.episode.indexOf(".mp4"));
     }
-    const episode = Object.keys(cachePath.folders[video.season].files).sort(window.tvShowSort).indexOf(video.episode);
+    const episode = Object.keys(cachePath.folders[latest.season].files).sort(window.tvShowSort).indexOf(latest.episode);
     this.props.videoLoader.loadVideo("tv", folder, episode);
   }
 
