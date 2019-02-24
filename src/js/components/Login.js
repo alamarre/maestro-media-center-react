@@ -1,7 +1,5 @@
 import React from "react";
 
-import { Link, } from "react-router";
-
 class Login extends React.Component {
 
   constructor(props) {
@@ -10,11 +8,13 @@ class Login extends React.Component {
   }
 
   login() {
-    var self = this;
     this.props.login.loginPromise(this.usernameInput.value, this.passwordInput.value)
       .then((token) => {
-            
         this.props.authTokenManager.setToken(token);
+        if(this.props.postLoginFunction) {
+          return this.props.postLoginFunction(this.props.router, token);
+        }
+        
         this.props.router.push("/profile");
       }, (error) => {
         console.log(error);

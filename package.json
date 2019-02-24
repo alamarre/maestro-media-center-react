@@ -4,14 +4,16 @@
   "description": "React UI for Maestro Media Center",
   "main": "index.js",
   "scripts": {
+    "adminrun": "./node_modules/.bin/webpack-dev-server --config webpack.admin.config.js --progress --colors --host 0.0.0.0 --port 8089",
     "devrun": "export NODE_ENV=debug; ./node_modules/.bin/webpack-dev-server --config webpack.config.js --progress --colors --host 0.0.0.0 ",
     "castrun": "./node_modules/.bin/webpack-dev-server --config webpack.chromecast.config.js --progress --colors --host 0.0.0.0 --port 8088",
     "devcastbuild": "./node_modules/.bin/webpack --config webpack.chromecast.config.js --progress --colors",
-    "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch",
+    "watch": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors --watch", 
     "build": "export NODE_ENV=production; ./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "devbuild": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "deploy": "export HOST=api.maestromediacenter.com; export WEBSOCKET_HOST=gladiator.omny.ca; export WEBSOCKET_PORT=443; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.config.js && aws s3 sync build/ s3://videos.omny.ca/",
-    "deploy-chromecast": "export HOST=api.maestromediacenter.com; export WEBSOCKET_HOST=gladiator.omny.ca; export WEBSOCKET_PORT=443; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.chromecast.config.js && ./node_modules/.bin/webpack --config webpack.config.js && aws s3 sync castbuild/ s3://chromecast.maestromediacenter.com/"
+    "deploy-admin": "export HOST=adminapi.maestromediacenter.com; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.admin.config.js && aws s3 sync adminbuild/ s3://admin.omny.ca/",
+    "deploy-chromecast": "export HOST=api.maestromediacenter.com; export WEBSOCKET_HOST=gladiator.omny.ca; export WEBSOCKET_PORT=443; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.chromecast.config.js && aws s3 sync castbuild/ s3://chromecast.maestromediacenter.com/"
   },
   "author": "Al Lamarre",
   "license": "AGPL-3.0",

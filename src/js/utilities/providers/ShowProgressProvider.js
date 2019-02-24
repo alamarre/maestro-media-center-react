@@ -2,6 +2,7 @@ class ShowProgressProvider {
   constructor(apiRequester, cacheProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
+    this.last = {};
   }
 
   getShowsInProgress() {
@@ -54,6 +55,12 @@ class ShowProgressProvider {
   }
 
   markStatus(path, status, progress) {
+    if(path === this.last.path
+       && status === this.last.status
+       && progress === this.last.progress) {
+      return;
+    }
+    this.last = {path, status, progress,};
     Promise.all([this.cacheProvider.getCache(), this.cacheProvider.getRootFolders(),]).then((values) => {
       const rootFolders = values[1];
       while (path.startsWith("/")) {

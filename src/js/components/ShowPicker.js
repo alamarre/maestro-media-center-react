@@ -76,7 +76,7 @@ class ShowPicker extends React.Component {
   }
 
   play(episode) {
-    const files = Object.keys(this.props.showCache.folders[this.state.season].files);
+    const files = Object.keys(this.props.showCache.folders[this.state.season].files).sort(window.tvShowSort);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
       if (files[i] == episode) {

@@ -28,8 +28,10 @@ class MetadataImage extends Component {
       type === "tv" ?
         `tv/show/${name}` :
         `${type}/${name}`;
-    const image = this.state.failed ? failedImage : `${imagePath}.png`;
-    const src = `${imageRoot}/${window.accountId}/${width}x${height}/${image}`;
+    const dimensions = `${width}x${height}`;
+    const image = this.state.failed ? `${dimensions}/${failedImage}` : `${window.accountId}/${dimensions}/${imagePath}.png`;
+    const src = `${imageRoot}/${image}`;
+
     const style = Object.assign({display: "block", width, height,}, this.props.style);
     return <img style={style} src={src} onError={this.errorHandler.bind(this)}></img>;
   }
