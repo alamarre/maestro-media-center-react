@@ -1,5 +1,7 @@
 //import 'bootstrap';
+import "@babel/polyfill";
 import "font-awesome/scss/font-awesome.scss";
+import "bootstrap";
 import React from "react";
 import { render, } from "react-dom";
 import { Router, Route, hashHistory, } from "react-router";
@@ -62,12 +64,12 @@ var div = document.createElement("div");
 div.id = "app";
 document.body.appendChild(div);
 
-import LoginProvider from "../utilities/LoginProvider";
+const LoginProvider = require("../utilities/LoginProvider");
 const loginProvider = new LoginProvider(apiRequester);
-import LoginComponent from "../components/Login";
+const LoginComponent  = require( "../components/Login");
 
-import ProfileProvider from "../utilities/providers/ProfileProvider";
-import ChooseProfile from "../components/ChooseProfile";
+const ProfileProvider  = require( "../utilities/providers/ProfileProvider");
+const ChooseProfile  = require( "../components/ChooseProfile");
 const profileProvider = new ProfileProvider(apiRequester);
 
 const PlaylistProvider = require("../utilities/providers/PlaylistProvider");

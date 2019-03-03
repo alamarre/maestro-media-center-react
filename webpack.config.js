@@ -9,7 +9,10 @@ var BUILD_DIR = path.resolve(__dirname, "build");
 var APP_DIR = path.resolve(__dirname, "src/js/");
 
 var jquery = require("jquery");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+
 var alwaysPlugins = [
+  //new BundleAnalyzerPlugin(),
   new HtmlWebpackPlugin({
     "title": "Maestro Media Center",
     template: "template.html",
@@ -32,11 +35,15 @@ var alwaysPlugins = [
   }),];
 module.exports = {
   context: __dirname,
-  devtool: debug ? "inline-sourcemap" : false,
+  devtool: debug ? "inline-sourcemap" : "sourcemap",
   entry: APP_DIR + "/web/app.js",
+  mode: debug ? "development" : "production",
   output: {
     path: BUILD_DIR,
     filename: "app.js",
+  },
+  optimization: {
+    minimize: debug ? false: true,
   },
   module: {
     rules: [
@@ -107,7 +114,5 @@ module.exports = {
         "WEBSOCKET_PORT": JSON.stringify(process.env.WEBSOCKET_PORT),
       },
     }),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: true, }),
   ]),
 };

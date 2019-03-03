@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import React from "react";
 import { render, } from "react-dom";
 import { Router, Route, hashHistory, } from "react-router";
@@ -24,9 +25,9 @@ const authTokenManager = new AuthTokenManger(new QueryStringReader(), new Settin
 const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 
 
-import LoginProvider from "../utilities/LoginProvider";
+const LoginProvider = require("../utilities/LoginProvider");
 const loginProvider = new LoginProvider(apiRequester);
-import LoginComponent from "../components/Login";
+const LoginComponent = require("../components/Login");
 
 const div = document.createElement("div");
 document.body.appendChild(div);

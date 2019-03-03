@@ -1,5 +1,5 @@
 import React from "react";
-import ShowPicker from "./ShowPicker";
+const ShowPicker = require("./ShowPicker");
 const CollectionPicker = require("./pickers/CollectionStartPicker");
 const PlaylistPicker = require("./pickers/PlaylistPicker");
 const MoviePicker = require("./pickers/MovieDetails");
@@ -119,4 +119,4 @@ class SearchResults extends React.Component {
   }
 }
 
-export default SearchResults;
+module.exports = SearchResults;

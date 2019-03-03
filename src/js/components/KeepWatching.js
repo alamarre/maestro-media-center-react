@@ -1,6 +1,6 @@
 import React from "react";
 
-import ShowPicker from "./ShowPicker";
+const ShowPicker = require("./ShowPicker");
 
 const Carousel = require("./generic/Carousel");
 const MetadataImage = require("./generic/MetadataImage");

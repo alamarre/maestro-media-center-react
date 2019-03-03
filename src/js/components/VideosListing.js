@@ -1,6 +1,6 @@
 import React from "react";
 
-import ShowPicker from "./ShowPicker";
+const ShowPicker = require("./ShowPicker");
 const MoviePicker = require("./pickers/MovieDetails");
 
 class VideosListing extends React.Component {

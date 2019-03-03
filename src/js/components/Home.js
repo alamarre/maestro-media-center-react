@@ -2,8 +2,8 @@ import React from "react";
 import { Link, } from "react-router";
 const EasyInputComponent = require("./EasyInputComponent");
 
-import SearchResults from "./SearchResults";
-import KeepWatching from "./KeepWatching";
+const SearchResults = require("./SearchResults");
+const KeepWatching = require("./KeepWatching");
 const SettingsComponent = require("./Settings");
 
 const NewMovies = require("./NewMovies");

@@ -25,4 +25,4 @@ class LoginProvider {
 
 }
 
-export default LoginProvider;
+module.exports = LoginProvider;

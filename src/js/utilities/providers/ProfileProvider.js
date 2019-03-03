@@ -22,4 +22,4 @@ class ProfileProvider {
 
 }
 
-export default ProfileProvider;
+module.exports = ProfileProvider;

@@ -168,4 +168,4 @@ class ShowPicker extends React.Component {
   }
 }
 
-export default ShowPicker;
+module.exports = ShowPicker;
