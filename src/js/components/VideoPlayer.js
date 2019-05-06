@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 
 const ChromecastPlayer = require("./VideoPlayers/Chromecast");
 const Html5VideoPlayer = require("./VideoPlayers/Html5Video");
@@ -137,7 +137,15 @@ class VideoPlayer extends React.Component {
         sources[0] = data;
       }
     }
-    this.setState({ sources, subtitles,  name, seekTime, });
+
+    const orderedSources = [].concat(sources);
+    for(const source of sources) {
+      const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+      if(newSource) {
+        orderedSources.unshift(newSource);
+      }
+    }
+    this.setState({ sources: orderedSources, subtitles,  name, seekTime, });
     this.props.videoLoader.setUrl(this.type, path, index);
   }
 

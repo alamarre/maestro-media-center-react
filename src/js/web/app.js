@@ -1,10 +1,10 @@
-//import 'bootstrap';
-import "@babel/polyfill";
-import "font-awesome/scss/font-awesome.scss";
-import "bootstrap";
-import React from "react";
-import { render, } from "react-dom";
-import { Router, Route, hashHistory, } from "react-router";
+//const 'bootstrap';
+require("@babel/polyfill");
+require("font-awesome/scss/font-awesome.scss");
+require("bootstrap");
+const React = require("react");
+const { render, } = require("react-dom");
+const { Router, Route, hashHistory, } = require("react-router");
 
 require("../style.scss");
 
@@ -49,7 +49,7 @@ var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":"
 const accountProvider = new AccountProvider(apiRequester);
 
 const WebSocketSender = require("../utilities/WebSocketSender");
-const webSocketSender = new WebSocketSender(wsHost, wsPort);
+const webSocketSender = new WebSocketSender(wsHost, wsPort, authTokenManager);
 webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
 webSocketSender.connect();
 
@@ -59,7 +59,7 @@ const cacheProvider = new CacheProvider(apiRequester);
 const showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
 const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
 
-var webSocketRemoteController = new WebSocketRemoteController(wsHost, settingsManager.get("myClientName"), wsPort);
+var webSocketRemoteController = new WebSocketRemoteController(wsHost, settingsManager.get("myClientName"), wsPort, authTokenManager);
 var div = document.createElement("div");
 div.id = "app";
 document.body.appendChild(div);

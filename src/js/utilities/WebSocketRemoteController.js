@@ -1,14 +1,17 @@
 class WebSocketRemoteController {
-  constructor(host, clientName, webSocketPort) {
+  constructor(host, clientName, webSocketPort, authTokenManager) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
-    this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
+    this.authTokenManager = authTokenManager;
+    const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
+    this.webSocketUrl = `${protocol}://${host}${portString}`;
     this.clientName = clientName;
     this.updateFunctions = {};
   }
 
   updateSettings(host, clientName, webSocketPort) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
-    this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
+    const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
+    this.webSocketUrl = `${protocol}://${host}${portString}`;
     this.clientName = clientName;
     this.guid = clientName;
   }
@@ -19,6 +22,7 @@ class WebSocketRemoteController {
       this.webSocket.send(JSON.stringify({
         "action": "setId",
         id: this.clientName,
+        token: this.authTokenManager.getToken(),
       }));
     }
   }
@@ -60,6 +64,7 @@ class WebSocketRemoteController {
         ws.send(JSON.stringify({
           "action": "setId",
           id: self.clientName,
+          token: this.authTokenManager.getToken(),
         }));
       }
     };
@@ -89,7 +94,7 @@ class WebSocketRemoteController {
           this.safeRun(self.updateFunctions.play);
           break;
         case "load":
-          const event = new CustomEvent("maestro-load-video", { detail: message, });
+          var event = new CustomEvent("maestro-load-video", { detail: message, });
 
           document.dispatchEvent(event);
           break;

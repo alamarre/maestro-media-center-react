@@ -1,8 +1,8 @@
-import React from "react";
-import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
+const React = require("react");
+const Slider = require("rc-slider").default;
+require("rc-slider/assets/index.css");
 
-module.exports = class RemoteController extends React.Component {
+class RemoteController extends React.Component {
 
   constructor(props) {
     super(props);
@@ -35,4 +35,6 @@ module.exports = class RemoteController extends React.Component {
       <div>{body}</div>
     );
   }
-};
+}
+
+module.exports = RemoteController;

@@ -50,7 +50,12 @@ module.exports = {
       {
         test: /\.jsx?/,
         include: APP_DIR,
-        loader: "babel-loader",
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react",],
+          },
+        },
       },
       {
         test: /\.json$/,

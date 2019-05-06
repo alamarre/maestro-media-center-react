@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 
 const ShowPicker = require("./ShowPicker");
 
@@ -13,6 +13,7 @@ class KeepWatching extends React.Component {
   constructor(props) {
     super(props);
     this.state = { root: "", videos: [], };
+    this.dragging = false;
     props.showProgressProvider.getShowsInProgress().then(videos => {
       this.setState({ videos: videos.sort(lastWatchedSort), });
     });
@@ -23,6 +24,9 @@ class KeepWatching extends React.Component {
   }
 
   async play(video) {
+    if(this.dragging) {
+      return;
+    }
     if(video.show === "movie") {
       return this.props.videoLoader.loadVideo(video.show, video.episode.substring("Movies/".length), 0);
     }
@@ -44,18 +48,16 @@ class KeepWatching extends React.Component {
     this.props.videoLoader.loadVideo("tv", folder, episode);
   }
 
+  isDragging(dragging) {
+    this.dragging = dragging;
+  }
+
   cancelShowChooser() {
     this.setState({ "showName": null, });
   }
 
   render() {
     const videos = this.state.videos.slice(0, 30).map((video) => {
-      //const imageSource = `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`
-      /*const imageSource = video.show === "movie" ?
-        `${this.props.imageRoot}/150x225/movies/${video.episode.substring("Movies/".length)}.jpg` :
-        video.show === "collection" ?
-          `${this.props.imageRoot}/150x225/collections/${video.season}.jpg` :
-          `${this.props.imageRoot}/150x225/tv/show/${video.show}.jpg`;*/
       const type = video.show === "movie" ? "movies" :
         video.show === "collection" ? "collections": "tv";
       const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
@@ -69,7 +71,7 @@ class KeepWatching extends React.Component {
       </div>;
     });
 
-    let videosView = <Carousel itemWidth={150}>{videos}</Carousel>;
+    let videosView = <Carousel isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 
 const Carousel = require("./generic/Carousel");
 const MoviePicker = require("./pickers/MovieDetails");
@@ -8,6 +8,7 @@ class NewMovies extends React.Component {
   constructor(props) {
     super(props);
     this.state = { videos: [], };
+    this.dragging = false;
     this.loadMovies();
   }
 
@@ -18,8 +19,14 @@ class NewMovies extends React.Component {
     this.setState({videos,});
   }
 
+  isDragging(dragging) {
+    this.dragging = dragging;
+  }
+
   play(movieName) {
-    this.setState({movieName,});
+    if(!this.dragging) {
+      this.setState({movieName,});
+    }
   }
 
   cancelChooser() {
@@ -40,7 +47,7 @@ class NewMovies extends React.Component {
       </div>;
     });
 
-    let videosView = <Carousel itemWidth={150}>{videos}</Carousel>;
+    let videosView = <Carousel isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

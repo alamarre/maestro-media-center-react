@@ -1,15 +1,17 @@
 class WebSocketSender {
-  constructor(host, webSocketPort) {
-    this.protocol = protocol;
+  constructor(host, webSocketPort, authTokenManager) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
-    this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
+    const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
+    this.webSocketUrl = `${protocol}://${host}${portString}`;
+    this.authTokenManager = authTokenManager;
     this.updateFunctions = {};
     this.devices = [];
   }
   
   updateSettings(host, webSocketPort) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
-    this.webSocketUrl = `${protocol}://${host}:${webSocketPort}`;
+    const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
+    this.webSocketUrl = `${protocol}://${host}${portString}`;
   }
 
   getDevices() {
@@ -26,6 +28,7 @@ class WebSocketSender {
       ws.send(JSON.stringify({
         "action" : "list",
         "keepUpdating": true,
+        token: this.authTokenManager.getToken(),
       }));
     };
         
@@ -93,6 +96,7 @@ class WebSocketSender {
       "type": type,
       folder: folder,
       index: index,
+      token: this.authTokenManager.getToken(),
     });
   }
 
@@ -111,6 +115,7 @@ class WebSocketSender {
 
   sendMessage(message) {
     message.client = this.client;
+    message.token = this.authTokenManager.getToken(),
     this.webSocket.send(JSON.stringify(message));
   }
 }

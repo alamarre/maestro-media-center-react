@@ -1,7 +1,7 @@
-import "@babel/polyfill";
-import React from "react";
-import { render, } from "react-dom";
-import { Router, Route, hashHistory, } from "react-router";
+require("@babel/polyfill");
+const React = require("react");
+const { render, } = require("react-dom");
+const { Router, Route, hashHistory, } = require("react-router");
 const Metadata = require("./components/Metadata");
 
 require("../style.scss");

@@ -1,11 +1,11 @@
-import React from 'react'
-import { Modal } from 'react-bootstrap';
+const React = require("react");
+const { Modal, } = require("react-bootstrap");
 
 class ShowPicker extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { "collection": null };
+    this.state = { "collection": null, };
     this.loadCollectionData();
   }
 
@@ -16,12 +16,12 @@ class ShowPicker extends React.Component {
     if (!keepWatchingData || keepWatchingData.season !== this.props.collectionName) {
       keepWatchingData = null;
     }
-    this.setState({ collection, keepWatchingData });
+    this.setState({ collection, keepWatchingData, });
   }
 
   play(video) {
     const index = this.state.collection.indexOf(video);
-    let folder = this.props.collectionName;
+    const folder = this.props.collectionName;
     this.props.videoLoader.loadVideo("collection", folder, index);
   }
 
@@ -40,15 +40,15 @@ class ShowPicker extends React.Component {
 
     let keepWatchingView = null;
     if (this.state.keepWatchingData) {
-      let index = this.state.keepWatchingData.episode;
-      let video = this.state.collection[index];
+      const index = this.state.keepWatchingData.episode;
+      const video = this.state.collection[index];
       keepWatchingView = <div>
         <button className="maestroButton roundedButton fa fa-play c" onClick={evt => this.play(video)}></button>
         <span>Keep watching: {video}</span>
       </div>;
     }
 
-    let body = <div>
+    const body = <div>
       <Modal show={true} animation={false} onHide={evt => this.props.cancelFunction()}>
         <Modal.Header>
           <Modal.Title>{this.props.collectionName}</Modal.Title>
@@ -57,7 +57,7 @@ class ShowPicker extends React.Component {
         <Modal.Body>
 
           {keepWatchingView}
-          <hr style={{ backgroundColor: "white" }} ></hr>
+          <hr style={{ backgroundColor: "white", }} ></hr>
           {videos}
         </Modal.Body>
         <Modal.Footer>
@@ -68,7 +68,7 @@ class ShowPicker extends React.Component {
 
     return (
       <div>{body}</div>
-    )
+    );
   }
 }
 

@@ -1,4 +1,4 @@
-import localforage from "localforage";
+const localforage = require("localforage");
 
 function createDirectoryPromise(dirEntry, directoryName) {
   return new Promise((s, f) => {
@@ -85,8 +85,10 @@ class OfflineVideoStorage {
     if(sources.length < 1) {
       return;
     }
+    const localSource = await this.episodeLoader.getAvailableLocalSource(sources[0]);
+    const source = localSource || sources[0];
     // our URLs aren't always properly encoded so fix it before the cordova code fails
-    const url = new URL(sources[0]).href;
+    const url = new URL(source).href;
     progressFunction({state: "Downloading", progress:  0,});
     const headers = {};
     let start = 0;

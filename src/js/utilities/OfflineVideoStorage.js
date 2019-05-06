@@ -1,4 +1,4 @@
-import localforage from "localforage";
+const localforage = require("localforage");
 const $ = require("jquery");
 const sliceSize = 1024 * 1024 * 100;
 

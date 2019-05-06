@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 const cast = window.cast;
 class ChromecastPlayer extends React.Component {
   constructor(props) {

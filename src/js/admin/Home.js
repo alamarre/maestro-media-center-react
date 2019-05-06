@@ -1,6 +1,6 @@
-import React from "react";
+const React = require("react");
 
-import { Link, } from "react-router";
+const { Link, } = require("react-router");
 
 class Home extends React.Component {
 

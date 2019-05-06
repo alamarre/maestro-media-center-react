@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 const ShowPicker = require("./ShowPicker");
 const CollectionPicker = require("./pickers/CollectionStartPicker");
 const PlaylistPicker = require("./pickers/PlaylistPicker");

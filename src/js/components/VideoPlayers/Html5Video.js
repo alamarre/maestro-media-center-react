@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 
 class Html5VideoPlayer extends React.Component {
   constructor(props) {
@@ -44,6 +44,7 @@ class Html5VideoPlayer extends React.Component {
   }
 
   seekToTime(time) {
+    this.refs.video.focus();
     this.refs.video.currentTime = time;
   }
 
@@ -68,7 +69,15 @@ class Html5VideoPlayer extends React.Component {
       return <source src={s} key={s} type="video/mp4"></source>;
     });
 
-    return <video key={"video"} crossOrigin="anonymous" onClick={() => this.playPause()} onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }} onEnded={() => this.props.onEnded(this)} onPlay={() => this.props.onPlay(this)} onPause={() => this.props.onPause(this)} style={{ margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute", background: "#000", display: this.props.sources != null ? "block" : "none", }} ref='video' data-source={this.props.source} controls={true} autoPlay={true}>
+    return <video key={"video"} crossOrigin="anonymous" 
+      onClick={() => this.playPause()}
+      onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }}
+      onEnded={() => this.props.onEnded(this)}
+      onPlay={() => this.props.onPlay(this)}
+      onPause={() => this.props.onPause(this)}
+      style={{ margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute",
+        background: "#000", display: this.props.sources != null ? "block" : "none", outline: "none", }}
+      ref='video' data-source={this.props.source} controls={true} autoPlay={true}>
       {sources}
       {subtitles}
     </video>;

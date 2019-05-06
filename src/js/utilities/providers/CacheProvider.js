@@ -1,4 +1,4 @@
-import localforage from "localforage";
+const localforage = require("localforage");
 
 class CacheProvider {
   constructor(apiRequester, options = {}) {

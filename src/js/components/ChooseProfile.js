@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Link } from 'react-router'
+const React = require("react");
 
 class ChooseProfile extends React.Component {
 
@@ -9,37 +7,37 @@ class ChooseProfile extends React.Component {
     this.state = {
       "addingProfile": false,
       "profiles": null,
-      "newUsername": ""
+      "newUsername": "",
     };
 
     props.profileProvider.getProfiles()
       .then((profiles) => {
-        this.setState({ "profiles": profiles })
+        this.setState({ "profiles": profiles, });
       }, (err) => {
         throw err;
       });
   }
 
   startAddingProfile() {
-    this.setState({ "addingProfile": true });
+    this.setState({ "addingProfile": true, });
   }
 
   createProfile() {
-    let username = this.state.newUsername;
+    const username = this.state.newUsername;
     this.props.profileProvider.createProfile(username, false)
       .then(() => {
         this.setProfile(username);
       },
-        () => { });
+      () => { });
 
   }
 
   updateCurrentUsername(value) {
-    this.setState({ "newUsername": value });
+    this.setState({ "newUsername": value, });
   }
 
   cancelCreate() {
-    this.setState({ "newUsername": "", "addingProfile": false });
+    this.setState({ "newUsername": "", "addingProfile": false, });
   }
 
   setProfile(profile) {
@@ -50,9 +48,9 @@ class ChooseProfile extends React.Component {
   }
 
   render() {
-    let addProfileSection = <div>
+    const addProfileSection = <div>
       <button className="btn btn-primary" onClick={this.startAddingProfile.bind(this)}>Add a new user</button>
-    </div>
+    </div>;
 
     let body = <div>
       <div>Loading Profiles</div>
@@ -61,19 +59,19 @@ class ChooseProfile extends React.Component {
 
     if (this.state.addingProfile) {
       body = <div>
-        <label style={{ textAlign: "left", width: "300px" }}>Name</label>
+        <label style={{ textAlign: "left", width: "300px", }}>Name</label>
         <div>
-          <input style={{ width: "300px", display: "inline-block" }} className="form-control" type="text" onChange={evt => this.updateCurrentUsername(evt.target.value)} />
+          <input style={{ width: "300px", display: "inline-block", }} className="form-control" type="text" onChange={evt => this.updateCurrentUsername(evt.target.value)} />
         </div>
-        <div style={{ marginTop: "20px" }}>
-          <button style={{ marginRight: "10px" }} className="btn btn-primary" onClick={this.createProfile.bind(this)}>Ok</button>
+        <div style={{ marginTop: "20px", }}>
+          <button style={{ marginRight: "10px", }} className="btn btn-primary" onClick={this.createProfile.bind(this)}>Ok</button>
           <button className="btn btn-secondary" onClick={this.cancelCreate.bind(this)}>Cancel</button>
         </div>
       </div>;
     } else if (this.state.profiles) {
       let profiles = this.state.profiles.map((profile) => {
-        return <button className="maestroButton fa fa-user fa-3x" style={{ border: "solid 1px white", width: "300px", fontSize: "100px" }} key={profile.profileName} onClick={this.setProfile.bind(this, profile.profileName)}>
-          <div style={{ textOverflow: "ellipsis", overflow: "hidden" }}>{profile.profileName}</div>
+        return <button className="maestroButton fa fa-user fa-3x" style={{ border: "solid 1px white", width: "300px", fontSize: "100px", }} key={profile.profileName} onClick={this.setProfile.bind(this, profile.profileName)}>
+          <div style={{ textOverflow: "ellipsis", overflow: "hidden", }}>{profile.profileName}</div>
         </button>;
       });
 
@@ -90,13 +88,13 @@ class ChooseProfile extends React.Component {
 
 
     return (
-      <div style={{ display: "table", height: "100%", width: "100%", position: "absolute" }}>
-        <div style={{ display: "table-cell", height: "50%", width: "50%", verticalAlign: "middle", textAlign: "center" }}>
+      <div style={{ display: "table", height: "100%", width: "100%", position: "absolute", }}>
+        <div style={{ display: "table-cell", height: "50%", width: "50%", verticalAlign: "middle", textAlign: "center", }}>
           {body}
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default ChooseProfile;
+module.exports = ChooseProfile;

@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 
 const EasyInputComponent = require("./EasyInputComponent");
 
@@ -7,7 +7,7 @@ class Settings extends EasyInputComponent {
   constructor(props) {
     super(props);
     this.state = {
-      remoteControl: this.props.settingsManager.get("remoteControl") == "true",
+      remoteControl: this.props.settingsManager.get("remoteControl") == "true" || this.props.settingsManager.get("remoteControl") === true,
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
@@ -24,7 +24,7 @@ class Settings extends EasyInputComponent {
     });
 
     this.setState({
-      remoteControl: this.props.settingsManager.get("remoteControl") == "true",
+      remoteControl: this.props.settingsManager.get("remoteControl") == "true" || this.props.settingsManager.get("remoteControl") === true,
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
@@ -81,7 +81,7 @@ class Settings extends EasyInputComponent {
     var body = <div style={{backgroundColor: "black", padding: "20px 20px 20px 20px",}}>
       <div className="form-check">
         <label className="form-check-label">
-          <input type="checkbox" className="form-check-input" name="remoteControl" defaultChecked={this.state.remoteControl} onChange={this.handleCheckBoxChange} />
+          <input type="checkbox" className="form-check-input" name="remoteControl" defaultChecked={this.state.remoteControl} onClick={this.handleCheckBoxChange} />
           Allow remote control
         </label>
       </div>

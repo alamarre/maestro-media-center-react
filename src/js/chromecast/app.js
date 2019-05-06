@@ -1,7 +1,7 @@
-import "@babel/polyfill";
-import React from "react";
-import { render, } from "react-dom";
-import { Router, Route, hashHistory, } from "react-router";
+require("@babel/polyfill");
+const React = require("react");
+const { render, } = require("react-dom");
+const { Router, Route, hashHistory, } = require("react-router");
 
 require("./style.scss");
 
@@ -37,7 +37,7 @@ const movieInfoProvider = new MovieInfoProvider(cacheProvider);
 const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
 const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
 
-const webSocketRemoteController = new WebSocketRemoteController(host, "Desktop Test Client", wsPort);
+const webSocketRemoteController = new WebSocketRemoteController(host, "Desktop Test Client", wsPort, authTokenManager);
 
 const chromecastListener = new ChromecastListener(apiRequester, authTokenManager, webSocketRemoteController, cacheProvider);
 chromecastListener.initialize();

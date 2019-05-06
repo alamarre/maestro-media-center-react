@@ -1,5 +1,5 @@
-import React from "react";
-import { Modal, } from "react-bootstrap";
+const React = require("react");
+const { Modal, } = require("react-bootstrap");
 
 const MetadataImage = require("../generic/MetadataImage");
 

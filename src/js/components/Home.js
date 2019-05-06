@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, } from "react-router";
+const React = require("react");
+const { Link, } = require("react-router");
 const EasyInputComponent = require("./EasyInputComponent");
 
 const SearchResults = require("./SearchResults");
@@ -43,6 +43,17 @@ class Home extends EasyInputComponent {
 
     document.addEventListener("mousemove", this.showSettingsTemporarily.bind(this));
     document.body.addEventListener("click", this.showSettingsTemporarily.bind(this), true);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      if(!window.accountId) {
+        this.props.accountProvider.getAccountId().then(accountInfo => {
+          window.accountId = accountInfo.accountId;
+          this.forceUpdate();
+        }); 
+      }
+    }
   }
 
   showSettingsTemporarily() {

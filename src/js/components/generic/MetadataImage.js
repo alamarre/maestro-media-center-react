@@ -1,4 +1,5 @@
-import React,{ Component, } from "react";
+const React = require("react");
+const { Component, } = require("react");
 
 const imageRoot = process.env.IMAGE_ROOT || "https://maestro-images.omny.ca";
 const failedImage = "fallback.png";
