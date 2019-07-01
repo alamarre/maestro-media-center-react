@@ -6,9 +6,12 @@ const { Router, Route, hashHistory, } = require("react-router");
 require("./style.scss");
 
 const host = process.env.HOST;
-const scheme = "http";
-const port = 3000;
-const wsPort = port + 1;
+var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http" : "https");
+var port = process.env.PORT
+  || window.location.port
+  || (scheme == "http" ? 80 : 443);
+const wsHost = process.env.WEBSOCKET_HOST || host;
+var wsPort = process.env.WEBSOCKET_PORT || port;
 const jquery = require("jquery");
 
 const Home = require("./ChromecastHome");

@@ -10,7 +10,14 @@ class PlaylistProvider {
 
   async getPlaylist(playlist) {
     const result = (await this.getPlaylists()).filter(p => p.name === playlist);
-    return result.length === 1 ? result[0] : null;
+    if(result.length === 0) {
+      return null;
+    }
+
+    if(typeof result[0].playlist === "string") {
+      result[0].playlist = JSON.parse(result[0].playlist);
+    }
+    return result[0];
   }
 }
 
