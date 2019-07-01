@@ -11,6 +11,7 @@ class Settings extends EasyInputComponent {
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
+      lockProfilePin: this.props.settingsManager.get("lockProfilePin"),
     };
 
     this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
@@ -50,12 +51,44 @@ class Settings extends EasyInputComponent {
   }
 
   switchProfile() {
+    const pinNeeded = this.props.settingsManager.get("lockProfilePin");
+    if(pinNeeded) {
+      const pinEntered = window.prompt("Please enter the pin");
+      if(pinEntered != pinNeeded) {
+        alert("Wrong pin");
+        return;
+      }
+      this.props.settingsManager.set("lockProfilePin", null);
+    }
+
     this.props.router.push("/profile");
   }
 
   logout() {
     document.cookie = "";
     this.props.router.push("/login");
+  }
+
+  togglePin() {
+    const pinNeeded = this.props.settingsManager.get("lockProfilePin");
+    if(pinNeeded) {
+        const pinEntered = window.prompt("Please enter the pin");
+        if(pinEntered != pinNeeded) {
+          alert("Wrong pin");
+          this.setState({"lockProfilePin": pinNeeded});
+          return;
+        }
+        this.props.settingsManager.set("lockProfilePin", null);
+        this.setState({"lockProfilePin": null});
+        return;
+    }
+    const pin = prompt("Set a pin");
+    if(!RegExp("^[1-9]{1}[0-9]*$").test(pin)) {
+      alert("PIN must be a number");
+      return;
+    }
+    this.props.settingsManager.set("lockProfilePin", pin);
+    this.setState({"lockProfilePin": pin});
   }
 
   render() {
@@ -91,11 +124,16 @@ class Settings extends EasyInputComponent {
         {otherOptions}
       </div>
       <div className="form-group">
+        <input type="checkbox" className="form-check-input" name="lockProfilePin" checked={this.state.lockProfilePin > 0} onClick={this.togglePin.bind(this)} />
+          Require a pin to change profile
+      </div>
+      <div className="form-group">
         <button className="btn btn-primary" onClick={this.switchProfile.bind(this)}>Switch Profile</button>
       </div>
       <div className="form-group">
         <button className="btn btn-primary" onClick={this.logout.bind(this)}>Logout</button>
       </div>
+      
     </div>;
     return (
       <div>{body}</div>
