@@ -10,6 +10,7 @@ class VideoPlayer extends React.Component {
 
     this.episodeLoader = episodeLoader;
     this.type = this.props.location.query.type;
+    this.profile = this.props.location.query.profile;
     this.preventIdleTimer = null;
     this.state = { "overlayVisibility": false, seekTime: -1, };
     this.progressTimer = null;
@@ -57,6 +58,7 @@ class VideoPlayer extends React.Component {
       var parentPath = path.substring(0, path.lastIndexOf("/"));
       var subdirectory = path.substring(path.lastIndexOf("/") + 1);
       this.type = event.type;
+      this.profile = event.profile;
       this.setSourcePath(parentPath, subdirectory, event.index);
     });
   }
@@ -146,7 +148,7 @@ class VideoPlayer extends React.Component {
       }
     }
     this.setState({ sources: orderedSources, subtitles,  name, seekTime, });
-    this.props.videoLoader.setUrl(this.type, path, index);
+    this.props.videoLoader.setUrl(this.type, path, index, true, this.profile);
   }
 
   onPause() {
@@ -176,13 +178,13 @@ class VideoPlayer extends React.Component {
   async goToNext() {
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToNext();
     this.setState({ sources, subtitles, name, seekTime, });
-    this.props.videoLoader.setUrl(this.type, path, index);
+    this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
   }
 
   async goToPrevious() {
     const { sources, subtitles,  name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToPrevious();
     this.setState({ sources, subtitles,  name, seekTime, });
-    this.props.videoLoader.setUrl(this.type, path, index);
+    this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
   }
 }
 

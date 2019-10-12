@@ -97,6 +97,7 @@ class WebSocketSender {
       folder: folder,
       index: index,
       token: this.authTokenManager.getToken(),
+      profile: this.authTokenManager.getProfile(),
     });
   }
 

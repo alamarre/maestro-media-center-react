@@ -36,6 +36,14 @@ class AuthTokenManager {
 
   getProfile() {
     //return this.profile;
+    const loc = window.location.hash.indexOf("?");
+    if(loc > -1) {
+      const query = window.location.hash.substring(loc);
+      const urlParams = new URLSearchParams(query);
+      if(urlParams.has("profile")) {
+        return urlParams.get("profile");
+      }
+    }
     return this.getCookie("user_profile");
   }
 

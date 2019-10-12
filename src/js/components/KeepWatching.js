@@ -35,6 +35,10 @@ class KeepWatching extends React.Component {
       return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
     }
 
+    if(video.show === "playlist") {
+      return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
+    }
+
     const latest = await this.props.showProgressProvider.getShowProgress(video.show);
 
     const showPath = await this.props.cacheProvider.getShowPath(video.show);
@@ -59,11 +63,14 @@ class KeepWatching extends React.Component {
   render() {
     const videos = this.state.videos.slice(0, 30).map((video) => {
       const type = video.show === "movie" ? "movies" :
+        video.show === "playlist" ? "playlist":
         video.show === "collection" ? "collections": "tv";
       const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
         video.show === "collection" ?
           video.season:
-          video.show;    
+        video.show === "playlist"?
+        video.season :
+          video.show;
       return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video.show} onClick={this.play.bind(this, video)}>
         <MetadataImage style={{display: "block", margin: "0 0 0 0", padding: "0 0 0 0",}} width={150} height={225} type={type} name={name} ></MetadataImage>
@@ -71,7 +78,7 @@ class KeepWatching extends React.Component {
       </div>;
     });
 
-    let videosView = <Carousel isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
+    let videosView = <Carousel navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

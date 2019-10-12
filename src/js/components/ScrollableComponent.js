@@ -1,0 +1,62 @@
+const React = require("react");
+
+class Scrollable extends React.Component {
+
+  constructor(props, refs, isDialog = true ) {
+    super(props);
+    this.isDialog = isDialog;
+    this.selectedIndex = 0;
+    this.state={selectedIndex: 0, refs,};
+  }
+
+  componentDidMount() {
+    if(this.isDialog) {
+      this.props.navigation.focusDialog(this);
+    }
+
+    // force a render
+    this.setState({selectedIndex: 0,}, () => {
+      this.focusCurrent();
+    });
+
+  }
+
+  focusCurrent() {
+    if(this.state.refs.length > 0 && Object.keys(this.refs).length > 0) {
+      this.refs[this.state.refs[this.selectedIndex]].focus();
+    }
+  }
+
+  componentWillUnmount() {
+    if(this.isDialog) {
+      this.props.navigation.unfocusDialog();
+    }
+  }
+
+  moveLeft() {
+  }
+
+  moveRight() {
+  }
+
+  focusNext() {
+    this.selectedIndex++;
+    if(this.selectedIndex >= this.state.refs.length) {
+      this.selectedIndex = 0;
+    }
+
+    this.refs[this.state.refs[this.selectedIndex]].focus();
+  }
+
+  focusPrevious() {
+    this.selectedIndex--;
+    if(this.selectedIndex< 0) {
+      this.selectedIndex = this.state.refs.length -1;
+    }
+
+    this.refs[this.state.refs[this.selectedIndex]].focus();
+  }
+
+}
+
+module.exports = Scrollable;

@@ -12,7 +12,7 @@
     "build": "export NODE_ENV=production; ./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "devbuild": "./node_modules/.bin/webpack --config webpack.config.js --progress --colors",
     "deploy": "export HOST=maestro-web.al.workers.dev; export WEBSOCKET_HOST=gladiator.omny.ca; export WEBSOCKET_PORT=443; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.config.js && aws s3 sync build/ s3://videos.omny.ca/",
-    "deploy-admin": "export HOST=adminapi.maestromediacenter.com; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.admin.config.js && aws s3 sync adminbuild/ s3://admin.omny.ca/",
+    "deploy-admin": "export HOST=maestro-admin.al.workers.dev; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.admin.config.js && aws s3 sync adminbuild/ s3://admin.omny.ca/",
     "deploy-chromecast": "export HOST=maestro-web.al.workers.dev; export WEBSOCKET_HOST=gladiator.omny.ca; export WEBSOCKET_PORT=443; export SCHEME=https; export PORT=443; ./node_modules/.bin/webpack --config webpack.chromecast.config.js && aws s3 sync castbuild/ s3://chromecast.maestromediacenter.com/"
   },
   "author": "Al Lamarre",

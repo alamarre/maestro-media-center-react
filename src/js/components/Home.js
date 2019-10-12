@@ -24,7 +24,7 @@ class Home extends EasyInputComponent {
       this.props.accountProvider.getAccountId().then(accountInfo => {
         window.accountId = accountInfo.accountId;
         this.forceUpdate();
-      }); 
+      });
     }
 
     this.props.videoLoader.setRouter(this.props.router);
@@ -32,7 +32,7 @@ class Home extends EasyInputComponent {
     document.addEventListener("maestro-load-video", (event) => {
       event = event.detail;
       //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
-      this.props.router.push(`/view?type=${event.type}&index=${event.index}&folder=${event.folder}`);
+      this.props.router.push(`/view?type=${event.type}&index=${event.index}&folder=${event.folder}&profile=${event.profile}`);
     });
 
     document.addEventListener("maestro-offline-change", (event) => {
@@ -47,11 +47,12 @@ class Home extends EasyInputComponent {
 
   componentDidUpdate(prevProps) {
     if (this.props.location !== prevProps.location) {
-      if(!window.accountId) {
+      this.props.navigation.clear();
+      if (!window.accountId) {
         this.props.accountProvider.getAccountId().then(accountInfo => {
           window.accountId = accountInfo.accountId;
           this.forceUpdate();
-        }); 
+        });
       }
     }
   }
@@ -75,7 +76,7 @@ class Home extends EasyInputComponent {
   }
 
   render() {
-    
+
     const settingsView = this.state.showSettings ?
       <SettingsComponent router={this.props.router} remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender} settingsManager={this.props.settingsManager} />
       : null;
@@ -99,7 +100,7 @@ class Home extends EasyInputComponent {
       {settingsView}
     </div>;
 
-    if(this.props.router.location.pathname !== "/login" 
+    if (this.props.router.location.pathname !== "/login"
       && this.props.router.location.pathname != "/profile"
       && !window.accountId) {
       return <div>{settingsSection}</div>;
@@ -116,6 +117,7 @@ class Home extends EasyInputComponent {
     var body = this.props.children || <div>
       <div>
         <SearchResults
+          navigation={this.props.navigation}
           episodeLoader={this.props.episodeLoader}
           offlineStorage={this.props.offlineStorage}
           collectionsManager={this.props.collectionsManager}
@@ -129,7 +131,7 @@ class Home extends EasyInputComponent {
           showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
-        <KeepWatching imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+        <KeepWatching navigation={this.props.navigation} imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
         <NewMovies {...this.props} ></NewMovies>

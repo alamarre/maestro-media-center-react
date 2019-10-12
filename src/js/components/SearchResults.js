@@ -10,15 +10,36 @@ class SearchResults extends React.Component {
   constructor(props) {
     super(props);
     this.state = { "searchResults": [], };
+    this.currentResult = -1;
   }
 
   search(value) {
     if (!value || value == "") {
+      this.props.navigation.unfocusDialog();
       this.setState({ "searchResults": [], });
     }
     this.props.searcher.getResults(value).then(results => {
       this.setState({ "searchResults": results, });
+      this.props.navigation.focusDialog(this);
     });
+  }
+
+  focusNext() {
+    this.currentResult++;
+    if(this.currentResult >= this.state.searchResults.length)
+    {
+      this.currentResult = 0;
+    }
+    this.refs[`searchresult-${this.currentResult}`].focus();
+  }
+
+  focusPrevious() {
+    this.currentResult--;
+    if(this.currentResult < 0)
+    {
+      this.currentResult = this.state.searchResults.length-1;
+    }
+    this.refs[`searchresult-${this.currentResult}`].focus();
   }
 
   selectSource(item) {
@@ -46,9 +67,14 @@ class SearchResults extends React.Component {
     this.setState({ "showName": null, "collectionName": null, "playlistName": null, movieName: null, });
   }
 
+  componentDidMount() {
+    this.props.navigation.registerElement(this.refs.searchbox);
+  }
+
   render() {
-    let searchResults = this.state.searchResults.map(item => {
-      return <li className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
+    let searchResults = this.state.searchResults.map((item, index) => {
+      const ref = `searchresult-${index}`;
+      return <li ref={ref} className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
         <MetadataImage style={{display: "inline-block",}} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
       </li>;
@@ -58,6 +84,7 @@ class SearchResults extends React.Component {
     let showPicker = null;
     if (this.state.showName) {
       showPicker = <ShowPicker
+        navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         offlineStorage={this.props.offlineStorage}
@@ -71,6 +98,7 @@ class SearchResults extends React.Component {
       </ShowPicker>;
     } else if (this.state.collectionName) {
       showPicker = <CollectionPicker
+        navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         offlineStorage={this.props.offlineStorage}
@@ -82,6 +110,7 @@ class SearchResults extends React.Component {
       </CollectionPicker>;
     } else if (this.state.playlistName) {
       showPicker = <PlaylistPicker
+        navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         offlineStorage={this.props.offlineStorage}
@@ -93,6 +122,7 @@ class SearchResults extends React.Component {
       </PlaylistPicker>;
     } else if (this.state.movieName) {
       showPicker = <MoviePicker
+        navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         offlineStorage={this.props.offlineStorage}
@@ -106,7 +136,7 @@ class SearchResults extends React.Component {
     }
     var body = <div>
       <div>
-        <label>Search:</label><input type="text" onChange={evt => this.search(evt.target.value)} />
+        <label>Search:</label><input ref="searchbox" type="text" onChange={evt => this.search(evt.target.value)} />
       </div>
       {searchResults}
       {showPicker}

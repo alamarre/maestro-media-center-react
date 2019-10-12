@@ -1,20 +1,25 @@
 const React = require("react");
 const { Modal, } = require("react-bootstrap");
+const ScrollableComponent = require("../ScrollableComponent");
 
 const MetadataImage = require("../generic/MetadataImage");
 
-class MovieDetails extends React.Component {
+class MovieDetails extends ScrollableComponent {
 
   constructor(props) {
-    super(props);
-    this.state = { "movie": null, };
+    super(props, ["playbutton", "cancel"]);
+    this.state = Object.assign(this.state, { "movie": null, playBackgroundColor: "#FF0" });
     this.loadData();
   }
 
   async loadData() {
     const movieInfo = await this.props.metadataProvider.getMovieMetadata(this.props.movieName);
-    this.setState({ movieInfo, });
+    this.setState({ movieInfo, }, () => {
+      this.focusCurrent();
+    });
   }
+
+
 
   play() {
     this.props.videoLoader.loadVideo("movie", this.props.movieName, 0);
@@ -28,7 +33,7 @@ class MovieDetails extends React.Component {
     const videoView = <div style={{display: "table",}}>
       <MetadataImage style={{display: "inline",}} type="movies" width={150} height={225} name={this.props.movieName} ></MetadataImage>
       <div style={{display: "table-cell", verticalAlign: "top",}}>
-        <button className="maestroButton roundedButton fa fa-play" onClick={() => this.play()}></button>
+        <button ref="playbutton" className="maestroButton roundedButton fa fa-play" onClick={() => this.play()}></button>
         <span>{this.props.movieName} </span>
         <hr />
         <div style={{marginLeft: "20",}}>{this.state.movieInfo.overview}</div>
@@ -46,7 +51,7 @@ class MovieDetails extends React.Component {
           {videoView}
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
+          <button ref="cancel" className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
         </Modal.Footer>
       </Modal>
     </div>;
