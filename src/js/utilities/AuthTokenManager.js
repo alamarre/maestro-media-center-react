@@ -14,7 +14,7 @@ class AuthTokenManager {
   {
     return this.cookieManager.getCookie(cname);
   }
-    
+
   setCookie(cname, cvalue, exdays)
   {
     return this.cookieManager.setCookie(cname, cvalue, exdays);
@@ -40,7 +40,7 @@ class AuthTokenManager {
     if(loc > -1) {
       const query = window.location.hash.substring(loc);
       const urlParams = new URLSearchParams(query);
-      if(urlParams.has("profile")) {
+      if(urlParams.has("profile")  && urlParams.get("profile")) {
         return urlParams.get("profile");
       }
     }
@@ -53,7 +53,7 @@ class AuthTokenManager {
       this.setCookie("user_profile", profile, 365);
     }
   }
-    
+
   saveToken() {
     var token = this.queryStringReader.getParameter("access_token");
     this.setToken(token);

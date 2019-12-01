@@ -11,6 +11,12 @@ class MoviePlayerManager {
     return await this.updateSource();
   }
 
+  async reload() {
+    const result =  await this.updateSource();
+    result.seekTime = 0;
+    return result;
+  }
+
   async updateSource() {
     const sourceInfo = await this.episodeLoader.getVideoSource("Movies/" + this.movieName);
     const {sources, subtitles,} =  sourceInfo;
@@ -36,7 +42,7 @@ class MoviePlayerManager {
   }
 
   async goToNext() {
-    return null;
+    return {};
   }
 
   async goToPrevious() {

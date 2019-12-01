@@ -24,18 +24,18 @@ class KeepWatching extends React.Component {
   }
 
   async play(video) {
-    if(this.dragging) {
+    if (this.dragging) {
       return;
     }
-    if(video.show === "movie") {
+    if (video.show === "movie") {
       return this.props.videoLoader.loadVideo(video.show, video.episode.substring("Movies/".length), 0);
     }
 
-    if(video.show === "collection") {
+    if (video.show === "collection") {
       return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
     }
 
-    if(video.show === "playlist") {
+    if (video.show === "playlist") {
       return this.props.videoLoader.loadVideo(video.show, video.season, video.episode);
     }
 
@@ -45,7 +45,7 @@ class KeepWatching extends React.Component {
     const cachePath = await this.props.cacheProvider.getCacheFromPath(showPath);
     //this.setState({showName, showPath, cachePath});
     const folder = `${showPath}/${latest.season}`;
-    if(latest.episode.endsWith(".mp4")) {
+    if (latest.episode.endsWith(".mp4")) {
       latest.episode = latest.episode.substring(0, latest.episode.indexOf(".mp4"));
     }
     const episode = Object.keys(cachePath.folders[latest.season].files).sort(window.tvShowSort).indexOf(latest.episode);
@@ -63,22 +63,22 @@ class KeepWatching extends React.Component {
   render() {
     const videos = this.state.videos.slice(0, 30).map((video) => {
       const type = video.show === "movie" ? "movies" :
-        video.show === "playlist" ? "playlist":
-        video.show === "collection" ? "collections": "tv";
+        video.show === "playlist" ? "playlist" :
+          video.show === "collection" ? "collections" : "tv";
       const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
         video.show === "collection" ?
-          video.season:
-        video.show === "playlist"?
-        video.season :
-          video.show;
-      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", }}
+          video.season :
+          video.show === "playlist" ?
+            video.season :
+            video.show;
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video.show} onClick={this.play.bind(this, video)}>
-        <MetadataImage style={{display: "block", margin: "0 0 0 0", padding: "0 0 0 0",}} width={150} height={225} type={type} name={name} ></MetadataImage>
+        <MetadataImage style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={type} name={name} ></MetadataImage>
         {name}
       </div>;
     });
 
-    let videosView = <Carousel navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
+    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

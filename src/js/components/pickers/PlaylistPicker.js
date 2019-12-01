@@ -1,11 +1,12 @@
 const React = require("react");
 const { Modal, } = require("react-bootstrap");
+const ScrollableComponent = require("../ScrollableComponent");
 
-class PlaylistPicker extends React.Component {
+class PlaylistPicker extends ScrollableComponent {
 
   constructor(props) {
-    super(props);
-    this.state = { "playlist": null, };
+    super(props, []);
+    this.state = Object.assign({ "playlist": null, }, this.state);
     this.loadPlaylistData();
   }
 
@@ -13,10 +14,19 @@ class PlaylistPicker extends React.Component {
     const playlistInfo = await this.props.playlistManager.getPlaylist(this.props.playlistName);
     const playlist = playlistInfo.playlist;
     let keepWatchingData = await this.props.showProgressProvider.getShowProgress("playlist");
+
+    let refs =[];
     if (!keepWatchingData || keepWatchingData.season !== this.props.playlistName) {
       keepWatchingData = null;
+    } else {
+      refs.push("keepwatching");
     }
-    this.setState({ playlist, keepWatchingData, });
+
+    const items = playlist.map((x, index) => `playlist-${index}`);
+    refs = refs.concat(items).concat(["cancel"]);
+    this.setState({ playlist, keepWatchingData, refs, }, () => {
+      this.focusCurrent();
+    });
   }
 
   play(video) {
@@ -30,10 +40,10 @@ class PlaylistPicker extends React.Component {
       return <div></div>;
     }
 
-    const videos = this.state.playlist.map(video => {
-      const index = this.state.playlist.indexOf(video);
+    const videos = this.state.playlist.map((video, index) => {
+      const ref = `playlist-${index}`;
       return <div key={index}>
-        <button className="maestroButton roundedButton fa fa-play" onClick={() => this.play(video)}></button>
+        <button ref={ref} className="maestroButton roundedButton fa fa-play" onClick={() => this.play(video)}></button>
         <span>{video.file}</span>
       </div>;
 
@@ -44,7 +54,7 @@ class PlaylistPicker extends React.Component {
       const index = this.state.keepWatchingData.episode;
       const video = this.state.playlist[index];
       keepWatchingView = <div>
-        <button className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(video)}></button>
+        <button ref="keepwatching" className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(video)}></button>
         <span>Keep watching: {video.file}</span>
       </div>;
     }
@@ -62,7 +72,7 @@ class PlaylistPicker extends React.Component {
           {videos}
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
+          <button ref="cancel" className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
         </Modal.Footer>
       </Modal>
     </div>;

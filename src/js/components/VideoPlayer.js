@@ -2,6 +2,7 @@ const React = require("react");
 
 const ChromecastPlayer = require("./VideoPlayers/Chromecast");
 const Html5VideoPlayer = require("./VideoPlayers/Html5Video");
+const ReloadVideoDialog = require("./ReloadVideoDialog");
 
 class VideoPlayer extends React.Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class VideoPlayer extends React.Component {
     this.type = this.props.location.query.type;
     this.profile = this.props.location.query.profile;
     this.preventIdleTimer = null;
-    this.state = { "overlayVisibility": false, seekTime: -1, };
+    this.state = { "overlayVisibility": false, seekTime: -1, promptReload: false };
     this.progressTimer = null;
     if (this.props.remoteController) {
       this.props.remoteController.mapUpdateFunctions({
@@ -64,6 +65,17 @@ class VideoPlayer extends React.Component {
   }
 
   render() {
+    if(this.state.promptReload) {
+      const reload = async () => {
+        const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].reload();
+        this.setState({ sources, subtitles, name, seekTime, promptReload: false });
+        this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
+      };
+      const goHome = () => {
+        this.props.router.push("/");
+      };
+      return <ReloadVideoDialog navigation={this.props.navigation} reload={reload} goHome={goHome}></ReloadVideoDialog>
+    }
     var currentEpisodeStyle = {
       position: "absolute",
       left: 100,
@@ -177,8 +189,12 @@ class VideoPlayer extends React.Component {
 
   async goToNext() {
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToNext();
-    this.setState({ sources, subtitles, name, seekTime, });
-    this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
+    if(sources == null && this.props.navigation) {
+      this.setState({promptReload: true});
+    } else {
+      this.setState({ sources, subtitles, name, seekTime, });
+      this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
+    }
   }
 
   async goToPrevious() {

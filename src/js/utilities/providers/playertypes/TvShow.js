@@ -27,6 +27,12 @@ class TvShowPlayerManager {
     this.parentFolders = listing.folders;
   }
 
+  async reload() {
+    this.subdirectory = this.parentFolders[0];
+    this.index = 0;
+    return await this.getEpisodes();
+  }
+
   async updateSource() {
     const parentPath = this.parentPath.startsWith("/") ? this.parentPath : "/" + this.parentPath;
     const episode = this.episodes[this.index];
@@ -46,7 +52,7 @@ class TvShowPlayerManager {
       }
     }
 
-    
+
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
@@ -70,6 +76,8 @@ class TvShowPlayerManager {
           return await this.getEpisodes();
         }
       }
+
+      return {};
     }
   }
 

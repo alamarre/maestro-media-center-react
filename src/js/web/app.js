@@ -15,7 +15,7 @@ var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http"
 var port = process.env.PORT
   || window.location.port
   || (scheme == "http" ? 80 : 443);
-const wsHost = process.env.WEBSOCKET_HOST || host;
+const wsHost = "j5095i3iw3.execute-api.us-east-1.amazonaws.com/main" || process.env.WEBSOCKET_HOST || host;
 var wsPort = process.env.WEBSOCKET_PORT || port;
 var jquery = require("jquery");
 
@@ -38,6 +38,7 @@ const SettingsManager = require("../utilities/CookiesSettingsManager");
 const VideoLoader = require("../utilities/VideoLoader");
 const RemoteControllerComponent = require("../components/RemoteController");
 const CollectionsManager = require("../utilities/CollectionsManager");
+const HomepageCollectionManager = require("../utilities/HomepageCollectionManager");
 const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
 const OfflineStorage = require("../utilities/OfflineVideoStorage");
 const CordovaOfflineStorage = require("../utilities/CordovaOfflineVideoStorage");
@@ -86,6 +87,8 @@ const searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheP
 const movieInfoProvider = new MovieInfoProvider(cacheProvider);
 const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
 
+const homepageCollectionManager = new HomepageCollectionManager(apiRequester);
+
 const NewMoviesProvider = require("../utilities/providers/NewMoviesProvider");
 const newMoviesProvider = new NewMoviesProvider(apiRequester, cacheProvider);
 
@@ -114,7 +117,7 @@ const metadataProvider = new MetadataProvider(apiRequester);
 episodeLoader = cacheBasedEpisodeProvider;
 render((
   <Router history={hashHistory}>
-    <Route path="/" component={(props) => (<Home {...props} navigation={keyboardNavigation} accountProvider={accountProvider} newMoviesProvider={newMoviesProvider} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
+    <Route path="/" component={(props) => (<Home {...props} homepageCollectionManager={homepageCollectionManager} navigation={keyboardNavigation} accountProvider={accountProvider} newMoviesProvider={newMoviesProvider} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >
       <Route path="videos(/:videoType)" component={(props) => (<VideosListing {...props} navigation={keyboardNavigation} offlineStorage={offlineStorage} metadataProvider={metadataProvider} imageRoot={imageRoot} videoLoader={videoLoader} playlistManager={playlistProvider} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider} />)} />
       <Route path="view" component={(props) => (<VideoPlayer {...props} navigation={keyboardNavigation} offlineStorage={offlineStorage} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} chromecastManager={chromecastManager} showProgressProvider={showProgressProvider} episodeLoader={episodeLoader} remoteController={webSocketRemoteController} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} navigation={keyboardNavigation} authTokenManager={authTokenManager} login={loginProvider} />)} />

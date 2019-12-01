@@ -14,9 +14,9 @@ class NewMovies extends React.Component {
 
   async loadMovies() {
     const videos = (await this.props.newMoviesProvider.getNewMovies())
-      .sort((a,b) => b.time-a.time)
+      .sort((a, b) => b.time - a.time)
       .map(v => v.movie);
-    this.setState({videos,});
+    this.setState({ videos, });
   }
 
   isDragging(dragging) {
@@ -24,8 +24,8 @@ class NewMovies extends React.Component {
   }
 
   play(movieName) {
-    if(!this.dragging) {
-      this.setState({movieName,});
+    if (!this.dragging) {
+      this.setState({ movieName, });
     }
   }
 
@@ -34,20 +34,20 @@ class NewMovies extends React.Component {
   }
 
   render() {
-    if(this.state.videos.length === 0) {
+    if (this.state.videos.length === 0) {
       return <div></div>;
     }
     const videos = this.state.videos.slice(0, 30).map((video) => {
 
       const name = video;
-      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign:"left", verticalAlign: "top", wordWrap: "break-word", }}
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video} onClick={this.play.bind(this, video)}>
-        <MetadataImage style={{display: "block", margin: "0 0 0 0", padding: "0 0 0 0",}} width={150} height={225} type="movies" name={video}></MetadataImage>
+        <MetadataImage style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type="movies" name={video}></MetadataImage>
         {name}
       </div>;
     });
 
-    let videosView = <Carousel navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
+    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

@@ -7,6 +7,7 @@ const KeepWatching = require("./KeepWatching");
 const SettingsComponent = require("./Settings");
 
 const NewMovies = require("./NewMovies");
+const HomePageCollectionViewer = require("./HomePageCollectionViewer");
 
 class Home extends EasyInputComponent {
 
@@ -77,6 +78,7 @@ class Home extends EasyInputComponent {
 
   render() {
 
+    //const getChristmasShows = () => this.props.cacheProvider.getCacheFromPath("Movies/Christmas");
     const settingsView = this.state.showSettings ?
       <SettingsComponent router={this.props.router} remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender} settingsManager={this.props.settingsManager} />
       : null;
@@ -117,6 +119,7 @@ class Home extends EasyInputComponent {
     var body = this.props.children || <div>
       <div>
         <SearchResults
+          navOrder={0}
           navigation={this.props.navigation}
           episodeLoader={this.props.episodeLoader}
           offlineStorage={this.props.offlineStorage}
@@ -131,10 +134,13 @@ class Home extends EasyInputComponent {
           showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
-        <KeepWatching navigation={this.props.navigation} imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+        <KeepWatching navOrder={1} navigation={this.props.navigation} imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
-        <NewMovies {...this.props} ></NewMovies>
+        <NewMovies navOrder={2} {...this.props} ></NewMovies>
+      </div>
+      <div>
+        <HomePageCollectionViewer navOrder={3} {...this.props} ></HomePageCollectionViewer>
       </div>
       <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
       <div>{remoteLink}</div>

@@ -13,6 +13,11 @@ class PlaylistManager {
     return await this.updateSource();
   }
 
+  async reload() {
+    this.index = 0;
+    return this.updateSource();
+  }
+
   async updateSource() {
     const video = this.movies[this.index];
     let seekTime = 0;
@@ -39,6 +44,8 @@ class PlaylistManager {
     if (index < this.movies.length) {
       this.index = index;
       return this.updateSource();
+    } else {
+      return {};
     }
   }
 

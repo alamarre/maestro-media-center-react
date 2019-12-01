@@ -26,8 +26,7 @@ class SearchResults extends React.Component {
 
   focusNext() {
     this.currentResult++;
-    if(this.currentResult >= this.state.searchResults.length)
-    {
+    if (this.currentResult >= this.state.searchResults.length) {
       this.currentResult = 0;
     }
     this.refs[`searchresult-${this.currentResult}`].focus();
@@ -35,9 +34,8 @@ class SearchResults extends React.Component {
 
   focusPrevious() {
     this.currentResult--;
-    if(this.currentResult < 0)
-    {
-      this.currentResult = this.state.searchResults.length-1;
+    if (this.currentResult < 0) {
+      this.currentResult = this.state.searchResults.length - 1;
     }
     this.refs[`searchresult-${this.currentResult}`].focus();
   }
@@ -57,7 +55,7 @@ class SearchResults extends React.Component {
           //this.props.videoLoader.loadVideo("collection", item.name, 0);
           this.setState({ collectionName: item.name, });
         } else {
-          this.setState({movieName: item.name,});
+          this.setState({ movieName: item.name, });
           // this.props.videoLoader.loadVideo(item.type, item.name, 0);
         }
       });
@@ -68,14 +66,14 @@ class SearchResults extends React.Component {
   }
 
   componentDidMount() {
-    this.props.navigation.registerElement(this.refs.searchbox);
+    this.props.navigation.registerElement(this.refs.searchbox, this.props.navOrder);
   }
 
   render() {
     let searchResults = this.state.searchResults.map((item, index) => {
       const ref = `searchresult-${index}`;
       return <li ref={ref} className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
-        <MetadataImage style={{display: "inline-block",}} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
+        <MetadataImage style={{ display: "inline-block", }} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
       </li>;
     });

@@ -3,6 +3,14 @@ class CacheBasedEpisodeProvider {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
     this.showProgressProvider = showProgressProvider;
+    this.serverPromise = this.updateServers();
+  }
+
+  async updateServers() {
+    const result = await this.getAvailableServers();
+    this.serverPromise = result;
+    setTimeout(() => this.updateServers(), 30000);
+    return result;
   }
 
   getListingPromise(folder) {
@@ -63,22 +71,32 @@ class CacheBasedEpisodeProvider {
     return await this.apiRequester.apiRequestPromise("servers", "", {});
   }
 
-  async getAvailableLocalSource(source) {
-    const url = new URL(source);
+  async getAvailableServers() {
     const servers = await this.getServers();
-    const matching = servers.filter( s => s.publicHostname === url.hostname);
-    if(matching.length === 1) {
-      const server = matching[0];
+    const availableServers = [];
+
+    for(const server of servers) {
       try {
         const result = await fetch((server.scheme || "http") +"://"+server.ip+":"+server.port+"/health");
         const body = await result.json();
-        if(!body.clientIp) {
-          return null;
+        if(body.clientIp) {
+          availableServers.push(server);
         }
       }
       catch(e) {
-        return null;
+        //
       }
+
+    }
+    return availableServers;
+  }
+
+  async getAvailableLocalSource(source) {
+    const url = new URL(source);
+    const servers = await this.serverPromise;
+    const matching = servers.filter( s => s.publicHostname === url.hostname);
+    if(matching.length === 1) {
+      const server = matching[0];
       const resultUrl = (server.scheme || "http") +"://"+server.ip+":"+server.port+url.pathname + url.search;
       return resultUrl;
     }
