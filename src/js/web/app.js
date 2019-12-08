@@ -6,7 +6,11 @@ const React = require("react");
 const { render, } = require("react-dom");
 const { Router, Route, hashHistory, } = require("react-router");
 
+require("./clipboard");
 require("../style.scss");
+window.maestroSettings = {
+  NEVER_HIDE_SETTINGS: false
+}
 
 var host = process.env.HOST || window.location.hostname;
 

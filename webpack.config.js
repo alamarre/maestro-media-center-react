@@ -3,6 +3,7 @@ const appId = process.env.CHROMECAST_DEBUG ? "D8828ECA" : "C3639C8B";
 var webpack = require("webpack");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+const WebpackPwaManifest = require("webpack-pwa-manifest");
 
 var path = require("path");
 var BUILD_DIR = path.resolve(__dirname, "build");
@@ -12,10 +13,40 @@ var jquery = require("jquery");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 var alwaysPlugins = [
+
+
+
   //new BundleAnalyzerPlugin(),
   new HtmlWebpackPlugin({
     "title": "Maestro Media Center",
     template: "template.html",
+  }),
+  new WebpackPwaManifest({
+    name: "Maestro Media Center",
+    short_name: "Maestro",
+    description: "",
+    background_color: "#ff0000",
+    crossorigin: "use-credentials", //can be null, use-credentials or anonymous
+    icons: [
+      {
+        src: path.resolve("m-maestro.png"),
+        sizes: [96, 128, 192, 256, 384, 512, 1024,], // multiple sizes,
+        destination: path.join("icons", "ios"),
+        ios: true,
+      },
+      {
+        src: path.resolve("m-maestro.png"),
+        size: 1024, // multiple sizes,
+        destination: path.join("icons", "ios"),
+        ios: "startup",
+      },
+    ],
+    inject: true,
+    ios: {
+      "apple-mobile-web-app-title": "Maestro",
+      "apple-mobile-web-app-status-bar-style": "black",
+    },
+
   }),
   new webpack.ProvidePlugin({
     jQuery: "jquery",
@@ -43,7 +74,7 @@ module.exports = {
     filename: "app.js",
   },
   optimization: {
-    minimize: debug ? false: true,
+    minimize: debug ? false : true,
   },
   module: {
     rules: [

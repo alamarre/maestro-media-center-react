@@ -95,7 +95,7 @@ class Home extends EasyInputComponent {
 
     const settingsSection = <div style={{ display: settingsDisplay, }} className="settings">
       <div style={{ textAlign: "right", zIndex: 10, }}>
-        <button class="cast-button" is="google-cast-button"></button>
+
         {homeButton}
         <button className="maestroButton fa fa-cog" onClick={this.toggleSetting} name="showSettings"></button>
       </div>

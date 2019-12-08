@@ -64,6 +64,7 @@
     "webpack-cli": "^3.2.3",
     "webpack-dev-middleware": "^3.6.0",
     "webpack-dev-server": "^3.2.1",
+    "webpack-pwa-manifest": "^4.1.1",
     "webpack-sass-loader": "^2.2.1"
   }
 }

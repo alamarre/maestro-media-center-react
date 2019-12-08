@@ -10,12 +10,19 @@ class ChooseProfile extends React.Component {
       "newUsername": "",
     };
 
-    props.profileProvider.getProfiles()
-      .then((profiles) => {
-        this.setState({ "profiles": profiles, });
-      }, (err) => {
-        throw err;
-      });
+
+  }
+
+  componentWillMount() {
+    setInterval(() => {
+      this.props.profileProvider.getProfiles()
+        .then((profiles) => {
+          this.setState({ "profiles": profiles, });
+        }, (err) => {
+          throw err;
+        });
+    }, 1000);
+
   }
 
   startAddingProfile() {
@@ -28,7 +35,7 @@ class ChooseProfile extends React.Component {
       .then(() => {
         this.setProfile(username);
       },
-      () => { });
+        () => { });
 
   }
 

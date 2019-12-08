@@ -16,7 +16,7 @@ class ShowPicker extends ScrollableComponent {
       let seasonSet = false;
       for (const show of shows) {
         if (show.show === props.showName) {
-          if(show.episode.endsWith(".mp4")) {
+          if (show.episode.endsWith(".mp4")) {
             show.episode = show.episode.substring(0, show.episode.indexOf(".mp4"));
           }
           this.setState({
@@ -45,7 +45,14 @@ class ShowPicker extends ScrollableComponent {
 
   async loadSeasonMetadata(season) {
     const episodes = Object.keys(this.props.showCache.folders[season].files).map((episode, index) => `episode-${index}`);
-    let refs =[];
+    const downloadPromises = [];
+    for (const episode of Object.keys(this.props.showCache.folders[this.state.season].files)) {
+      const folder = this.props.showPath + "/" + this.state.season;
+      const path = `${folder}/${episode}`;
+      //downloadPromises.push(this.props.episodeLoader.getVideoSource(path));
+    }
+    Promise.all(downloadPromises).then((episodeSources) => this.setState({ episodeSources }));
+    let refs = [];
     if (this.state.keepWatchingData && season == this.state.keepWatchingData.season) {
       refs.push("keepwatching");
     }
@@ -55,9 +62,9 @@ class ShowPicker extends ScrollableComponent {
       this.focusCurrent();
     });
 
-    if(this.props.metadataProvider) {
+    if (this.props.metadataProvider) {
       const metadata = await this.props.metadataProvider.getTvSeasonMetaData(this.props.showName, season);
-      this.setState({metadata,}, () => {
+      this.setState({ metadata, }, () => {
         this.focusCurrent();
       });
     }
@@ -67,7 +74,39 @@ class ShowPicker extends ScrollableComponent {
     this.setState({ "episode": episode, });
   }
 
-  download(episode) {
+  async download(episode) {
+    const files = Object.keys(this.props.showCache.folders[this.state.season].files);
+    let index = -1;
+    for (let i = 0; i < files.length; i++) {
+      if (files[i] == episode) {
+        index = i;
+      }
+    }
+    /*if (this.state.episodeSources.length > index) {
+      const sources = this.state.episodeSources[index];
+      const url = new URL(sources.sources[0]).href;
+      alert(url);
+      //Clipboard.copy(url);
+      //window.open(url, "_system");
+      //alert("Download url copied to clipboard");
+    }*/
+    const folder = this.props.showPath + "/" + this.state.season;
+    const path = `${folder}/${episode}`;
+    const sources = await this.props.episodeLoader.getVideoSource(path);
+    const url = new URL(sources.sources[0]).href;
+    console.log(url);
+    if (navigator && navigator.clipboard) {
+      await navigator.clipboard.writeText(url);
+      alert("copied to clipboard");
+    } else {
+      alert(url);
+    }
+    //await Clipboard.copy(url);
+    //window.open(url, '_blank');*/
+    //alert("Download url copied to clipboard");
+  }
+
+  downloadLegacy(episode) {
     const files = Object.keys(this.props.showCache.folders[this.state.season].files);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
@@ -118,7 +157,7 @@ class ShowPicker extends ScrollableComponent {
       let downloadButton = null;
       let downloadProgress = null;
       let overview = "";
-      if(this.state.metadata && count < this.state.metadata.length) {
+      if (this.state.metadata && count < this.state.metadata.length) {
         const metadata = this.state.metadata[count++];
         overview = metadata.overview;
       }
@@ -130,16 +169,16 @@ class ShowPicker extends ScrollableComponent {
           downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}%</span>;
         }
       }
-      return <div style={{display: "table", margin: "20px",}} key={episode}>
-        <MetadataImage style={{display: "table-cell", verticalAlign: "top",}}
+      return <div style={{ display: "table", margin: "20px", }} key={episode}>
+        <MetadataImage style={{ display: "table-cell", verticalAlign: "top", }}
           width={227} height={127} type="episode" name={episode} show={this.props.showName}
           season={this.state.season}  ></MetadataImage>
-        <div style={{display: "table-cell", verticalAlign: "top",}}>
+        <div style={{ display: "table-cell", verticalAlign: "top", }}>
           <button ref={ref} className="maestroButton roundedButton fa fa-play" onClick={() => this.play(episode)}></button>
           <span>{episode}</span>
           {downloadButton}
           {downloadProgress}
-          <div style={{marginLeft: "20px",}}>{overview}</div>
+          <div style={{ marginLeft: "20px", }}>{overview}</div>
         </div>
       </div>;
 

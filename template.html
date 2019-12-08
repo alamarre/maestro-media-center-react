@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-      <script>
-          window.chromecastPromise = new Promise((s,f) => {
-            window['__onGCastApiAvailable'] = function(isAvailable) {
-              if (isAvailable) {
-                s();
-              }
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="width=device-width,
+                               maximum-scale=0.5" />
+</head>
+
+<body>
+    <script>
+        window.chromecastPromise = new Promise((s, f) => {
+            window['__onGCastApiAvailable'] = function (isAvailable) {
+                if (isAvailable) {
+                    s();
+                }
             };
-          });
-          </script>
-        <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  </body>
+        });
+    </script>
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+</body>
+
 </html>

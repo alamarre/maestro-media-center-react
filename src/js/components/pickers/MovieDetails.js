@@ -19,8 +19,6 @@ class MovieDetails extends ScrollableComponent {
     });
   }
 
-
-
   play() {
     this.props.videoLoader.loadVideo("movie", this.props.movieName, 0);
   }
@@ -30,13 +28,13 @@ class MovieDetails extends ScrollableComponent {
       return <div></div>;
     }
 
-    const videoView = <div style={{display: "table",}}>
-      <MetadataImage style={{display: "inline",}} type="movies" width={150} height={225} name={this.props.movieName} ></MetadataImage>
-      <div style={{display: "table-cell", verticalAlign: "top",}}>
+    const videoView = <div style={{ display: "table", }}>
+      <MetadataImage style={{ display: "inline", }} type="movies" width={150} height={225} name={this.props.movieName} ></MetadataImage>
+      <div style={{ display: "table-cell", verticalAlign: "top", }}>
         <button ref="playbutton" className="maestroButton roundedButton fa fa-play" onClick={() => this.play()}></button>
         <span>{this.props.movieName} </span>
         <hr />
-        <div style={{marginLeft: "20",}}>{this.state.movieInfo.overview}</div>
+        <div style={{ marginLeft: "20", }}>{this.state.movieInfo.overview}</div>
       </div>
     </div>;
 
