@@ -192,7 +192,7 @@ class Carousel extends Component {
   }
 
   componentWillUnmount() {
-    this.props.navigation.remove(this);
+    //this.props.navigation.remove(this);
   }
 
   componentDidUpdate(prevProps) {

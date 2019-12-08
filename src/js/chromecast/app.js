@@ -10,7 +10,7 @@ var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http"
 var port = process.env.PORT
   || window.location.port
   || (scheme == "http" ? 80 : 443);
-const wsHost = process.env.WEBSOCKET_HOST || host;
+const wsHost = "j5095i3iw3.execute-api.us-east-1.amazonaws.com/main" || process.env.WEBSOCKET_HOST || host;
 var wsPort = process.env.WEBSOCKET_PORT || port;
 const jquery = require("jquery");
 
@@ -32,7 +32,7 @@ const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), new SettingsManager());
 const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 //const episodeLoader = new EpisodeLoader(apiRequester);
-const cacheProvider = new CacheProvider(apiRequester, {noPreload: true,});
+const cacheProvider = new CacheProvider(apiRequester, { noPreload: true, });
 const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
 const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
 const showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
@@ -40,7 +40,7 @@ const movieInfoProvider = new MovieInfoProvider(cacheProvider);
 const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
 const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
 
-const webSocketRemoteController = new WebSocketRemoteController(host, "Desktop Test Client", wsPort, authTokenManager);
+const webSocketRemoteController = new WebSocketRemoteController(wsHost, "Desktop Test Client", wsPort, authTokenManager);
 
 const chromecastListener = new ChromecastListener(apiRequester, authTokenManager, webSocketRemoteController, cacheProvider);
 chromecastListener.initialize();

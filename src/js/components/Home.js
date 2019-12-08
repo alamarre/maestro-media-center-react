@@ -8,6 +8,7 @@ const SettingsComponent = require("./Settings");
 
 const NewMovies = require("./NewMovies");
 const HomePageCollectionViewer = require("./HomePageCollectionViewer");
+const ClickableButton = require("./generic/ClickableButton");
 
 class Home extends EasyInputComponent {
 
@@ -142,7 +143,7 @@ class Home extends EasyInputComponent {
       <div>
         <HomePageCollectionViewer navOrder={3} {...this.props} ></HomePageCollectionViewer>
       </div>
-      <div><Link className="nostyle" to="videos">Browse the collection</Link></div>
+      <ClickableButton navigation={this.props.navigation} navOrder={4} to="videos">Browse the collection</ClickableButton>
       <div>{remoteLink}</div>
       {offlineLink}
     </div>;

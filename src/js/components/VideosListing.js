@@ -2,22 +2,25 @@ const React = require("react");
 
 const ShowPicker = require("./ShowPicker");
 const MoviePicker = require("./pickers/MovieDetails");
+const ScrollableComponent = require("./ScrollableComponent");
 
-class VideosListing extends React.Component {
+class VideosListing extends ScrollableComponent {
   constructor(props) {
-    super(props);
+    super(props, [], true);
     this.state = { root: "", folders: [], files: [], };
-    
 
-    if(this.props.router.params && this.props.router.params.videoType) {
+
+    if (this.props.router.params && this.props.router.params.videoType) {
       this.fetchFolder(this.props.router.params.videoType);
     } else if (this.props.episodeLoader) {
       this.props.episodeLoader.getListingPromise("").then(this.loadFolder.bind(this));
     }
   }
 
+
+
   componentWillReceiveProps(nextProps) {
-    if(nextProps.router.params) {
+    if (nextProps.router.params) {
       const newRoot = nextProps.router.params.videoType || "";
       this.setState({ root: newRoot, });
       this.props.episodeLoader.getListingPromise(newRoot).then(this.loadFolder.bind(this));
@@ -26,7 +29,7 @@ class VideosListing extends React.Component {
 
   fetchFolder(folder) {
     var newRoot = this.state.root + "/" + folder;
-    if(this.props.router.params && this.props.router.params.videoType != folder) {
+    if (this.props.router.params && this.props.router.params.videoType != folder) {
       this.props.router.push(`/videos${newRoot}`);
     }
     this.setState({ root: newRoot, });
@@ -34,7 +37,16 @@ class VideosListing extends React.Component {
   }
 
   loadFolder(folderData) {
-    this.setState({ "folders": folderData.folders, "files": folderData.files, });
+    let refs = [];
+    refs = refs.concat(
+      folderData.folders.map((f, i) => `folder-${i}`)
+    ).concat(
+      folderData.files.map((f, i) => `file-${i}`)
+    );
+
+    this.setState({ "folders": folderData.folders, refs, "files": folderData.files, }, () => {
+      this.focus();
+    });
   }
 
   selectSource(item) {
@@ -45,43 +57,49 @@ class VideosListing extends React.Component {
   }
 
   cancelShowChooser() {
-    this.setState({ "showName": null, movieName: null, });
+    this.setState({ "showName": null, movieName: null, }, () => {
+      this.props.navigation.focusDialog(this);
+    });
   }
 
   loadVideo(movieName) {
-    this.setState({movieName,});
+    this.setState({ movieName, });
   }
 
   render() {
-    var folders = this.state.folders.map((folder) => {
-      return <div key={folder} onClick={this.fetchFolder.bind(this, folder)}>{folder}</div>;
+    var folders = this.state.folders.map((folder, i) => {
+      const ref = `folder-${i}`;
+      return <button className="maestroButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button>;
     });
 
     //var index = 0;
-    var files = this.state.files.map((file) => {
+    var files = this.state.files.map((file, i) => {
       const fileName = (file.name) ? file.name : file;
       //const folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
 
+      const ref = `file-${i}`;
       if (file.type && file.type == "tv") {
         const imageSource = `${this.props.imageRoot}/${window.accountId}/50x75/tv/show/${file.name}.png`;
-        return <div style={{ margin: "20px", }} key={fileName} onClick={() => this.selectSource(file)} >
+
+        return <button className="maestroButton" ref={ref} style={{ margin: "20px", display: "block" }} key={fileName} onClick={() => this.selectSource(file)} >
           <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
           {fileName}
-        </div>;
+        </button>;
       }
 
       const imageSource = `${this.props.imageRoot}/${window.accountId}/50x75/movies/${file.name}.png`;
 
-      return <div style={{ margin: "20px", }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
+      return <button ref={ref} className="maestroButton" style={{ margin: "20px", display: "block" }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
         <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
         {fileName}
-      </div>;
+      </button>;
     });
 
     let showPicker = null;
 
     if (this.state.showName) {
       showPicker = <ShowPicker
+        navigation={this.props.navigation}
         router={this.props.router}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
@@ -93,6 +111,7 @@ class VideosListing extends React.Component {
       </ShowPicker>;
     } else if (this.state.movieName) {
       showPicker = <MoviePicker
+        navigation={this.props.navigation}
         router={this.props.router}
         metadataProvider={this.props.metadataProvider}
         videoLoader={this.props.videoLoader}

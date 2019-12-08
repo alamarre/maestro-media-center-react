@@ -25,21 +25,23 @@ class KeyboardNavigation {
       e.preventDefault();
     }
     switch (code) {
-      case 37:
-        this.moveLeft();
-        break;
-      case 38:
-        this.focusPrevious();
-        break;
-      case 39:
-        this.moveRight();
-        break;
-      case 40:
-        this.focusNext();
-        break;
-      case 13:
+    case 37:
+      this.moveLeft();
+      break;
+    case 38:
+      this.focusPrevious();
+      break;
+    case 39:
+      this.moveRight();
+      break;
+    case 40:
+      this.focusNext();
+      break;
+    case 13:
+      if (e.type == "keypress") {
         this.select();
-        break;
+      }
+      break;
     }
     console.log(code);
   }
@@ -61,7 +63,12 @@ class KeyboardNavigation {
       return this.currentDialog.selectCurrent();
     }
     if (this.index >= 0) {
-      this.elements[this.index].selectCurrent();
+      const element = this.elements[this.index];
+      if (element.selectCurrent) {
+        element.selectCurrent();
+      } else if (element.click) {
+        element.click();
+      }
     }
   }
 

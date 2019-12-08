@@ -2,33 +2,37 @@ const React = require("react");
 
 class Scrollable extends React.Component {
 
-  constructor(props, refs, isDialog = true ) {
+  constructor(props, refs, isDialog = true) {
     super(props);
     this.isDialog = isDialog;
     this.selectedIndex = 0;
-    this.state={selectedIndex: 0, refs,};
+    this.state = { selectedIndex: 0, refs, };
   }
 
   componentDidMount() {
-    if(this.isDialog) {
+    if (this.isDialog) {
       this.props.navigation.focusDialog(this);
     }
 
     // force a render
-    this.setState({selectedIndex: 0,}, () => {
+    this.setState({ selectedIndex: 0, }, () => {
       this.focusCurrent();
     });
 
   }
 
+  focus() {
+    this.focusCurrent();
+  }
+
   focusCurrent() {
-    if(this.state.refs.length > 0 && Object.keys(this.refs).length > 0) {
+    if (this.state && this.state.refs && this.state.refs.length > 0 && Object.keys(this.refs).length > 0) {
       this.refs[this.state.refs[this.selectedIndex]].focus();
     }
   }
 
   componentWillUnmount() {
-    if(this.isDialog) {
+    if (this.isDialog && this.props.navigation && this.props.navigation.unfocusDialog) {
       this.props.navigation.unfocusDialog();
     }
   }
@@ -39,9 +43,15 @@ class Scrollable extends React.Component {
   moveRight() {
   }
 
+  selectCurrent() {
+    if (this.state && this.state.refs && this.state.refs.length > 0 && Object.keys(this.refs).length > 0) {
+      this.refs[this.state.refs[this.selectedIndex]].click();
+    }
+  }
+
   focusNext() {
     this.selectedIndex++;
-    if(this.selectedIndex >= this.state.refs.length) {
+    if (this.selectedIndex >= this.state.refs.length) {
       this.selectedIndex = 0;
     }
 
@@ -50,8 +60,8 @@ class Scrollable extends React.Component {
 
   focusPrevious() {
     this.selectedIndex--;
-    if(this.selectedIndex< 0) {
-      this.selectedIndex = this.state.refs.length -1;
+    if (this.selectedIndex < 0) {
+      this.selectedIndex = this.state.refs.length - 1;
     }
 
     this.refs[this.state.refs[this.selectedIndex]].focus();
