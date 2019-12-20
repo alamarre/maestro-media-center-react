@@ -23,7 +23,7 @@ var alwaysPlugins = [
   }),
   new WebpackPwaManifest({
     name: "Maestro Media Center",
-    short_name: "Maestro",
+    short_name: process.env.PWA_NAME || "Maestro",
     description: "",
     background_color: "#ff0000",
     crossorigin: "use-credentials", //can be null, use-credentials or anonymous
@@ -65,6 +65,11 @@ var alwaysPlugins = [
     allChunks: true,
   }),];
 module.exports = {
+  devServer: {
+    compress: true,
+    host: "0.0.0.0",
+    port: process.env.LOCAL_PORT || 3000,
+  },
   context: __dirname,
   devtool: debug ? "inline-sourcemap" : "sourcemap",
   entry: APP_DIR + "/web/app.js",

@@ -49,7 +49,7 @@ class ShowPicker extends ScrollableComponent {
     for (const episode of Object.keys(this.props.showCache.folders[this.state.season].files)) {
       const folder = this.props.showPath + "/" + this.state.season;
       const path = `${folder}/${episode}`;
-      //downloadPromises.push(this.props.episodeLoader.getVideoSource(path));
+      downloadPromises.push(this.props.episodeLoader.getVideoSource(path));
     }
     Promise.all(downloadPromises).then((episodeSources) => this.setState({ episodeSources }));
     let refs = [];
@@ -74,7 +74,7 @@ class ShowPicker extends ScrollableComponent {
     this.setState({ "episode": episode, });
   }
 
-  async download(episode) {
+  download(episode) {
     const files = Object.keys(this.props.showCache.folders[this.state.season].files);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
@@ -82,15 +82,16 @@ class ShowPicker extends ScrollableComponent {
         index = i;
       }
     }
-    /*if (this.state.episodeSources.length > index) {
+    if (this.state.episodeSources.length > index) {
       const sources = this.state.episodeSources[index];
       const url = new URL(sources.sources[0]).href;
-      alert(url);
+      window.open(url, "_blank")
+      //alert(url);
       //Clipboard.copy(url);
-      //window.open(url, "_system");
+      //window.location = url;
       //alert("Download url copied to clipboard");
-    }*/
-    const folder = this.props.showPath + "/" + this.state.season;
+    }
+    /*const folder = this.props.showPath + "/" + this.state.season;
     const path = `${folder}/${episode}`;
     const sources = await this.props.episodeLoader.getVideoSource(path);
     const url = new URL(sources.sources[0]).href;
@@ -165,6 +166,9 @@ class ShowPicker extends ScrollableComponent {
       if (this.props.offlineStorage.canStoreOffline()) {
         downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)}></button>;
         const progress = this.downloadProgress[episode];
+        if (this.state.episodeSources && this.state.episodeSources.length > index) {
+          //downloadButton = <a href={new URL(this.state.episodeSources[index].sources[0]).href} download>Download</a>;
+        }
         if (progress && progress.state) {
           downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}%</span>;
         }
