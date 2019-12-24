@@ -16,6 +16,11 @@ button:focus {
     border: 1px solid #FF0;
 }
 
+li:focus {
+  background-color: #FF0;
+  border: 1px solid #FF0;
+}
+
 div:focus {
   background-color: #FF0;
 }

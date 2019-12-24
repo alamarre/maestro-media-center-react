@@ -15,6 +15,9 @@ class HomepageCollectionViewer extends React.Component {
       for (const collection of collections) {
         collection.items = collection.items.sort((a, b) => window.tvShowSort(a.name, b.name));
       }
+      if (props.updateCount) {
+        props.updateCount(collections.length);
+      }
       this.setState({ collections, });
     });
   }

@@ -84,7 +84,7 @@ class ShowPicker extends ScrollableComponent {
     }
     if (this.state.episodeSources.length > index) {
       const sources = this.state.episodeSources[index];
-      const url = new URL(sources.sources[0]).href;
+      const url = new URL(sources.sources[0]).href + "?download=true";
       window.open(url, "_blank")
       //alert(url);
       //Clipboard.copy(url);
@@ -167,7 +167,7 @@ class ShowPicker extends ScrollableComponent {
         downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)}></button>;
         const progress = this.downloadProgress[episode];
         if (this.state.episodeSources && this.state.episodeSources.length > index) {
-          //downloadButton = <a href={new URL(this.state.episodeSources[index].sources[0]).href} download>Download</a>;
+          //downloadButton = <a href={new URL(this.state.episodeSources[index].sources[0]).href + "?download=true"} download>Download</a>;
         }
         if (progress && progress.state) {
           downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}%</span>;

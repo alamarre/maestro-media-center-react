@@ -1,4 +1,5 @@
 const React = require("react");
+const ReactDOM = require("react-dom");
 const { Link, } = require("react-router");
 const EasyInputComponent = require("./EasyInputComponent");
 
@@ -14,14 +15,14 @@ class Home extends EasyInputComponent {
 
   constructor(props) {
     super(props);
-    this.state = { showSettings: false, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS), };
+    this.state = { showSettings: false, collectionCount: 0, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS), };
   }
 
   componentWillMount() {
     if (!this.props.authTokenManager.isAuthenticated() && this.props.router.location.pathname != "/login") {
-      this.props.router.push("/login");
+      this.props.router.replace("/login");
     } else if (!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profile") {
-      this.props.router.push("/profile");
+      this.props.router.replace("/profile");
     } else {
       this.props.accountProvider.getAccountId().then(accountInfo => {
         window.accountId = accountInfo.accountId;
@@ -49,7 +50,8 @@ class Home extends EasyInputComponent {
 
   componentDidUpdate(prevProps) {
     if (this.props.location !== prevProps.location) {
-      this.props.navigation.clear();
+      //this.props.navigation.clear();
+
       if (!window.accountId) {
         this.props.accountProvider.getAccountId().then(accountInfo => {
           window.accountId = accountInfo.accountId;
@@ -57,6 +59,10 @@ class Home extends EasyInputComponent {
         });
       }
     }
+  }
+
+  updateCollectionCount(count) {
+    this.setState({ collectionCount: count });
   }
 
   showSettingsTemporarily() {
@@ -89,7 +95,7 @@ class Home extends EasyInputComponent {
     if (["/login", "/profile", "/remote",].includes(this.props.router.location.pathname)) {
       settingsDisplay = "none";
     } else if (!["/",].includes(this.props.router.location.pathname)) {
-      homeButton = <button className="maestroButton fa fa-home" onClick={() => this.goHome()}></button>;
+      //homeButton = <button className="maestroButton fa fa-home" onClick={() => this.goHome()}></button>;
     }
 
 
@@ -97,7 +103,6 @@ class Home extends EasyInputComponent {
       <div style={{ textAlign: "right", zIndex: 10, }}>
 
         {homeButton}
-        <button className="maestroButton fa fa-cog" onClick={this.toggleSetting} name="showSettings"></button>
       </div>
 
       {settingsView}
@@ -111,11 +116,13 @@ class Home extends EasyInputComponent {
 
     let offlineLink = null;
     if (this.props.offlineStorage.canStoreOffline()) {
-      offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
+      //offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
     }
 
+    const settingsLink = <ClickableButton navigation={this.props.navigation} navOrder={this.state.collectionCount + 4} to="settings">Settings</ClickableButton>;
+
     const remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") != "") ?
-      <Link className="nostyle" to="remote">Remote Control</Link>
+      <Link ref="remote" className="nostyle" to="remote">Remote Control</Link>
       : null;
     var body = this.props.children || <div>
       <div>
@@ -141,11 +148,12 @@ class Home extends EasyInputComponent {
         <NewMovies navOrder={2} {...this.props} ></NewMovies>
       </div>
       <div>
-        <HomePageCollectionViewer navOrder={3} {...this.props} ></HomePageCollectionViewer>
+        <HomePageCollectionViewer updateCount={(count) => this.updateCollectionCount(count)} navOrder={3} {...this.props} ></HomePageCollectionViewer>
       </div>
-      <ClickableButton navigation={this.props.navigation} navOrder={4} to="videos">Browse the collection</ClickableButton>
+
+      <ClickableButton navigation={this.props.navigation} navOrder={this.state.collectionCount + 3} to="videos">Browse the collection</ClickableButton>
       <div>{remoteLink}</div>
-      {offlineLink}
+      {settingsLink}
     </div>;
     return (
       <div>{settingsSection}{body}</div>

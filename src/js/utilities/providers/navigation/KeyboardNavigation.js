@@ -19,9 +19,16 @@ class KeyboardNavigation {
     }
   }
 
+  preventDefault(e) {
+    const code = e.which || e.keyCode || 0;
+    if ((code >= 37 && code <= 40)) {
+      e.preventDefault();
+    }
+  }
+
   handleKeypress(e) {
     const code = e.which || e.keyCode || 0;
-    if (code >= 37 && code <= 40) {
+    if ((code >= 37 && code <= 40)) {
       e.preventDefault();
     }
     switch (code) {
@@ -37,9 +44,14 @@ class KeyboardNavigation {
     case 40:
       this.focusNext();
       break;
+    case 77:
+    case 109:
+      this.openMenu();
+      break;
     case 13:
       if (e.type == "keypress") {
         this.select();
+        e.preventDefault();
       }
       break;
     }
@@ -73,8 +85,16 @@ class KeyboardNavigation {
   }
 
   registerElement(element, navOrder) {
-    const wrapper = { element, focus: () => element.focus(), selectCurrent: () => element.focus(), type: "element", };
+    const wrapper = { element, persist: navOrder === -1, focus: () => element.focus(), selectCurrent: () => element.focus(), type: "element", };
     if (navOrder === 0 || navOrder > 0) {
+      if (this.elements[navOrder] && this.elements[navOrder].persist) {
+        let current = this.elements[navOrder];
+        for (var i = 1; current.persist; i++) {
+          const next = this.elements[navOrder + i];
+          this.elements[navOrder + i] = current;
+          current = next;
+        }
+      }
       this.elements[navOrder] = wrapper;
     } else {
       this.elements.push(wrapper);
@@ -98,6 +118,12 @@ class KeyboardNavigation {
 
   unfocusDialog() {
     this.currentDialog = null;
+  }
+
+  openMenu() {
+    if (this.currentDialog && this.currentDialog.openMenu) {
+      this.currentDialog.openMenu();
+    }
   }
 
   clear() {

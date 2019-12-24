@@ -3,17 +3,18 @@ const React = require("react");
 const ChromecastPlayer = require("./VideoPlayers/Chromecast");
 const Html5VideoPlayer = require("./VideoPlayers/Html5Video");
 const ReloadVideoDialog = require("./ReloadVideoDialog");
+const ScrollableComponent = require("./ScrollableComponent");
+const Menu = require("./generic/Menu");
 
-class VideoPlayer extends React.Component {
+class VideoPlayer extends ScrollableComponent {
   constructor(props) {
-    super(props);
+    super(props, [], true);
     const episodeLoader = this.props.episodeLoader;
-
     this.episodeLoader = episodeLoader;
     this.type = this.props.location.query.type;
     this.profile = this.props.location.query.profile;
     this.preventIdleTimer = null;
-    this.state = { "overlayVisibility": false, seekTime: -1, promptReload: false };
+    this.state = { "overlayVisibility": false, showMenu: false, seekTime: -1, promptReload: false };
     this.progressTimer = null;
     if (this.props.remoteController) {
       this.props.remoteController.mapUpdateFunctions({
@@ -43,7 +44,20 @@ class VideoPlayer extends React.Component {
     }
   }
 
+  openMenu() {
+    this.setState({ "showMenu": true }, () => {
+      //this.props.navigation.focusDialog(this.refs.menu);
+    })
+  }
+
+  closeMenu() {
+    this.setState({ "showMenu": false }, () => {
+      this.props.navigation.focusDialog(this);
+    })
+  }
+
   componentDidMount() {
+    super.componentDidMount();
     this.props.videoLoader.setRouter(this.props.router);
     if (this.props.location.query.folder) {
       var path = this.props.location.query.folder;
@@ -65,7 +79,7 @@ class VideoPlayer extends React.Component {
   }
 
   render() {
-    if(this.state.promptReload) {
+    if (this.state.promptReload) {
       const reload = async () => {
         const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].reload();
         this.setState({ sources, subtitles, name, seekTime, promptReload: false });
@@ -117,13 +131,23 @@ class VideoPlayer extends React.Component {
         />;
 
       } else {
-        videoSource = <Html5VideoPlayer key="videoplayer" remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles}  onEnded={this.goToNext.bind(this)}
+        videoSource = <Html5VideoPlayer key="videoplayer" remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles} onEnded={this.goToNext.bind(this)}
           onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
         />;
       }
     }
+    let menu = null;
+    if (this.state.showMenu) {
+      const items = [
+        { name: "Go Home", action: () => this.props.router.push("/") },
+        { name: "Toggle Screen Visibility", action: () => this.toggleVisibility() },
+        { name: "Close", action: () => this.closeMenu() },
+      ];
+      menu = <Menu navigation={this.props.navigation} ref={menu} items={items}></Menu>
+    }
     return (
       <div>
+        {menu}
         {videoSource}
         <div style={currentEpisodeStyle} ref="episodeInfo">{this.state.name}</div>
         {overlay}
@@ -144,7 +168,7 @@ class VideoPlayer extends React.Component {
       parentPath = subdirectory;
       subdirectory = "";
     }
-    const { sources, subtitles,  name, seekTime, path, } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
+    const { sources, subtitles, name, seekTime, path, } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
     if (this.props.offlineStorage) {
       const data = await this.props.offlineStorage.getVideo(sources[0]);
       if (data) {
@@ -153,13 +177,13 @@ class VideoPlayer extends React.Component {
     }
 
     const orderedSources = [].concat(sources);
-    for(const source of sources) {
+    for (const source of sources) {
       const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
-      if(newSource) {
+      if (newSource) {
         orderedSources.unshift(newSource);
       }
     }
-    this.setState({ sources: orderedSources, subtitles,  name, seekTime, });
+    this.setState({ sources: orderedSources, subtitles, name, seekTime, });
     this.props.videoLoader.setUrl(this.type, path, index, true, this.profile);
   }
 
@@ -189,8 +213,8 @@ class VideoPlayer extends React.Component {
 
   async goToNext() {
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToNext();
-    if(sources == null && this.props.navigation) {
-      this.setState({promptReload: true});
+    if (sources == null && this.props.navigation) {
+      this.setState({ promptReload: true });
     } else {
       this.setState({ sources, subtitles, name, seekTime, });
       this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
@@ -198,8 +222,8 @@ class VideoPlayer extends React.Component {
   }
 
   async goToPrevious() {
-    const { sources, subtitles,  name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToPrevious();
-    this.setState({ sources, subtitles,  name, seekTime, });
+    const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToPrevious();
+    this.setState({ sources, subtitles, name, seekTime, });
     this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
   }
 }

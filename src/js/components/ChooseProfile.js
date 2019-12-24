@@ -1,15 +1,15 @@
 const React = require("react");
+const ScrollableComponent = require("./ScrollableComponent");
 
-class ChooseProfile extends React.Component {
+class ChooseProfile extends ScrollableComponent {
 
   constructor(props) {
-    super(props);
-    this.state = {
+    super(props, [], true);
+    this.state = Object.assign({}, this.state, {
       "addingProfile": false,
       "profiles": null,
       "newUsername": "",
-    };
-
+    });
 
   }
 
@@ -17,7 +17,7 @@ class ChooseProfile extends React.Component {
     setInterval(() => {
       this.props.profileProvider.getProfiles()
         .then((profiles) => {
-          this.setState({ "profiles": profiles, });
+          this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`) }, this.focusCurrent());
         }, (err) => {
           throw err;
         });
@@ -51,7 +51,15 @@ class ChooseProfile extends React.Component {
     this.props.authTokenManager.setProfile(profile);
     this.props.cache.reload();
     this.props.search.createIndex();
-    this.props.router.push("/");
+    this.props.router.replace("/");
+  }
+
+  moveLeft() {
+    this.focusPrevious();
+  }
+
+  moveRight() {
+    this.focusNext();
   }
 
   render() {
@@ -76,8 +84,9 @@ class ChooseProfile extends React.Component {
         </div>
       </div>;
     } else if (this.state.profiles) {
-      let profiles = this.state.profiles.map((profile) => {
-        return <button className="maestroButton fa fa-user fa-3x" style={{ border: "solid 1px white", width: "300px", fontSize: "100px", }} key={profile.profileName} onClick={this.setProfile.bind(this, profile.profileName)}>
+      let profiles = this.state.profiles.map((profile, i) => {
+        const ref = `profile-${i}`;
+        return <button ref={ref} className="maestroButton fa fa-user fa-3x" style={{ border: "solid 1px white", width: "300px", fontSize: "100px", }} key={profile.profileName} onClick={this.setProfile.bind(this, profile.profileName)}>
           <div style={{ textOverflow: "ellipsis", overflow: "hidden", }}>{profile.profileName}</div>
         </button>;
       });

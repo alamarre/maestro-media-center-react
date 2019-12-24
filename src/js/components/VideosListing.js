@@ -17,8 +17,6 @@ class VideosListing extends ScrollableComponent {
     }
   }
 
-
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.router.params) {
       const newRoot = nextProps.router.params.videoType || "";
@@ -69,7 +67,7 @@ class VideosListing extends ScrollableComponent {
   render() {
     var folders = this.state.folders.map((folder, i) => {
       const ref = `folder-${i}`;
-      return <button className="maestroButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button>;
+      return <div><button className="maestroButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button></div>;
     });
 
     //var index = 0;

@@ -9,6 +9,11 @@ class ClickableButton extends React.Component {
     this.props.navigation.registerElement(node, this.props.navOrder);
   }
 
+  componentDidUpdate() {
+    const node = ReactDOM.findDOMNode(this.refs.link);
+    this.props.navigation.registerElement(node, this.props.navOrder);
+  }
+
   render() {
     return <div><Link ref="link" className="nostyle" to={this.props.to}>{this.props.children}</Link></div>
   }

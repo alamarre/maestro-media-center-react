@@ -1,21 +1,26 @@
 const React = require("react");
+const ReactDOM = require("react-dom");
 
-class Login extends React.Component {
+const ScrollableComponent = require("./ScrollableComponent");
+
+class Login extends ScrollableComponent {
 
   constructor(props) {
-    super(props);
-    this.state = { "error": false, };
+    super(props, ["username", "password", "login"]);
+    this.state = Object.assign(this.state, { "error": false, });
   }
 
   login() {
-    this.props.login.loginPromise(this.usernameInput.value, this.passwordInput.value)
+    const usernameInput = ReactDOM.findDOMNode(this.refs.username);
+    const passwordInput = ReactDOM.findDOMNode(this.refs.password);
+    this.props.login.loginPromise(usernameInput.value, passwordInput.value)
       .then((token) => {
         this.props.authTokenManager.setToken(token);
         if (this.props.postLoginFunction) {
           return this.props.postLoginFunction(this.props.router, token);
         }
 
-        this.props.router.push("/profile");
+        this.props.router.replace("/profile");
       }, (error) => {
         console.log(error);
         this.setState({ error: true, });
@@ -33,16 +38,16 @@ class Login extends React.Component {
         {errorMessage}
         <div style={{ textAlign: "center", }} className="form-group">
           <label style={{ textAlign: "left", width: "50%", }}>Username</label>
-          <div><input autoCorrect="off" autoCapitalize="none" type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" ref={(input) => { this.usernameInput = input; }} />
+          <div><input autoCorrect="off" autoCapitalize="none" type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" ref="username" />
           </div>
         </div>
         <div style={{ textAlign: "center", }} className="form-group" >
           <label style={{ textAlign: "left", width: "50%", }}>Password</label>
           <div>
-            <input type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" name="password" type="password" ref={(input) => { this.passwordInput = input; }} />
+            <input type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" name="password" type="password" ref="password" />
           </div>
         </div>
-        <button className="btn btn-primary" onClick={this.login.bind(this)}>Login</button>
+        <button ref="login" className="btn btn-primary" onClick={this.login.bind(this)}>Login</button>
       </div>
     </div>;
 

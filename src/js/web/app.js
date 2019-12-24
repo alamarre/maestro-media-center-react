@@ -27,6 +27,10 @@ var Home = require("../components/Home");
 
 var VideoPlayer = require("../components/VideoPlayer");
 var VideosListing = require("../components/VideosListing");
+
+
+var Settings = require("../components/Settings");
+
 var AuthTokenManger = require("../utilities/AuthTokenManager");
 var ApiRequester = require("../utilities/ApiRequester");
 var QueryStringReader = require("../utilities/QueryStringReader");
@@ -128,6 +132,7 @@ render((
       <Route path="profile" component={(props) => (<ChooseProfile {...props} navigation={keyboardNavigation} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider} />)} />
       <Route path="remote" component={(props) => (<RemoteControllerComponent {...props} navigation={keyboardNavigation} remote={webSocketSender} />)} />
       <Route path="offline" component={(props) => (<OfflineVideos {...props} navigation={keyboardNavigation} imageRoot={imageRoot} offlineStorage={offlineStorage} videoLoader={videoLoader} />)} />
+      <Route path="settings" component={(props) => (<Settings {...props} navigation={keyboardNavigation} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} webSocketSender={webSocketSender} />)} />
     </Route>
   </Router>
 ), div);
