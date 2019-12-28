@@ -1,8 +1,8 @@
-const React = require("react");
-const { Modal, } = require("react-bootstrap");
-const ScrollableComponent = require("../ScrollableComponent");
+import React from "react";
+import { Modal, } from "react-bootstrap";
+import ScrollableComponent from "../ScrollableComponent";
 
-class PlaylistPicker extends ScrollableComponent {
+export default class PlaylistPicker extends ScrollableComponent {
 
   constructor(props) {
     super(props, []);
@@ -83,4 +83,4 @@ class PlaylistPicker extends ScrollableComponent {
   }
 }
 
-module.exports = PlaylistPicker;
+

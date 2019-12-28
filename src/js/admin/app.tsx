@@ -1,8 +1,8 @@
 require("@babel/polyfill");
-const React = require("react");
-const { render, } = require("react-dom");
-const { Router, Route, hashHistory, } = require("react-router");
-const Metadata = require("./components/Metadata");
+import React from "react";
+import { render, } from "react-dom";
+import { Router, Route, hashHistory, } from "react-router";
+import Metadata from "./components/Metadata";
 
 require("../style.scss");
 require("./style.scss");
@@ -12,27 +12,27 @@ var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http"
 var port = process.env.PORT
   || window.location.port
   || (scheme == "http" ? 80 : 443);
-const jquery = require("jquery");
+import jquery from "jquery";
 
 const MAIN_HOST = process.env.MAIN_HOST;
 
 
-const Home = require("./Home");
-const AuthTokenManger = require("../utilities/AuthTokenManager");
-const SettingsManager = require("../utilities/CookiesSettingsManager");
-const ApiRequester = require("../utilities/ApiRequester");
+import Home from "./Home";
+import AuthTokenManger from "../utilities/AuthTokenManager";
+import SettingsManager from "../utilities/CookiesSettingsManager";
+import ApiRequester from "../utilities/ApiRequester";
 import ApiCaller from "../utilities/providers/ApiCaller";
-const QueryStringReader = require("../utilities/QueryStringReader");
-// const EpisodeLoader = require("../utilities/EpisodeLoader");
+import QueryStringReader from "../utilities/QueryStringReader";
+// import EpisodeLoader from "../utilities/EpisodeLoader";
 
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), new SettingsManager());
 const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 const mainHostApiCaller = new ApiCaller(authTokenManager, scheme, MAIN_HOST + ":" + port);
 
 
-const LoginProvider = require("../utilities/LoginProvider");
+import LoginProvider from "../utilities/LoginProvider";
 const loginProvider = new LoginProvider(apiRequester);
-const LoginComponent = require("../components/Login");
+import LoginComponent from "../components/Login";
 
 const div = document.createElement("div");
 document.body.appendChild(div);

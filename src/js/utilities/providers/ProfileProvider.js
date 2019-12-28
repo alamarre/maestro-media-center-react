@@ -1,4 +1,4 @@
-class ProfileProvider {
+export default class ProfileProvider {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
   }
@@ -22,4 +22,3 @@ class ProfileProvider {
 
 }
 
-module.exports = ProfileProvider;

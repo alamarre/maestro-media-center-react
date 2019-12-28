@@ -1,4 +1,4 @@
-class CollectionsManager {
+export default class CollectionsManager {
   constructor(apiRequester, movieInfoProvider) {
     this.apiRequester = apiRequester;
     this.movieInfoProvider = movieInfoProvider;
@@ -14,4 +14,4 @@ class CollectionsManager {
   }
 }
 
-module.exports = CollectionsManager;
+

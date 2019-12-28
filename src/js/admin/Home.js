@@ -1,8 +1,8 @@
-const React = require("react");
+import React from "react";
 
-const { Link, } = require("react-router");
+import { Link, } from "react-router";
 
-class Home extends React.Component {
+export default class Home extends React.Component {
 
   constructor(props) {
     super(props);   
@@ -25,4 +25,4 @@ class Home extends React.Component {
   }
 }
 
-module.exports = Home;
+

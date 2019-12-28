@@ -1,6 +1,6 @@
-const React = require("react");
+import React from "react";
 
-class OfflineVideos extends React.Component {
+export default class OfflineVideos extends React.Component {
 
   constructor(props) {
     super(props);
@@ -48,4 +48,4 @@ class OfflineVideos extends React.Component {
   }
 }
 
-module.exports = OfflineVideos;
+

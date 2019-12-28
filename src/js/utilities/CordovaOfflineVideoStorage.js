@@ -1,4 +1,4 @@
-const localforage = require("localforage");
+import localforage from "localforage";
 
 function createDirectoryPromise(dirEntry, directoryName) {
   return new Promise((s, f) => {
@@ -35,7 +35,7 @@ function getFilePromise(dirEntry, options, fileName) {
   });
 }
 
-class OfflineVideoStorage {
+export default class OfflineVideoStorage {
 
   constructor(episodeLoader) {
     this._hasOffline = false;
@@ -155,4 +155,4 @@ class OfflineVideoStorage {
   }
 }
 
-module.exports = OfflineVideoStorage;
+

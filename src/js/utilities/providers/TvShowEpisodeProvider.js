@@ -1,4 +1,4 @@
-class TvShowEpisodeProvider {
+export default class TvShowEpisodeProvider {
   constructor(apiRequester, cacheProvider, showProgressProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
@@ -76,4 +76,3 @@ class TvShowEpisodeProvider {
   }
 }
 
-module.exports = TvShowEpisodeProvider;

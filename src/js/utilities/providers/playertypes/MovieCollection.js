@@ -1,4 +1,4 @@
-class MovieCollectionManager {
+export default class MovieCollectionManager {
   constructor(rootFolder, collectionsManager, episodeLoader, showProgressProvider) {
     this.rootFolder = rootFolder;
     this.collectionsManager = collectionsManager;
@@ -54,4 +54,4 @@ class MovieCollectionManager {
 
 }
 
-module.exports = MovieCollectionManager;
+

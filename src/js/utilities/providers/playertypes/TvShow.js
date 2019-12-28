@@ -1,4 +1,4 @@
-class TvShowPlayerManager {
+export default class TvShowPlayerManager {
   constructor(episodeLoader, showProgressProvider) {
     this.episodeLoader = episodeLoader;
     this.showProgressProvider = showProgressProvider;
@@ -100,4 +100,4 @@ class TvShowPlayerManager {
   }
 }
 
-module.exports = TvShowPlayerManager;
+

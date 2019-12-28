@@ -1,6 +1,6 @@
-const React = require("react");
+import React from "react";
 
-class EasyInputComponent extends React.Component {
+export default class EasyInputComponent extends React.Component {
 
   constructor(props) {
     super(props);
@@ -28,4 +28,4 @@ class EasyInputComponent extends React.Component {
   }
 }
 
-module.exports = EasyInputComponent;
+

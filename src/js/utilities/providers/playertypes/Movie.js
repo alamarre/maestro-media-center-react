@@ -1,4 +1,4 @@
-class MoviePlayerManager {
+export default class MoviePlayerManager {
   constructor(episodeLoader, showProgressProvider) {
     this.episodeLoader = episodeLoader;
     this.showProgressProvider = showProgressProvider;
@@ -51,4 +51,4 @@ class MoviePlayerManager {
 
 }
 
-module.exports = MoviePlayerManager;
+

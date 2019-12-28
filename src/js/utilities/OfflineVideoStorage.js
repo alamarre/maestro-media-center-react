@@ -1,8 +1,8 @@
-const localforage = require("localforage");
-const $ = require("jquery");
+import localforage from "localforage";
+import $ from "jquery";
 const sliceSize = 1024 * 1024 * 100;
 
-class OfflineVideoStorage {
+export default class OfflineVideoStorage {
 
   constructor() {
     this._hasOffline = false;
@@ -122,4 +122,4 @@ class OfflineVideoStorage {
   }
 }
 
-module.exports = OfflineVideoStorage;
+

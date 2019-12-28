@@ -8,10 +8,10 @@ var APP_DIR = path.resolve(__dirname, "src/js/admin/");
 
 admin.output.path = BUILD_DIR;
 admin.entry = APP_DIR + "/app.tsx",
-admin.plugins[0] = new HtmlWebpackPlugin({
-  "title":"Maestro Media Center",
-  template: "template.html",
-});
+  admin.plugins[0] = new HtmlWebpackPlugin({
+    "title": "Maestro Media Center",
+    template: "template.html",
+  });
 admin.devServer = {
   disableHostCheck: true,
 };

@@ -1,10 +1,10 @@
-const React = require("react");
+import React from "react";
 
-const ShowPicker = require("./ShowPicker");
-const MoviePicker = require("./pickers/MovieDetails");
-const ScrollableComponent = require("./ScrollableComponent");
+import ShowPicker from "./ShowPicker";
+import MoviePicker from "./pickers/MovieDetails";
+import ScrollableComponent from "./ScrollableComponent";
 
-class VideosListing extends ScrollableComponent {
+export default class VideosListing extends ScrollableComponent {
   constructor(props) {
     super(props, [], true);
     this.state = { root: "", folders: [], files: [], };
@@ -130,4 +130,4 @@ class VideosListing extends ScrollableComponent {
   }
 }
 
-module.exports = VideosListing;
+

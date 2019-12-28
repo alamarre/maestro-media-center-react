@@ -1,6 +1,6 @@
-const React = require("react");
+import React from "react";
 
-class Html5VideoPlayer extends React.Component {
+export default class Html5VideoPlayer extends React.Component {
   constructor(props) {
     super(props);
     if (this.props.remoteController) {
@@ -85,4 +85,4 @@ class Html5VideoPlayer extends React.Component {
 
 }
 
-module.exports = Html5VideoPlayer;
+

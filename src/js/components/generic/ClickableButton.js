@@ -1,8 +1,8 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
-const { Link, } = require("react-router");
+import React from "react";
+import ReactDOM from "react-dom";
+import { Link, } from "react-router";
 
-class ClickableButton extends React.Component {
+export default class ClickableButton extends React.Component {
 
   componentDidMount() {
     const node = ReactDOM.findDOMNode(this.refs.link);
@@ -21,4 +21,4 @@ class ClickableButton extends React.Component {
   }
 }
 
-module.exports = ClickableButton;
+

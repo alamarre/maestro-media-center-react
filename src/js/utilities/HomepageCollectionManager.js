@@ -1,4 +1,4 @@
-class HomepageCollectionManager {
+export default class HomepageCollectionManager {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
   }
@@ -22,4 +22,4 @@ class HomepageCollectionManager {
   }
 }
 
-module.exports = HomepageCollectionManager;
+

@@ -1,4 +1,4 @@
-class AccountProvider {
+export default class AccountProvider {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
   }
@@ -8,4 +8,3 @@ class AccountProvider {
   }
 }
 
-module.exports = AccountProvider;

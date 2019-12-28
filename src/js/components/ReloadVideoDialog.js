@@ -1,9 +1,9 @@
-const React = require("react");
-const { Modal, } = require("react-bootstrap");
+import React from "react";
+import { Modal, } from "react-bootstrap";
 
-const ScrollableComponent = require("./ScrollableComponent");
+import ScrollableComponent from "./ScrollableComponent";
 
-class ReloadVideoDialog extends ScrollableComponent {
+export default class ReloadVideoDialog extends ScrollableComponent {
   constructor(props) {
     super(props, ["reload", "home"]);
     this.state=Object.assign({}, this.state);
@@ -44,4 +44,4 @@ class ReloadVideoDialog extends ScrollableComponent {
   }
 }
 
-module.exports = ReloadVideoDialog;
+

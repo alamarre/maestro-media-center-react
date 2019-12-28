@@ -1,7 +1,7 @@
 require("@babel/polyfill");
-const React = require("react");
-const { render, } = require("react-dom");
-const { Router, Route, hashHistory, } = require("react-router");
+import React from "react";
+import { render, } from "react-dom";
+import { Router, Route, hashHistory, } from "react-router";
 
 require("./style.scss");
 
@@ -12,28 +12,28 @@ var port = process.env.PORT
   || (scheme == "http" ? 80 : 443);
 const wsHost = "j5095i3iw3.execute-api.us-east-1.amazonaws.com/main" || process.env.WEBSOCKET_HOST || host;
 var wsPort = process.env.WEBSOCKET_PORT || port;
-const jquery = require("jquery");
+import jquery from "jquery";
 
-const Home = require("./ChromecastHome");
-const AuthTokenManger = require("../utilities/AuthTokenManager");
-const SettingsManager = require("../utilities/CookiesSettingsManager");
-const ApiRequester = require("../utilities/ApiRequester");
-const QueryStringReader = require("../utilities/QueryStringReader");
-// const EpisodeLoader = require("../utilities/EpisodeLoader");
-const WebSocketRemoteController = require("../utilities/WebSocketRemoteController");
-const CacheProvider = require("../utilities/providers/CacheProvider");
-const CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
-const ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
-const ChromecastListener = require("./ChromecastListener");
-const VideoPlayer = require("../components/VideoPlayer");
-const CollectionsManager = require("../utilities/CollectionsManager");
-const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
+import Home from "./ChromecastHome";
+import AuthTokenManger from "../utilities/AuthTokenManager";
+import SettingsManager from "../utilities/CookiesSettingsManager";
+import ApiRequester from "../utilities/ApiRequester";
+import QueryStringReader from "../utilities/QueryStringReader";
+// import EpisodeLoader from "../utilities/EpisodeLoader";
+import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
+import CacheProvider from "../utilities/providers/CacheProvider";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import ChromecastListener from "./ChromecastListener";
+import VideoPlayer from "../components/VideoPlayer";
+import CollectionsManager from "../utilities/CollectionsManager";
+import MovieInfoProvider from "../utilities/providers/MovieInfoProvider";
 
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), new SettingsManager());
 const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 //const episodeLoader = new EpisodeLoader(apiRequester);
 const cacheProvider = new CacheProvider(apiRequester, { noPreload: true, });
-const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
+import PlaylistProvider from "../utilities/providers/PlaylistProvider";
 const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
 const showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
 const movieInfoProvider = new MovieInfoProvider(cacheProvider);
@@ -58,7 +58,7 @@ window.tvShowSort = function (a, b) {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base", });
 };
 
-const VideoLoader = require("../utilities/VideoLoader");
+import VideoLoader from "../utilities/VideoLoader";
 const videoLoader = new VideoLoader();
 
 const episodeProvider = cacheBasedEpisodeProvider;

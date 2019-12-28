@@ -1,4 +1,4 @@
-class PlaylistProvider {
+export default class PlaylistProvider {
   constructor(apiRequester, cacheProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
@@ -21,4 +21,4 @@ class PlaylistProvider {
   }
 }
 
-module.exports = PlaylistProvider;
+

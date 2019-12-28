@@ -2,9 +2,9 @@
 require("@babel/polyfill");
 require("font-awesome/scss/font-awesome.scss");
 require("bootstrap");
-const React = require("react");
-const { render, } = require("react-dom");
-const { Router, Route, hashHistory, } = require("react-router");
+import React from "react";
+import { render, } from "react-dom";
+import { Router, Route, hashHistory, } from "react-router";
 
 require("./clipboard");
 require("../style.scss");
@@ -18,37 +18,37 @@ var port = process.env.PORT
   || (scheme == "http" ? 80 : 443);
 const wsHost = "j5095i3iw3.execute-api.us-east-1.amazonaws.com/main" || process.env.WEBSOCKET_HOST || host;
 var wsPort = process.env.WEBSOCKET_PORT || port;
-var jquery = require("jquery");
+import jquery from "jquery";
 
 import App from "../components/App";
 
-var VideoPlayer = require("../components/VideoPlayer");
-var VideosListing = require("../components/VideosListing");
+import VideoPlayer from "../components/VideoPlayer";
+import VideosListing from "../components/VideosListing";
 
-var Settings = require("../components/Settings");
+import Settings from "../components/Settings";
 
-var AuthTokenManger = require("../utilities/AuthTokenManager");
-var ApiRequester = require("../utilities/ApiRequester");
+import AuthTokenManger from "../utilities/AuthTokenManager";
+import ApiRequester from "../utilities/ApiRequester";
 import ApiCaller from "../utilities/providers/ApiCaller";
 import dataProviderFactory from "../utilities/providers/data";
-var QueryStringReader = require("../utilities/QueryStringReader");
-var EpisodeLoader = require("../utilities/EpisodeLoader");
-var WebSocketRemoteController = require("../utilities/WebSocketRemoteController");
-const AccountProvider = require("../utilities/providers/AccountProvider");
-const CacheProvider = require("../utilities/providers/CacheProvider");
-const CacheBasedEpisodeProvider = require("../utilities/providers/CacheBasedEpisodeProvider");
-const SearchBasedShowProvider = require("../utilities/providers/SearchBasedShowProvider");
-const ShowProgressProvider = require("../utilities/providers/ShowProgressProvider");
-const ChromecastManager = require("../utilities/ChromecastManager");
-const SettingsManager = require("../utilities/CookiesSettingsManager");
-const VideoLoader = require("../utilities/VideoLoader");
-const RemoteControllerComponent = require("../components/RemoteController");
-const CollectionsManager = require("../utilities/CollectionsManager");
-const HomepageCollectionManager = require("../utilities/HomepageCollectionManager");
-const MovieInfoProvider = require("../utilities/providers/MovieInfoProvider");
-const OfflineStorage = require("../utilities/OfflineVideoStorage");
-const CordovaOfflineStorage = require("../utilities/CordovaOfflineVideoStorage");
-const OfflineVideos = require("../components/OfflineVideos");
+import QueryStringReader from "../utilities/QueryStringReader";
+import EpisodeLoader from "../utilities/EpisodeLoader";
+import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
+import AccountProvider from "../utilities/providers/AccountProvider";
+import CacheProvider from "../utilities/providers/CacheProvider";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import SearchBasedShowProvider from "../utilities/providers/SearchBasedShowProvider";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import ChromecastManager from "../utilities/ChromecastManager";
+import SettingsManager from "../utilities/CookiesSettingsManager";
+import VideoLoader from "../utilities/VideoLoader";
+import RemoteControllerComponent from "../components/RemoteController";
+import CollectionsManager from "../utilities/CollectionsManager";
+import HomepageCollectionManager from "../utilities/HomepageCollectionManager";
+import MovieInfoProvider from "../utilities/providers/MovieInfoProvider";
+import OfflineStorage from "../utilities/OfflineVideoStorage";
+import CordovaOfflineStorage from "../utilities/CordovaOfflineVideoStorage";
+import OfflineVideos from "../components/OfflineVideos";
 
 import KeyboardNavigation from "../utilities/providers/navigation/KeyboardNavigation";
 const keyboardNavigation = new KeyboardNavigation();
@@ -61,7 +61,7 @@ const apiCaller = new ApiCaller(authTokenManager, scheme, host + ":" + port);
 const dataProviders = dataProviderFactory(apiCaller);
 const accountProvider = new AccountProvider(apiRequester);
 
-const WebSocketSender = require("../utilities/WebSocketSender");
+import WebSocketSender from "../utilities/WebSocketSender";
 const webSocketSender = new WebSocketSender(wsHost, wsPort, authTokenManager);
 webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
 webSocketSender.connect();
@@ -77,18 +77,18 @@ var div = document.createElement("div");
 div.id = "app";
 document.body.appendChild(div);
 
-const LoginProvider = require("../utilities/LoginProvider");
+import LoginProvider from "../utilities/LoginProvider";
 const loginProvider = new LoginProvider(apiRequester);
-const LoginComponent = require("../components/Login");
+import LoginComponent from "../components/Login";
 
-const ProfileProvider = require("../utilities/providers/ProfileProvider");
-const ChooseProfile = require("../components/ChooseProfile");
+import ProfileProvider from "../utilities/providers/ProfileProvider";
+import ChooseProfile from "../components/ChooseProfile";
 const profileProvider = new ProfileProvider(apiRequester);
 
-const PlaylistProvider = require("../utilities/providers/PlaylistProvider");
+import PlaylistProvider from "../utilities/providers/PlaylistProvider";
 const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
 
-const CachedBasedSearch = require("../utilities/providers/CacheBasedSearch");
+import CachedBasedSearch from "../utilities/providers/CacheBasedSearch";
 const cacheBasedSearch = new CachedBasedSearch(cacheProvider, playlistProvider);
 
 const searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
@@ -98,13 +98,13 @@ const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvide
 
 const homepageCollectionManager = new HomepageCollectionManager(apiRequester);
 
-const NewMoviesProvider = require("../utilities/providers/NewMoviesProvider");
+import NewMoviesProvider from "../utilities/providers/NewMoviesProvider";
 const newMoviesProvider = new NewMoviesProvider(apiRequester, cacheProvider);
 
 const cordovaOfflineStorage = new CordovaOfflineStorage(cacheBasedEpisodeProvider);
 const offlineStorage = cordovaOfflineStorage.canStoreOffline() ?
   cordovaOfflineStorage :
-  new OfflineStorage(cacheBasedEpisodeProvider);
+  new OfflineStorage();
 
 const videoLoader = new VideoLoader(webSocketSender);
 
@@ -120,7 +120,7 @@ window["tvShowSort"] = function (a, b) {
 
 const imageRoot = "https://maestro-images.omny.ca";
 
-const MetadataProvider = require("../utilities/providers/MetadataProvider");
+import MetadataProvider from "../utilities/providers/MetadataProvider";
 const metadataProvider = new MetadataProvider(apiRequester);
 
 episodeLoader = cacheBasedEpisodeProvider;

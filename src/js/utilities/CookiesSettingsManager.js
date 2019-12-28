@@ -1,4 +1,4 @@
-class CookieSettingsManager {
+export default class CookieSettingsManager {
 
   get(name) {
     return this.getCookie(name);
@@ -54,4 +54,4 @@ class CookieSettingsManager {
   }
 }
 
-module.exports = CookieSettingsManager;
+

@@ -1,4 +1,4 @@
-const elasticlunr = require("elasticlunr");
+import elasticlunr from "elasticlunr";
 
 function addFilesInFolder(index, currentCache, path) {
   if (currentCache && currentCache.files) {
@@ -24,7 +24,7 @@ function addFilesInFolder(index, currentCache, path) {
   }
 }
 
-class CacheBasedSearch {
+export default class CacheBasedSearch {
   constructor(cacheProvider, playlistProvider) {
     this.cacheProvider = cacheProvider;
     this.cacheIndex = null;
@@ -160,4 +160,4 @@ class CacheBasedSearch {
   }
 }
 
-module.exports = CacheBasedSearch;
+

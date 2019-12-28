@@ -1,12 +1,17 @@
-const React = require("react");
+import React from "react";
 
-const ChromecastPlayer = require("./VideoPlayers/Chromecast");
-const Html5VideoPlayer = require("./VideoPlayers/Html5Video");
-const ReloadVideoDialog = require("./ReloadVideoDialog");
-const ScrollableComponent = require("./ScrollableComponent");
-const Menu = require("./generic/Menu");
+import ChromecastPlayer from "./VideoPlayers/Chromecast";
+import Html5VideoPlayer from "./VideoPlayers/Html5Video";
+import ReloadVideoDialog from "./ReloadVideoDialog";
+import ScrollableComponent from "./ScrollableComponent";
+import Menu from "./generic/Menu";
 
-class VideoPlayer extends ScrollableComponent {
+import TvShowSeriesPlayer from "../utilities/providers/playertypes/TvShow";
+import MoviePlayer from "../utilities/providers/playertypes/Movie";
+import MovieCollection from "../utilities/providers/playertypes/MovieCollection";
+import Playlist from "../utilities/providers/playertypes/Playlist";
+
+export default class VideoPlayer extends ScrollableComponent {
   constructor(props) {
     super(props, [], true);
     const episodeLoader = this.props.episodeLoader;
@@ -14,7 +19,7 @@ class VideoPlayer extends ScrollableComponent {
     this.type = this.props.location.query.type;
     this.profile = this.props.location.query.profile;
     this.preventIdleTimer = null;
-    this.state = { "overlayVisibility": false, showMenu: false, seekTime: -1, promptReload: false };
+    this.state = { "overlayVisibility": false, showMenu: false, seekTime: -1, promptReload: false, };
     this.progressTimer = null;
     if (this.props.remoteController) {
       this.props.remoteController.mapUpdateFunctions({
@@ -24,11 +29,6 @@ class VideoPlayer extends ScrollableComponent {
         toggleVisibility: this.toggleVisibility.bind(this),
       });
     }
-
-    const TvShowSeriesPlayer = require("../utilities/providers/playertypes/TvShow");
-    const MoviePlayer = require("../utilities/providers/playertypes/Movie");
-    const MovieCollection = require("../utilities/providers/playertypes/MovieCollection");
-    const Playlist = require("../utilities/providers/playertypes/Playlist");
 
     this.playerTypeHandlers = {
       tv: new TvShowSeriesPlayer(this.props.episodeLoader, this.props.showProgressProvider),
@@ -45,13 +45,13 @@ class VideoPlayer extends ScrollableComponent {
   }
 
   openMenu() {
-    this.setState({ "showMenu": true }, () => {
+    this.setState({ "showMenu": true, }, () => {
       //this.props.navigation.focusDialog(this.refs.menu);
     })
   }
 
   closeMenu() {
-    this.setState({ "showMenu": false }, () => {
+    this.setState({ "showMenu": false, }, () => {
       this.props.navigation.focusDialog(this);
     })
   }
@@ -82,7 +82,7 @@ class VideoPlayer extends ScrollableComponent {
     if (this.state.promptReload) {
       const reload = async () => {
         const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].reload();
-        this.setState({ sources, subtitles, name, seekTime, promptReload: false });
+        this.setState({ sources, subtitles, name, seekTime, promptReload: false, });
         this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
       };
       const goHome = () => {
@@ -139,11 +139,11 @@ class VideoPlayer extends ScrollableComponent {
     let menu = null;
     if (this.state.showMenu) {
       const items = [
-        { name: "Go Home", action: () => this.props.router.push("/") },
-        { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.closeMenu(); }  },
-        { name: "Previous episode", action: () => { this.goToPrevious(); this.closeMenu(); } },
-        { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }  },
-        { name: "Close", action: () => this.closeMenu() },
+        { name: "Go Home", action: () => this.props.router.push("/"), },
+        { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.closeMenu(); }, },
+        { name: "Previous episode", action: () => { this.goToPrevious(); this.closeMenu(); }, },
+        { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }, },
+        { name: "Close", action: () => this.closeMenu(), },
       ];
       menu = <Menu navigation={this.props.navigation} ref={menu} items={items}></Menu>
     }
@@ -216,7 +216,7 @@ class VideoPlayer extends ScrollableComponent {
   async goToNext() {
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToNext();
     if (sources == null && this.props.navigation) {
-      this.setState({ promptReload: true });
+      this.setState({ promptReload: true, });
     } else {
       this.setState({ sources, subtitles, name, seekTime, });
       this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
@@ -230,4 +230,4 @@ class VideoPlayer extends ScrollableComponent {
   }
 }
 
-module.exports = VideoPlayer;
+

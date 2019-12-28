@@ -1,10 +1,10 @@
-const React = require("react");
-const { Modal, } = require("react-bootstrap");
-const ScrollableComponent = require("../ScrollableComponent");
+import React from "react";
+import { Modal, } from "react-bootstrap";
+import ScrollableComponent from "../ScrollableComponent";
 
-const MetadataImage = require("../generic/MetadataImage");
+import MetadataImage from "../generic/MetadataImage";
 
-class MovieDetails extends ScrollableComponent {
+export default class MovieDetails extends ScrollableComponent {
 
   constructor(props) {
     super(props, ["playbutton", "cancel"]);
@@ -60,4 +60,4 @@ class MovieDetails extends ScrollableComponent {
   }
 }
 
-module.exports = MovieDetails;
+

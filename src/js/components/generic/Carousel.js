@@ -1,5 +1,5 @@
-const React = require("react");
-const { Component, } = require("react");
+import React from "react";
+import { Component, } from "react";
 
 // from https://stackoverflow.com/questions/3944122/detect-left-mouse-button-press
 function detectLeftButton(evt) {
@@ -11,7 +11,7 @@ function detectLeftButton(evt) {
   return button == 1;
 }
 
-class Carousel extends Component {
+export default class Carousel extends Component {
   constructor(props) {
     super(props);
     this.state = { current: 1, xOffset: 0, noButtons: true, showArrows: false, refs: [], };
@@ -199,7 +199,7 @@ class Carousel extends Component {
     if (this.props.children !== prevProps.children) {
       this.setState({ refs: this.props.children.map((a, index) => `child-${index}`), });
     }
-    if(this.props.navOrder) {
+    if (this.props.navOrder) {
       this.props.navigation.registerElementCollection(this, this.props.navOrder);
     }
   }
@@ -275,5 +275,3 @@ class Carousel extends Component {
     );
   }
 }
-
-module.exports = Carousel;

@@ -1,4 +1,4 @@
-class WebSocketRemoteController {
+export default class WebSocketRemoteController {
   constructor(host, clientName, webSocketPort, authTokenManager) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
     this.authTokenManager = authTokenManager;
@@ -118,4 +118,4 @@ class WebSocketRemoteController {
 
 }
 
-module.exports = WebSocketRemoteController;
+

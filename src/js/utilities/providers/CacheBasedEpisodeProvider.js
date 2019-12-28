@@ -17,7 +17,7 @@ function timeoutPromise(ms, promise) {
 }
 
 
-class CacheBasedEpisodeProvider {
+export default class CacheBasedEpisodeProvider {
   constructor(apiRequester, cacheProvider, showProgressProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
@@ -30,6 +30,10 @@ class CacheBasedEpisodeProvider {
     this.serverPromise = result;
     setTimeout(() => this.updateServers(), 30000);
     return result;
+  }
+
+  getRootPath() {
+    return this.apiRequester.getHost() + "/videos";
   }
 
   getListingPromise(folder) {
@@ -126,4 +130,4 @@ class CacheBasedEpisodeProvider {
 
 }
 
-module.exports = CacheBasedEpisodeProvider;
+

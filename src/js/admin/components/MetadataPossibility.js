@@ -1,6 +1,6 @@
-const React = require("react");
+import React from "react";
 
-class Metadata extends React.Component {
+export default class Metadata extends React.Component {
   constructor(props) {
     super(props);
     this.state = { selectedPossibility: 0, };
@@ -39,4 +39,4 @@ class Metadata extends React.Component {
   }
 }
 
-module.exports = Metadata;
+

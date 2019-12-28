@@ -1,12 +1,12 @@
-const React = require("react");
+import React from "react";
 
-const ShowPicker = require("./ShowPicker");
+import ShowPicker from "./ShowPicker";
 
-const Carousel = require("./generic/Carousel");
-const MoviePicker = require("./pickers/MovieDetails");
-const MetadataImage = require("./generic/MetadataImage");
+import Carousel from "./generic/Carousel";
+import MoviePicker from "./pickers/MovieDetails";
+import MetadataImage from "./generic/MetadataImage";
 
-class HomepageCollectionViewer extends React.Component {
+export default class HomepageCollectionViewer extends React.Component {
   constructor(props) {
     super(props);
     this.state = { root: "", collections: [], };
@@ -115,4 +115,4 @@ class HomepageCollectionViewer extends React.Component {
   }
 }
 
-module.exports = HomepageCollectionViewer;
+

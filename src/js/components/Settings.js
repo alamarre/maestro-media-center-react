@@ -1,8 +1,8 @@
-const React = require("react");
+import React from "react";
 
-const ScrollableComponent = require("./ScrollableComponent");
+import ScrollableComponent from "./ScrollableComponent";
 
-class Settings extends ScrollableComponent {
+export default class Settings extends ScrollableComponent {
 
   constructor(props) {
     super(props, ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",], true);
@@ -158,4 +158,4 @@ class Settings extends ScrollableComponent {
   }
 }
 
-module.exports = Settings;
+

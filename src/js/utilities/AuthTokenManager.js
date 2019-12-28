@@ -1,4 +1,4 @@
-class AuthTokenManager {
+export default class AuthTokenManager {
   constructor(queryStringReader, cookieManager) {
     this.queryStringReader = queryStringReader;
     this.cookieManager = cookieManager;
@@ -60,4 +60,4 @@ class AuthTokenManager {
   }
 }
 
-module.exports = AuthTokenManager;
+

@@ -1,7 +1,7 @@
 import ApiCaller from "./ApiCaller";
 import FileCache from "../../models/FileCache";
 import RootFolder from "../../models/RootFolder";
-const localforage = require("localforage");
+import localforage from "localforage";
 
 export default class CacheProvider {
   private apiCaller: ApiCaller;
@@ -42,7 +42,7 @@ export default class CacheProvider {
     await this.getRootFolders();
   }
 
-  isTvShow(path): Promise<boolean> {
+  isTvShow(path: string): Promise<boolean> {
     if (path.indexOf("/") == 0) {
       path = path.substring(1);
     }
@@ -60,7 +60,7 @@ export default class CacheProvider {
     });
   }
 
-  async getShowPath(showName): Promise<string> {
+  async getShowPath(showName: string): Promise<string> {
     const cache = await this.getCache();
     const rootFolders = await this.getRootFolders();
     for (const folder of rootFolders) {
@@ -73,7 +73,7 @@ export default class CacheProvider {
     }
   }
 
-  getCacheFromPath(path): Promise<FileCache> {
+  getCacheFromPath(path: string): Promise<FileCache> {
     return new Promise((s, f) => {
       this.getCache().then(cache => {
         if (path.indexOf("/") == 0) {

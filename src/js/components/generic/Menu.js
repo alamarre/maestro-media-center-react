@@ -1,9 +1,9 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
-const { Link, } = require("react-router");
-const ScrollableComponent = require("../ScrollableComponent");
+import React from "react";
+import ReactDOM from "react-dom";
+import { Link, } from "react-router";
+import ScrollableComponent from "../ScrollableComponent";
 
-class Menu extends ScrollableComponent {
+export default class Menu extends ScrollableComponent {
 
   constructor(props) {
     super(props, [], true);
@@ -39,4 +39,4 @@ class Menu extends ScrollableComponent {
   }
 }
 
-module.exports = Menu;
+

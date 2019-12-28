@@ -1,8 +1,8 @@
-const React = require("react");
+import React from "react";
 
-const MetadataPossibility = require("./MetadataPossibility");
+import MetadataPossibility from "./MetadataPossibility";
 
-class Metadata extends React.Component {
+export default class Metadata extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tvShowsToSelect: [], moviesToSelect: [], };
@@ -109,4 +109,4 @@ class Metadata extends React.Component {
   }
 }
 
-module.exports = Metadata;
+

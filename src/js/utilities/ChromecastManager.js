@@ -1,6 +1,6 @@
 const chromeCastAppId = process.env.CHROMECAST_APP_ID;
 
-class ChromecastManager {
+export default class ChromecastManager {
   constructor(apiRequester, authTokenManager, settingsManager, remoteController, scheme, host, port) {
     this.apiRequester = apiRequester;
     this.authTokenManager = authTokenManager;
@@ -89,4 +89,3 @@ class ChromecastManager {
   }
 }
 
-module.exports = ChromecastManager;

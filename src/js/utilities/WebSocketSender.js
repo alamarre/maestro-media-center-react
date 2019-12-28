@@ -1,4 +1,4 @@
-class WebSocketSender {
+export default class WebSocketSender {
   constructor(host, webSocketPort, authTokenManager) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
     const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
@@ -121,4 +121,3 @@ class WebSocketSender {
   }
 }
   
-module.exports = WebSocketSender;

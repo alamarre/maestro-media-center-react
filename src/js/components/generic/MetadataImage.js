@@ -1,9 +1,9 @@
-const React = require("react");
-const { Component, } = require("react");
+import React from "react";
+import { Component, } from "react";
 
 const imageRoot = process.env.IMAGE_ROOT || "https://maestro-images.omny.ca";
 const failedImage = "fallback.png";
-class MetadataImage extends Component {
+export default class MetadataImage extends Component {
   constructor(props) {
     super(props);
     this.state={failed: false,};
@@ -38,4 +38,3 @@ class MetadataImage extends Component {
   }
 }
 
-module.exports = MetadataImage;

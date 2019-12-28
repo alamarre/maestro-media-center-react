@@ -1,7 +1,7 @@
-const React = require("react");
-const ScrollableComponent = require("./ScrollableComponent");
+import React from "react";
+import ScrollableComponent from "./ScrollableComponent";
 
-class ChooseProfile extends ScrollableComponent {
+export default class ChooseProfile extends ScrollableComponent {
 
   constructor(props) {
     super(props, [], true);
@@ -118,4 +118,4 @@ class ChooseProfile extends ScrollableComponent {
   }
 }
 
-module.exports = ChooseProfile;
+

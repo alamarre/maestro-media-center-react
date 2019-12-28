@@ -1,6 +1,6 @@
-const React = require("react");
+import React from "react";
 
-class Scrollable extends React.Component {
+export default class Scrollable extends React.Component {
 
   constructor(props, refs, isDialog = true) {
     super(props);
@@ -74,5 +74,3 @@ class Scrollable extends React.Component {
   }
 
 }
-
-module.exports = Scrollable;

@@ -1,11 +1,11 @@
-const React = require("react");
-const ShowPicker = require("./ShowPicker");
-const CollectionPicker = require("./pickers/CollectionStartPicker");
-const PlaylistPicker = require("./pickers/PlaylistPicker");
-const MoviePicker = require("./pickers/MovieDetails");
-const MetadataImage = require("./generic/MetadataImage");
+import React from "react";
+import ShowPicker from "./ShowPicker";
+import CollectionPicker from "./pickers/CollectionStartPicker";
+import PlaylistPicker from "./pickers/PlaylistPicker";
+import MoviePicker from "./pickers/MovieDetails";
+import MetadataImage from "./generic/MetadataImage";
 
-class SearchResults extends React.Component {
+export default class SearchResults extends React.Component {
 
   constructor(props) {
     super(props);
@@ -172,4 +172,4 @@ class SearchResults extends React.Component {
   }
 }
 
-module.exports = SearchResults;
+

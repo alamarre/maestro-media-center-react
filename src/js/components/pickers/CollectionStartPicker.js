@@ -1,7 +1,7 @@
-const React = require("react");
-const { Modal, } = require("react-bootstrap");
+import React from "react";
+import { Modal, } from "react-bootstrap";
 
-class ShowPicker extends React.Component {
+export default class ShowPicker extends React.Component {
 
   constructor(props) {
     super(props);
@@ -72,4 +72,4 @@ class ShowPicker extends React.Component {
   }
 }
 
-module.exports = ShowPicker;
+

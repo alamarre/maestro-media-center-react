@@ -1,4 +1,5 @@
-module.exports = class VideoLoader {
+
+export default class VideoLoader {
   constructor(remoteController) {
     this.remoteController = remoteController;
   }
@@ -8,7 +9,7 @@ module.exports = class VideoLoader {
   }
 
   loadVideo(type, folder, index, profile) {
-    if(this.remoteController && this.remoteController.hasClient()) {
+    if (this.remoteController && this.remoteController.hasClient()) {
       this.remoteController.load(type, folder, index);
       this.router.push("/remote");
     } else {
@@ -17,14 +18,14 @@ module.exports = class VideoLoader {
   }
 
   setUrl(type, folder, index, addToHistory, profile) {
-    if(!profile) {
+    if (!profile) {
       profile = "";
     }
     const url = `/view?type=${type}&index=${index}&profile=${profile}&folder=${encodeURIComponent(folder)}`;
-    if(addToHistory) {
+    if (addToHistory) {
       this.router.push(url);
     } else {
       this.router.replace(url);
     }
   }
-};
+}

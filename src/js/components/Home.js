@@ -1,16 +1,16 @@
-const React = require("react");
-const { Link, } = require("react-router");
-const EasyInputComponent = require("./EasyInputComponent");
+import React from "react";
+import { Link, } from "react-router";
+import EasyInputComponent from "./EasyInputComponent";
 
-const SearchResults = require("./SearchResults");
-const KeepWatching = require("./KeepWatching");
+import SearchResults from "./SearchResults";
+import KeepWatching from "./KeepWatching";
 
-const NewMovies = require("./NewMovies");
+import NewMovies from "./NewMovies";
 import NewShows from "./NewShows";
-const HomePageCollectionViewer = require("./HomePageCollectionViewer");
-const ClickableButton = require("./generic/ClickableButton");
+import HomePageCollectionViewer from "./HomePageCollectionViewer";
+import ClickableButton from "./generic/ClickableButton";
 
-class Home extends EasyInputComponent {
+export default class Home extends EasyInputComponent {
 
   constructor(props) {
     super(props);
@@ -66,5 +66,3 @@ class Home extends EasyInputComponent {
     );
   }
 }
-
-export default Home;

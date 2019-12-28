@@ -5,9 +5,9 @@ export interface ICacheProvider {
   getCache(): Promise<FileCache>;
   fetchCache(): Promise<FileCache>;
   reload(): Promise<void>;
-  isTvShow(path: undefined): Promise<boolean>;
-  getShowPath(showName: undefined): Promise<string>;
-  getCacheFromPath(path: undefined): Promise<FileCache>;
+  isTvShow(path: string): Promise<boolean>;
+  getShowPath(showName: string): Promise<string>;
+  getCacheFromPath(path: string): Promise<FileCache>;
   getRootFolders(): Promise<RootFolder[]>;
   fetchRootFolders(): Promise<RootFolder[]>;
 }

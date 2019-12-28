@@ -1,4 +1,4 @@
-class ApiRequester {
+export default class ApiRequester {
   constructor(jQuery, authTokenManager, scheme, host) {
     this.authTokenManager = authTokenManager;
     this.scheme = scheme || "http";
@@ -90,5 +90,5 @@ class ApiRequester {
   }
 }
 
-module.exports = ApiRequester;
+
 

@@ -1,6 +1,6 @@
-const React = require("react");
+import React from "react";
 const cast = window.cast;
-class ChromecastPlayer extends React.Component {
+export default class ChromecastPlayer extends React.Component {
   constructor(props) {
     super(props);
     if (this.props.remoteController) {
@@ -128,4 +128,4 @@ class ChromecastPlayer extends React.Component {
 
 }
 
-module.exports = ChromecastPlayer;
+

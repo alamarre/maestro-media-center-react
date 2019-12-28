@@ -1,10 +1,10 @@
-const React = require("react");
+import React from "react";
 
-const Carousel = require("./generic/Carousel");
-const MoviePicker = require("./pickers/MovieDetails");
-const MetadataImage = require("./generic/MetadataImage");
+import Carousel from "./generic/Carousel";
+import MoviePicker from "./pickers/MovieDetails";
+import MetadataImage from "./generic/MetadataImage";
 
-class NewMovies extends React.Component {
+export default class NewMovies extends React.Component {
   constructor(props) {
     super(props);
     this.state = { videos: [], };
@@ -81,4 +81,4 @@ class NewMovies extends React.Component {
   }
 }
 
-module.exports = NewMovies;
+

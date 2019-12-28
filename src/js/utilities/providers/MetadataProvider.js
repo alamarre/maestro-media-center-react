@@ -1,6 +1,6 @@
 const imageRoot = process.env.IMAGE_ROOT || "https://maestro-images.omny.ca";
 
-class MetadataProvider {
+export default class MetadataProvider {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
   }
@@ -42,4 +42,3 @@ class MetadataProvider {
 
 }
 
-module.exports = MetadataProvider;

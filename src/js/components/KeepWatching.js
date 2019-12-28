@@ -1,15 +1,15 @@
-const React = require("react");
+import React from "react";
 
-const ShowPicker = require("./ShowPicker");
+import ShowPicker from "./ShowPicker";
 
-const Carousel = require("./generic/Carousel");
-const MetadataImage = require("./generic/MetadataImage");
+import Carousel from "./generic/Carousel";
+import MetadataImage from "./generic/MetadataImage";
 
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
 }
 
-class KeepWatching extends React.Component {
+export default class KeepWatching extends React.Component {
   constructor(props) {
     super(props);
     this.state = { root: "", videos: [], };
@@ -110,4 +110,4 @@ class KeepWatching extends React.Component {
   }
 }
 
-module.exports = KeepWatching;
+

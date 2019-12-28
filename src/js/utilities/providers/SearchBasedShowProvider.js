@@ -1,4 +1,4 @@
-class SearchBasedShowProvider {
+export default class SearchBasedShowProvider {
   constructor(apiRequester, cacheProvider, showProgressProvider, searchProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
@@ -51,4 +51,4 @@ class SearchBasedShowProvider {
 
 }
 
-module.exports = SearchBasedShowProvider;
+

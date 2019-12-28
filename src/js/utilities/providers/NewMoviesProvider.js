@@ -1,4 +1,4 @@
-class NewMoviesProvider {
+export default class NewMoviesProvider {
   constructor(apiRequester, cacheProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
@@ -14,4 +14,3 @@ class NewMoviesProvider {
 
 }
 
-module.exports = NewMoviesProvider;

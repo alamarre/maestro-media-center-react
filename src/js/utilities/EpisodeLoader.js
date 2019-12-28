@@ -1,4 +1,4 @@
-class EpisodeLoader {
+export default class EpisodeLoader {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
   }
@@ -28,4 +28,3 @@ class EpisodeLoader {
 
 }
 
-module.exports = EpisodeLoader;

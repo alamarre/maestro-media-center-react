@@ -1,4 +1,4 @@
-class LoginProvider {
+export default class LoginProvider {
   constructor(apiRequester) {
     this.apiRequester = apiRequester;
   }
@@ -25,4 +25,3 @@ class LoginProvider {
 
 }
 
-module.exports = LoginProvider;

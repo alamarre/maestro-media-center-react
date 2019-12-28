@@ -1,4 +1,4 @@
-class PlaylistManager {
+export default class PlaylistManager {
   constructor(rootFolder, playlistManager, episodeLoader, showProgressProvider) {
     this.rootFolder = rootFolder;
     this.playlistManager = playlistManager;
@@ -60,4 +60,4 @@ class PlaylistManager {
 
 }
 
-module.exports = PlaylistManager;
+

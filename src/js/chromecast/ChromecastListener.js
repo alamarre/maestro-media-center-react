@@ -1,6 +1,6 @@
 const cast = window.cast;
 
-class ChromecastListener {
+export default class ChromecastListener {
   constructor(apiRequester, authTokenManager, webSocketRemoteController, cache) {
     this.apiRequester = apiRequester;
     this.authTokenManager = authTokenManager;
@@ -41,4 +41,3 @@ class ChromecastListener {
   }
 }
 
-module.exports = ChromecastListener;

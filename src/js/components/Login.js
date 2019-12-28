@@ -1,12 +1,12 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
+import ReactDOM from "react-dom";
 
-const ScrollableComponent = require("./ScrollableComponent");
+import ScrollableComponent from "./ScrollableComponent";
 
-class Login extends ScrollableComponent {
+export default class Login extends ScrollableComponent {
 
   constructor(props) {
-    super(props, ["username", "password", "login"]);
+    super(props, ["username", "password", "login",]);
     this.state = Object.assign(this.state, { "error": false, });
   }
 
@@ -58,4 +58,4 @@ class Login extends ScrollableComponent {
   }
 }
 
-module.exports = Login;
+

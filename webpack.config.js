@@ -82,7 +82,7 @@ module.exports = {
     minimize: debug ? false : true,
   },
   resolve: {
-    extensions: [ ".tsx", ".ts", ".js", ".jsx",],
+    extensions: [".tsx", ".ts", ".js", ".jsx",],
   },
   module: {
     rules: [

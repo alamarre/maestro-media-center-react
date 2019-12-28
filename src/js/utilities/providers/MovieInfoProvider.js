@@ -1,6 +1,6 @@
-const normalizedMatch = require("../NormalizedMatch");
+import normalizedMatch from "../NormalizedMatch";
 
-class MovieInfoProvider {
+export default class MovieInfoProvider {
 
   constructor(cacheProvider) {
     this.cacheProvider = cacheProvider;
@@ -34,4 +34,4 @@ class MovieInfoProvider {
   }
 }
 
-module.exports = MovieInfoProvider;
+

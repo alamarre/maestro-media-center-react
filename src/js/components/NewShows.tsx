@@ -1,17 +1,19 @@
 import React from "react";
 
-const Carousel = require("./generic/Carousel");
-const ShowPicker = require("./ShowPicker");
-const MetadataImage = require("./generic/MetadataImage");
+import Carousel from "./generic/Carousel";
+import ShowPicker from "./ShowPicker";
+import MetadataImage from "./generic/MetadataImage";
 
 import ISimpleDataProvider from "../utilities/providers/data/ISimpleDataProvider";
 import RecentlyUpdatedTvShow from "../models/RecentlyUpdatedTvShow";
 import { INavigation, } from "../utilities/providers/navigation/INavigation";
+import { ICacheProvider, } from "../utilities/providers/ICacheProvider";
+import FileCache from "../models/FileCache";
 
 export interface NewShowsProps {
   showProvider: ISimpleDataProvider<RecentlyUpdatedTvShow>;
   navOrder: number;
-  cacheProvider: any;
+  cacheProvider: ICacheProvider;
   navigation: INavigation;
   offlineStorage: any;
   showProgressProvider: any;
@@ -23,15 +25,14 @@ export interface NewShowsState {
   shows: string[];
   showName: string;
   showPath: string;
-  cachePath: string;
-  showCache: object;
+  cachePath: FileCache;
 }
 
 export default class NewShows extends React.Component<NewShowsProps, NewShowsState> {
   private dragging: boolean;
   constructor(props: NewShowsProps) {
     super(props);
-    this.state = { shows: [], showName: null, showPath: null, showCache: null, cachePath: null, };
+    this.state = { shows: [], showName: null, showPath: null, cachePath: null, };
     this.dragging = false;
     this.load();
   }
@@ -47,7 +48,7 @@ export default class NewShows extends React.Component<NewShowsProps, NewShowsSta
     this.dragging = dragging;
   }
 
-  async play(showName) {
+  async play(showName: string) {
     if (!this.dragging) {
       const showPath = await this.props.cacheProvider.getShowPath(showName);
       const cachePath = await this.props.cacheProvider.getCacheFromPath(showPath);

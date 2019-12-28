@@ -1,4 +1,4 @@
-class ShowProgressProvider {
+export default class ShowProgressProvider {
   constructor(apiRequester, cacheProvider) {
     this.apiRequester = apiRequester;
     this.cacheProvider = cacheProvider;
@@ -136,4 +136,4 @@ class ShowProgressProvider {
   }
 }
 
-module.exports = ShowProgressProvider;
+
