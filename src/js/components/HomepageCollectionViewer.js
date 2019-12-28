@@ -12,6 +12,20 @@ class HomepageCollectionViewer extends React.Component {
     this.state = { root: "", collections: [], };
     this.dragging = false;
     props.homepageCollectionManager.getAllCollections().then(collections => {
+      collections = collections.filter(c => {
+        if(!c.startDate || !c.endDate) {
+          return true;
+        }
+
+        const start = new Date(c.startDate);
+        const end = new Date(c.endDate);
+        const current = new Date();
+        if(current > start && current < end) {
+          return true;
+        }
+        current.setFullYear(start.getFullYear());
+        return current > start && current < end;
+      })
       for (const collection of collections) {
         collection.items = collection.items.sort((a, b) => window.tvShowSort(a.name, b.name));
       }
@@ -32,17 +46,13 @@ class HomepageCollectionViewer extends React.Component {
 
   play(movie) {
     if (!this.dragging) {
-      this.setState({ movieName: movie.name });
+      this.setState({ movieName: movie.name, });
     }
   }
 
 
   cancelChooser() {
     this.setState({ "movieName": null, });
-  }
-
-  isDragging(dragging) {
-    this.dragging = dragging;
   }
 
   cancelShowChooser() {

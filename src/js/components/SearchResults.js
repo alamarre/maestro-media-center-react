@@ -10,13 +10,14 @@ class SearchResults extends React.Component {
   constructor(props) {
     super(props);
     this.state = { "searchResults": [], };
-    this.currentResult = -1;
+    this.currentResult = 0;
   }
 
   search(value) {
+    this.currentResult = 0;
     if (!value || value == "") {
       this.props.navigation.unfocusDialog();
-      this.setState({ "searchResults": [], });
+      return this.setState({ "searchResults": [], });
     }
     this.props.searcher.getResults(value).then(results => {
       this.setState({ "searchResults": results, });
@@ -26,18 +27,34 @@ class SearchResults extends React.Component {
 
   focusNext() {
     this.currentResult++;
-    if (this.currentResult >= this.state.searchResults.length) {
+    if (this.currentResult > this.state.searchResults.length) {
       this.currentResult = 0;
+
     }
-    this.refs[`searchresult-${this.currentResult}`].focus();
+    if (this.currentResult == 0) {
+      this.refs["searchbox"].focus();
+    }
+    else {
+      this.refs[`searchresult-${this.currentResult - 1}`].focus();
+    }
   }
 
   focusPrevious() {
     this.currentResult--;
     if (this.currentResult < 0) {
-      this.currentResult = this.state.searchResults.length - 1;
+      this.currentResult = this.state.searchResults.length;
     }
-    this.refs[`searchresult-${this.currentResult}`].focus();
+    if (this.currentResult == 0) {
+      this.refs["searchbox"].focus();
+    } else {
+      this.refs[`searchresult-${this.currentResult - 1}`].focus();
+    }
+  }
+
+  selectCurrent() {
+    if (this.currentResult > 0) {
+      this.refs[`searchresult-${this.currentResult - 1}`].click();
+    }
   }
 
   selectSource(item) {
@@ -62,6 +79,8 @@ class SearchResults extends React.Component {
   }
 
   cancelShowChooser() {
+    this.refs["searchbox"].value = "";
+    this.search("");
     this.setState({ "showName": null, "collectionName": null, "playlistName": null, movieName: null, });
   }
 
@@ -69,16 +88,22 @@ class SearchResults extends React.Component {
     this.props.navigation.registerElement(this.refs.searchbox, this.props.navOrder);
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.navOrder > -1) {
+      this.props.navigation.registerElement(this.refs.searchbox, this.props.navOrder);
+    }
+  }
+
   render() {
     let searchResults = this.state.searchResults.map((item, index) => {
       const ref = `searchresult-${index}`;
-      return <li ref={ref} className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
+      return <div ref={ref} className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
         <MetadataImage style={{ display: "inline-block", }} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
-      </li>;
+      </div>;
     });
 
-    searchResults = <ul style={{ position: "absolute", zIndex: 1000, }} className="list-group">{searchResults}</ul>;
+    searchResults = <div style={{ position: "absolute", zIndex: 1000, }} className="list-group">{searchResults}</div>;
     let showPicker = null;
     if (this.state.showName) {
       showPicker = <ShowPicker

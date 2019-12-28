@@ -92,6 +92,7 @@ class KeepWatching extends React.Component {
     if (this.state.showName) {
       showPicker = <ShowPicker
         router={this.props.router}
+        navigation={this.props.navigation}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         showName={this.state.showName}

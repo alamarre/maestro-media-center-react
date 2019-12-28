@@ -25,7 +25,7 @@ class Metadata extends React.Component {
               title: r.title,
               summary: r.overview,
               image: "http://image.tmdb.org/t/p/original"+r.poster_path,
-              year: r.release_date.substring(0,4),
+              year: r.release_date && r.release_date.substring(0,4),
             };
           }),
         };

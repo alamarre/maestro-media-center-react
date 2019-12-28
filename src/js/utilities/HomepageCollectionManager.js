@@ -11,10 +11,9 @@ class HomepageCollectionManager {
     const collectionNames = await this.getCollections();
     return await Promise.all(collectionNames.map(async collection => {
       const collectionData = await this.getCollection(collection.name);
-      return {
-        name: collection.name,
+      return Object.assign({
         items: collectionData,
-      };
+      }, collection);
     }));
   }
 

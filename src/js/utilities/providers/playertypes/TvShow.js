@@ -8,6 +8,7 @@ class TvShowPlayerManager {
     this.parentPath = parentPath;
     this.subdirectory = subdirectory;
     this.index = index;
+    // a little sketchy to not await, but shouldn't need this right away
     this.getSeasons();
     return await this.getEpisodes();
   }

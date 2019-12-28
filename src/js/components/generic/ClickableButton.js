@@ -11,7 +11,9 @@ class ClickableButton extends React.Component {
 
   componentDidUpdate() {
     const node = ReactDOM.findDOMNode(this.refs.link);
-    this.props.navigation.registerElement(node, this.props.navOrder);
+    if(this.props.navOrder) {
+      this.props.navigation.registerElement(node, this.props.navOrder);
+    }
   }
 
   render() {

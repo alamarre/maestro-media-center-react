@@ -14,7 +14,7 @@ function detectLeftButton(evt) {
 class Carousel extends Component {
   constructor(props) {
     super(props);
-    this.state = { current: 1, xOffset: 0, noButtons: true, showArrows: false, refs: [] };
+    this.state = { current: 1, xOffset: 0, noButtons: true, showArrows: false, refs: [], };
     this.moveStart = this.moveStart.bind(this);
     this.moving = this.moving.bind(this);
     this.moveEnd = this.moveEnd.bind(this);
@@ -52,7 +52,7 @@ class Carousel extends Component {
     const rect = currentNode.getBoundingClientRect();
     console.log(this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
     if (rect.x - 1.1 * this.props.itemWidth < 0) {
-      console.log('slide to the left');
+      console.log("slide to the left");
       this.lastOffset += this.props.itemWidth;
 
       this.currentOffset = this.lastOffset;
@@ -60,7 +60,7 @@ class Carousel extends Component {
 
     //this.normalize();
 
-    this.setState({ current }, () => {
+    this.setState({ current, }, () => {
       this.refs[`child-${current}`].focus();
       console.log("focused", current, this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
     });
@@ -93,7 +93,7 @@ class Carousel extends Component {
 
     //this.normalize();
 
-    this.setState({ current }, () => {
+    this.setState({ current, }, () => {
       this.refs[`child-${current}`].focus();
       console.log("focused", current, this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
     });
@@ -186,9 +186,9 @@ class Carousel extends Component {
     this.goNext();
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.registerElementCollection(this, this.props.navOrder);
-    this.setState({ refs: this.props.children.map((a, index) => `child-${index}`) });
+    this.setState({ refs: this.props.children.map((a, index) => `child-${index}`), });
   }
 
   componentWillUnmount() {
@@ -197,12 +197,15 @@ class Carousel extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.children !== prevProps.children) {
-      this.setState({ refs: this.props.children.map((a, index) => `child-${index}`) });
+      this.setState({ refs: this.props.children.map((a, index) => `child-${index}`), });
+    }
+    if(this.props.navOrder) {
+      this.props.navigation.registerElementCollection(this, this.props.navOrder);
     }
   }
 
   selectCurrent() {
-    let current = this.state.current;
+    const current = this.state.current;
     const currentNode = this.refs[`child-${current}`];
     currentNode.children[0].click();
   }

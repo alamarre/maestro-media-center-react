@@ -1,15 +1,33 @@
-class KeyboardNavigation {
+import { INavigation, } from "./INavigation";
+
+export interface FocusableItem {
+  selectCurrent();
+  moveRight();
+  moveLeft();
+  focusNext();
+  focusPrevious();
+  focus();
+  element: object;
+  persist: boolean;
+  type: string;
+  openMenu?();
+}
+
+export default class KeyboardNavigation implements INavigation {
+  private elements: FocusableItem[];
+  private index: number;
+  private currentDialog: FocusableItem;
+
   constructor() {
     this.elements = [];
     document.onkeydown = this.handleKeypress.bind(this);
     document.onkeypress = this.handleKeypress.bind(this);
     document.onkeyup = this.handleBack.bind(this);
-    this.current = null;
     this.index = -1;
     this.currentDialog = null;
   }
 
-  handleBack(e) {
+  private handleBack(e) {
 
     const code = e.which || e.keyCode || 0;
     if (code == 27) {
@@ -19,41 +37,41 @@ class KeyboardNavigation {
     }
   }
 
-  preventDefault(e) {
+  private preventDefault(e) {
     const code = e.which || e.keyCode || 0;
     if ((code >= 37 && code <= 40)) {
       e.preventDefault();
     }
   }
 
-  handleKeypress(e) {
+  private handleKeypress(e) {
     const code = e.which || e.keyCode || 0;
     if ((code >= 37 && code <= 40)) {
       e.preventDefault();
     }
     switch (code) {
-    case 37:
-      this.moveLeft();
-      break;
-    case 38:
-      this.focusPrevious();
-      break;
-    case 39:
-      this.moveRight();
-      break;
-    case 40:
-      this.focusNext();
-      break;
-    case 77:
-    case 109:
-      this.openMenu();
-      break;
-    case 13:
-      if (e.type == "keypress") {
-        this.select();
-        e.preventDefault();
-      }
-      break;
+      case 37:
+        this.moveLeft();
+        break;
+      case 38:
+        this.focusPrevious();
+        break;
+      case 39:
+        this.moveRight();
+        break;
+      case 40:
+        this.focusNext();
+        break;
+      case 77:
+      case 109:
+        this.openMenu();
+        break;
+      case 13:
+        if (e.type == "keypress") {
+          this.select();
+          //e.preventDefault();
+        }
+        break;
     }
     console.log(code);
   }
@@ -64,13 +82,13 @@ class KeyboardNavigation {
     } else {
       this.elements.push(collection);
     }
-    if (this.elements.length == 1 || navOrder === 0) {
+    if (this.elements.length == 1 || navOrder === 0 && !this.currentDialog) {
       this.index = 0;
       collection.focus();
     }
   }
 
-  select() {
+  private select() {
     if (this.currentDialog) {
       return this.currentDialog.selectCurrent();
     }
@@ -78,14 +96,23 @@ class KeyboardNavigation {
       const element = this.elements[this.index];
       if (element.selectCurrent) {
         element.selectCurrent();
-      } else if (element.click) {
-        element.click();
       }
     }
   }
 
   registerElement(element, navOrder) {
-    const wrapper = { element, persist: navOrder === -1, focus: () => element.focus(), selectCurrent: () => element.focus(), type: "element", };
+    const wrapper: FocusableItem = {
+      element,
+      persist: navOrder === -1,
+      focus: () => element.focus(),
+      selectCurrent: () => element.click(),
+      type: "element",
+      moveLeft: () => { },
+      moveRight: () => { },
+      focusNext: () => { },
+      focusPrevious: () => { },
+    };
+
     if (navOrder === 0 || navOrder > 0) {
       if (this.elements[navOrder] && this.elements[navOrder].persist) {
         let current = this.elements[navOrder];
@@ -99,7 +126,7 @@ class KeyboardNavigation {
     } else {
       this.elements.push(wrapper);
     }
-    if (this.elements.length == 1 || navOrder === 0) {
+    if (this.elements.length == 1 || navOrder === 0 && !this.currentDialog) {
       this.index = 0;
       element.focus();
     }
@@ -118,19 +145,24 @@ class KeyboardNavigation {
 
   unfocusDialog() {
     this.currentDialog = null;
-  }
-
-  openMenu() {
-    if (this.currentDialog && this.currentDialog.openMenu) {
-      this.currentDialog.openMenu();
+    this.index = 0;
+    if (this.elements[this.index]) {
+      this.elements[this.index].focus();
     }
   }
 
   clear() {
     this.elements = [];
+    this.currentDialog = null;
   }
 
-  focusPrevious() {
+  private openMenu() {
+    if (this.currentDialog && this.currentDialog.openMenu) {
+      this.currentDialog.openMenu();
+    }
+  }
+
+  private focusPrevious() {
     if (this.currentDialog) {
       return this.currentDialog.focusPrevious();
     }
@@ -141,7 +173,7 @@ class KeyboardNavigation {
 
   }
 
-  focusNext() {
+  private focusNext() {
     if (this.currentDialog) {
       return this.currentDialog.focusNext();
     }
@@ -151,7 +183,7 @@ class KeyboardNavigation {
     }
   }
 
-  moveLeft() {
+  private moveLeft() {
     if (this.currentDialog) {
       return this.currentDialog.moveLeft();
     }
@@ -161,7 +193,7 @@ class KeyboardNavigation {
     }
   }
 
-  moveRight() {
+  private moveRight() {
     if (this.currentDialog) {
       return this.currentDialog.moveRight();
     }
@@ -170,9 +202,4 @@ class KeyboardNavigation {
       current.moveRight();
     }
   }
-
-
-
 }
-
-module.exports = KeyboardNavigation;

@@ -72,7 +72,7 @@ module.exports = {
   },
   context: __dirname,
   devtool: debug ? "inline-sourcemap" : "sourcemap",
-  entry: APP_DIR + "/web/app.js",
+  entry: APP_DIR + "/web/app.tsx",
   mode: debug ? "development" : "production",
   output: {
     path: BUILD_DIR,
@@ -81,11 +81,21 @@ module.exports = {
   optimization: {
     minimize: debug ? false : true,
   },
+  resolve: {
+    extensions: [ ".tsx", ".ts", ".js", ".jsx",],
+  },
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        include: APP_DIR,
+        exclude: /node_modules/,
+        use: "ts-loader",
+      },
+      {
         test: /\.jsx?/,
         include: APP_DIR,
+        exclude: /node_modules/,
         use: {
           loader: "babel-loader",
           options: {

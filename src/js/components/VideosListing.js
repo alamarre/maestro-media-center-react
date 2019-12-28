@@ -67,7 +67,7 @@ class VideosListing extends ScrollableComponent {
   render() {
     var folders = this.state.folders.map((folder, i) => {
       const ref = `folder-${i}`;
-      return <div><button className="maestroButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button></div>;
+      return <div key={folder}><button className="maestroButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button></div>;
     });
 
     //var index = 0;
@@ -79,7 +79,7 @@ class VideosListing extends ScrollableComponent {
       if (file.type && file.type == "tv") {
         const imageSource = `${this.props.imageRoot}/${window.accountId}/50x75/tv/show/${file.name}.png`;
 
-        return <button className="maestroButton" ref={ref} style={{ margin: "20px", display: "block" }} key={fileName} onClick={() => this.selectSource(file)} >
+        return <button key={file} className="maestroButton" ref={ref} style={{ margin: "20px", display: "block" }} key={fileName} onClick={() => this.selectSource(file)} >
           <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
           {fileName}
         </button>;
@@ -87,7 +87,7 @@ class VideosListing extends ScrollableComponent {
 
       const imageSource = `${this.props.imageRoot}/${window.accountId}/50x75/movies/${file.name}.png`;
 
-      return <button ref={ref} className="maestroButton" style={{ margin: "20px", display: "block" }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
+      return <button key={file} ref={ref} className="maestroButton" style={{ margin: "20px", display: "block" }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
         <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
         {fileName}
       </button>;
@@ -100,6 +100,7 @@ class VideosListing extends ScrollableComponent {
         navigation={this.props.navigation}
         router={this.props.router}
         videoLoader={this.props.videoLoader}
+        episodeLoader={this.props.episodeLoader}
         showProgressProvider={this.props.showProgressProvider}
         offlineStorage={this.props.offlineStorage}
         showName={this.state.showName}

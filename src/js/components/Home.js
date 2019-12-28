@@ -1,13 +1,12 @@
 const React = require("react");
-const ReactDOM = require("react-dom");
 const { Link, } = require("react-router");
 const EasyInputComponent = require("./EasyInputComponent");
 
 const SearchResults = require("./SearchResults");
 const KeepWatching = require("./KeepWatching");
-const SettingsComponent = require("./Settings");
 
 const NewMovies = require("./NewMovies");
+import NewShows from "./NewShows";
 const HomePageCollectionViewer = require("./HomePageCollectionViewer");
 const ClickableButton = require("./generic/ClickableButton");
 
@@ -18,113 +17,17 @@ class Home extends EasyInputComponent {
     this.state = { showSettings: false, collectionCount: 0, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS), };
   }
 
-  componentWillMount() {
-    if (!this.props.authTokenManager.isAuthenticated() && this.props.router.location.pathname != "/login") {
-      this.props.router.replace("/login");
-    } else if (!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profile") {
-      this.props.router.replace("/profile");
-    } else {
-      this.props.accountProvider.getAccountId().then(accountInfo => {
-        window.accountId = accountInfo.accountId;
-        this.forceUpdate();
-      });
-    }
-
-    this.props.videoLoader.setRouter(this.props.router);
-
-    document.addEventListener("maestro-load-video", (event) => {
-      event = event.detail;
-      //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
-      this.props.router.push(`/view?type=${event.type}&index=${event.index}&folder=${event.folder}&profile=${event.profile}`);
-    });
-
-    document.addEventListener("maestro-offline-change", (event) => {
-      event = event.detail;
-      //this.props.videoLoader.loadVideo(event.type, event.folder, event.index);
-      this.setState({ hasOfflineVideos: event.offline, });
-    });
-
-    document.addEventListener("mousemove", this.showSettingsTemporarily.bind(this));
-    document.body.addEventListener("click", this.showSettingsTemporarily.bind(this), true);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.location !== prevProps.location) {
-      //this.props.navigation.clear();
-
-      if (!window.accountId) {
-        this.props.accountProvider.getAccountId().then(accountInfo => {
-          window.accountId = accountInfo.accountId;
-          this.forceUpdate();
-        });
-      }
-    }
-  }
-
   updateCollectionCount(count) {
-    this.setState({ collectionCount: count });
-  }
-
-  showSettingsTemporarily() {
-    if (window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS) {
-      return;
-    }
-    this.setState({ hideSettings: false, });
-    if (this.hideSettingsTimeout) {
-      window.clearTimeout(this.hideSettingsTimeout);
-    }
-
-    this.hideSettingsTimeout = window.setTimeout(() => {
-      this.setState({ hideSettings: true, });
-    }, 5000);
-  }
-
-  goHome() {
-    this.props.router.push("/");
+    this.setState({ collectionCount: count, });
   }
 
   render() {
-
-    //const getChristmasShows = () => this.props.cacheProvider.getCacheFromPath("Movies/Christmas");
-    const settingsView = this.state.showSettings ?
-      <SettingsComponent router={this.props.router} remoteController={this.props.remoteController} webSocketSender={this.props.webSocketSender} settingsManager={this.props.settingsManager} />
-      : null;
-    let settingsDisplay = this.state.hideSettings ? "none" : "block";
-
-    let homeButton = null;
-    if (["/login", "/profile", "/remote",].includes(this.props.router.location.pathname)) {
-      settingsDisplay = "none";
-    } else if (!["/",].includes(this.props.router.location.pathname)) {
-      //homeButton = <button className="maestroButton fa fa-home" onClick={() => this.goHome()}></button>;
-    }
-
-
-    const settingsSection = <div style={{ display: settingsDisplay, }} className="settings">
-      <div style={{ textAlign: "right", zIndex: 10, }}>
-
-        {homeButton}
-      </div>
-
-      {settingsView}
-    </div>;
-
-    if (this.props.router.location.pathname !== "/login"
-      && this.props.router.location.pathname != "/profile"
-      && !window.accountId) {
-      return <div>{settingsSection}</div>;
-    }
-
-    let offlineLink = null;
-    if (this.props.offlineStorage.canStoreOffline()) {
-      //offlineLink = <div><Link className="nostyle" to="offline">Offline Videos</Link></div>;
-    }
-
-    const settingsLink = <ClickableButton navigation={this.props.navigation} navOrder={this.state.collectionCount + 4} to="settings">Settings</ClickableButton>;
+    const settingsLink = <ClickableButton navigation={this.props.navigation} navOrder={this.state.collectionCount + 5} to="settings">Settings</ClickableButton>;
 
     const remoteLink = (this.props.settingsManager.get("playToRemoteClient") && this.props.settingsManager.get("playToRemoteClient") != "") ?
       <Link ref="remote" className="nostyle" to="remote">Remote Control</Link>
       : null;
-    var body = this.props.children || <div>
+    var body = <div>
       <div>
         <SearchResults
           navOrder={0}
@@ -150,15 +53,18 @@ class Home extends EasyInputComponent {
       <div>
         <HomePageCollectionViewer updateCount={(count) => this.updateCollectionCount(count)} navOrder={3} {...this.props} ></HomePageCollectionViewer>
       </div>
+      <div>
+        <NewShows navOrder={this.state.collectionCount + 3} {...this.props} showProvider={this.props.dataProviders.recentTvShows} ></NewShows>
+      </div>
 
-      <ClickableButton navigation={this.props.navigation} navOrder={this.state.collectionCount + 3} to="videos">Browse the collection</ClickableButton>
+      <ClickableButton navigation={this.props.navigation} navOrder={this.state.collectionCount + 4} to="videos">Browse the collection</ClickableButton>
       <div>{remoteLink}</div>
       {settingsLink}
     </div>;
     return (
-      <div>{settingsSection}{body}</div>
+      <div>{body}</div>
     );
   }
 }
 
-module.exports = Home;
+export default Home;

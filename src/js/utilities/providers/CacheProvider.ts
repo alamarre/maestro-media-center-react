@@ -1,17 +1,22 @@
+import ApiCaller from "./ApiCaller";
+import FileCache from "../../models/FileCache";
+import RootFolder from "../../models/RootFolder";
 const localforage = require("localforage");
 
-class CacheProvider {
-  constructor(apiRequester, options = {}) {
-    this.apiRequester = apiRequester;
+export default class CacheProvider {
+  private apiCaller: ApiCaller;
+  private cachePromise: Promise<FileCache>;
+  private rootFoldersPromise: Promise<RootFolder[]>;
+
+  constructor(apiCaller) {
+    this.apiCaller = apiCaller;
     this.cachePromise = null;
     this.rootFoldersPromise = null;
-    if(options.noPreload) {
-      this.getCache().catch(() => { });
-      this.getRootFolders().catch(() => { });
-    }
+    this.getCache().catch(() => { });
+    this.getRootFolders().catch(() => { });
   }
 
-  async getCache() {
+  async getCache(): Promise<FileCache> {
     if (!this.cachePromise) {
       this.cachePromise = this.fetchCache();
 
@@ -20,9 +25,9 @@ class CacheProvider {
     return this.cachePromise;
   }
 
-  async fetchCache() {
+  async fetchCache(): Promise<FileCache> {
     try {
-      const result = await this.apiRequester.apiRequestPromise("folders", "cache", {});
+      const result: FileCache = await this.apiCaller.get<FileCache>("folders", "cache");
       await localforage.setItem("cache", result);
       return result;
     } catch (e) {
@@ -30,14 +35,14 @@ class CacheProvider {
     }
   }
 
-  reload() {
+  async reload(): Promise<void> {
     this.cachePromise = null;
-    this.getCache();
+    await this.getCache();
     this.rootFoldersPromise = null;
-    this.getRootFolders();
+    await this.getRootFolders();
   }
 
-  isTvShow(path) {
+  isTvShow(path): Promise<boolean> {
     if (path.indexOf("/") == 0) {
       path = path.substring(1);
     }
@@ -47,8 +52,7 @@ class CacheProvider {
         const parts = path.split("/");
         for (const rootFolder of rootFolders) {
           if (rootFolder.name === parts[0]) {
-            s(rootFolder.type && rootFolder.type.toLowerCase() === "tv");
-            return;
+            return s(rootFolder.type && rootFolder.type.toLowerCase() === "tv");
           }
         }
         f();
@@ -56,7 +60,7 @@ class CacheProvider {
     });
   }
 
-  async getShowPath(showName) {
+  async getShowPath(showName): Promise<string> {
     const cache = await this.getCache();
     const rootFolders = await this.getRootFolders();
     for (const folder of rootFolders) {
@@ -69,7 +73,7 @@ class CacheProvider {
     }
   }
 
-  getCacheFromPath(path) {
+  getCacheFromPath(path): Promise<FileCache> {
     return new Promise((s, f) => {
       this.getCache().then(cache => {
         if (path.indexOf("/") == 0) {
@@ -82,33 +86,22 @@ class CacheProvider {
           current = current.folders[parts[i]];
         }
 
-        if (current && current.folders && current.folders.sort) {
-          current.folders = current.folders.sort(tvShowSort);
-        }
-
-        if (current && current.files && current.files.sort) {
-          current.files = current.files.sort(tvShowSort);
-        }
-
         s(current);
       }, f);
     });
   }
 
-  getRootFolders() {
+  getRootFolders(): Promise<RootFolder[]> {
     if (!this.rootFoldersPromise) {
       this.rootFoldersPromise = this.fetchRootFolders();
     }
-    this.rootFoldersPromise.then(rootFolders => {
-      this.rootFolders = rootFolders;
-    });
 
     return this.rootFoldersPromise;
   }
 
-  async fetchRootFolders() {
+  async fetchRootFolders(): Promise<RootFolder[]> {
     try {
-      const result = this.apiRequester.apiRequestPromise("folders", "root", {});
+      const result = this.apiCaller.get<RootFolder[]>("folders", "root");
       await localforage.setItem("rootFolders", result);
       return result;
     } catch (e) {
@@ -116,5 +109,3 @@ class CacheProvider {
     }
   }
 }
-
-module.exports = CacheProvider;

@@ -14,15 +14,19 @@ class ChooseProfile extends ScrollableComponent {
   }
 
   componentWillMount() {
-    setInterval(() => {
+    this.profileUpdater = setInterval(() => {
       this.props.profileProvider.getProfiles()
         .then((profiles) => {
-          this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`) }, this.focusCurrent());
+          this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`), }, this.focusCurrent());
         }, (err) => {
           throw err;
         });
     }, 1000);
 
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.profileUpdater);
   }
 
   startAddingProfile() {
@@ -35,7 +39,7 @@ class ChooseProfile extends ScrollableComponent {
       .then(() => {
         this.setProfile(username);
       },
-        () => { });
+      () => { });
 
   }
 
@@ -51,6 +55,7 @@ class ChooseProfile extends ScrollableComponent {
     this.props.authTokenManager.setProfile(profile);
     this.props.cache.reload();
     this.props.search.createIndex();
+    this.props.serverProvider.updateServers();
     this.props.router.replace("/");
   }
 

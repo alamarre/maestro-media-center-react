@@ -5,9 +5,9 @@ const ScrollableComponent = require("./ScrollableComponent");
 class Settings extends ScrollableComponent {
 
   constructor(props) {
-    super(props, ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close"], true);
+    super(props, ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",], true);
 
-    this.allRefs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close"];
+    this.allRefs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
 
     this.state = Object.assign({}, this.state, {
       remoteControl: this.props.settingsManager.get("remoteControl") == "true" || this.props.settingsManager.get("remoteControl") === true,
@@ -48,20 +48,19 @@ class Settings extends ScrollableComponent {
 
   handleClientNameChange(event) {
     const value = event.target.value;
-    if (value) {
-      this.handleInputChange(event);
 
+    this.handleInputChange(event);
+    if (value) {
       this.props.remoteController.updateClientName(value);
     }
   }
 
   handleSendToClientNameChange(event) {
     const value = event.target.value;
-    if (value) {
-      this.handleInputChange(event);
 
-      this.props.webSocketSender.setClient(value);
-    }
+    this.handleInputChange(event);
+    this.props.webSocketSender.setClient(value);
+
   }
 
   handleCheckBoxChange(event) {
@@ -97,11 +96,11 @@ class Settings extends ScrollableComponent {
       const pinEntered = window.prompt("Please enter the pin");
       if (pinEntered != pinNeeded) {
         alert("Wrong pin");
-        this.setState({ "lockProfilePin": pinNeeded });
+        this.setState({ "lockProfilePin": pinNeeded, });
         return;
       }
       this.props.settingsManager.set("lockProfilePin", null);
-      this.setState({ "lockProfilePin": null });
+      this.setState({ "lockProfilePin": null, });
       return;
     }
     const pin = prompt("Set a pin");
@@ -110,7 +109,7 @@ class Settings extends ScrollableComponent {
       return;
     }
     this.props.settingsManager.set("lockProfilePin", pin);
-    this.setState({ "lockProfilePin": pin });
+    this.setState({ "lockProfilePin": pin, });
   }
 
   render() {

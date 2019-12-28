@@ -140,7 +140,9 @@ class VideoPlayer extends ScrollableComponent {
     if (this.state.showMenu) {
       const items = [
         { name: "Go Home", action: () => this.props.router.push("/") },
-        { name: "Toggle Screen Visibility", action: () => this.toggleVisibility() },
+        { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.closeMenu(); }  },
+        { name: "Previous episode", action: () => { this.goToPrevious(); this.closeMenu(); } },
+        { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }  },
         { name: "Close", action: () => this.closeMenu() },
       ];
       menu = <Menu navigation={this.props.navigation} ref={menu} items={items}></Menu>
@@ -184,7 +186,7 @@ class VideoPlayer extends ScrollableComponent {
       }
     }
     this.setState({ sources: orderedSources, subtitles, name, seekTime, });
-    this.props.videoLoader.setUrl(this.type, path, index, true, this.profile);
+    this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
   }
 
   onPause() {

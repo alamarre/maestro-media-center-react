@@ -21,6 +21,12 @@ class Scrollable extends React.Component {
 
   }
 
+  componentDidUpdate() {
+    if (this.isDialog) {
+      this.props.navigation.focusDialog(this);
+    }
+  }
+
   focus() {
     this.focusCurrent();
   }
