@@ -1,6 +1,5 @@
 import React from "react";
 
-import ChromecastPlayer from "./VideoPlayers/Chromecast";
 import Html5VideoPlayer from "./VideoPlayers/Html5Video";
 import ReloadVideoDialog from "./ReloadVideoDialog";
 import Menu from "./generic/Menu";
@@ -125,16 +124,10 @@ export default class VideoPlayer extends React.Component {
     }
     let videoSource = null;
     if (this.state.seekTime > -1) {
-      if (this.props.isChromecast) {
-        videoSource = <ChromecastPlayer remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles}
-          onEnded={this.goToNext.bind(this)} onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
-        />;
+      videoSource = <Html5VideoPlayer key="videoplayer" remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles} onEnded={this.goToNext.bind(this)}
+        onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
+      />;
 
-      } else {
-        videoSource = <Html5VideoPlayer key="videoplayer" remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles} onEnded={this.goToNext.bind(this)}
-          onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
-        />;
-      }
     }
     let menu = null;
     if (this.state.showMenu) {

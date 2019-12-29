@@ -15,7 +15,6 @@ jobs:
         - pip install --user awscli
         - export PATH=$PATH:$HOME/.local/bin
         - npm install
-      script: 
+      script:
         - npm run deploy
-        - npm run deploy-chromecast
         - npm run deploy-admin

@@ -1,5 +1,4 @@
 var debug = process.env.NODE_ENV !== "production";
-const appId = process.env.CHROMECAST_DEBUG ? "D8828ECA" : "C3639C8B";
 var webpack = require("webpack");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
@@ -57,7 +56,6 @@ var alwaysPlugins = [
   }),
   new webpack.DefinePlugin({
     "process.env": {
-      "CHROMECAST_APP_ID": JSON.stringify(appId),
     },
   }),
   new ExtractTextPlugin({

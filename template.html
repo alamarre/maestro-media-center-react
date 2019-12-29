@@ -12,15 +12,6 @@
 </head>
 
 <body>
-    <script>
-        window.chromecastPromise = new Promise((s, f) => {
-            window['__onGCastApiAvailable'] = function (isAvailable) {
-                if (isAvailable) {
-                    s();
-                }
-            };
-        });
-    </script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 </body>
 
