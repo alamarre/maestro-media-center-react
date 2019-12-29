@@ -1,15 +1,42 @@
 import React from "react";
 import { Modal, } from "react-bootstrap";
 
-import ScrollableComponent from "./ScrollableComponent";
-
 import MetadataImage from "./generic/MetadataImage";
+import FileCache from "../models/FileCache";
+import { INavigation, } from "../utilities/providers/navigation/INavigation";
+import Scrollable from "./ScrollableComponent";
+import KeepWatching from "../models/KeepWatchingData";
 
-export default class ShowPicker extends ScrollableComponent {
+export interface ShowPickerProps {
+  navOrder?: number;
+  navigation: INavigation;
+  offlineStorage: any;
+  showProgressProvider: any;
+  videoLoader: any;
+  router: any;
+  cancelFunction: () => void;
+  showName: string;
+  showPath: string;
+  showCache: FileCache;
+  metadataProvider: any;
+  episodeLoader: any;
+}
 
+export interface ShowPickerState {
+  season: string;
+  episode: string;
+  keepWatchingData: KeepWatching;
+  episodeSources: any;
+  metadata: any[];
+  refs: string[];
+}
+
+export default class ShowPicker extends React.Component<ShowPickerProps, ShowPickerState> {
+
+  private downloadProgress: any;
   constructor(props) {
-    super(props, ["cancel"]);
-    this.state = Object.assign({ "season": null, "episode": null, }, this.state);
+    super(props);
+    this.state = Object.assign({ "season": null, "episode": null, refs: ["cancel",], }, this.state);
     this.downloadProgress = {};
 
     props.showProgressProvider.getShowsInProgress().then(shows => {
@@ -22,7 +49,7 @@ export default class ShowPicker extends ScrollableComponent {
           this.setState({
             "season": show.season,
             "episode": show.episode,
-            "keepWatchingData": show,
+            keepWatchingData: show,
           }, () => {
             this.loadSeasonMetadata(show.season);
           });
@@ -51,21 +78,21 @@ export default class ShowPicker extends ScrollableComponent {
       const path = `${folder}/${episode}`;
       downloadPromises.push(this.props.episodeLoader.getVideoSource(path));
     }
-    Promise.all(downloadPromises).then((episodeSources) => this.setState({ episodeSources }));
+    Promise.all(downloadPromises).then((episodeSources) => this.setState({ episodeSources, }));
     let refs = [];
     if (this.state.keepWatchingData && season == this.state.keepWatchingData.season) {
       refs.push("keepwatching");
     }
-    refs = refs.concat(["selector"]).concat(episodes).concat(["cancel"]);
-    this.selectedIndex = 0;
+    refs = refs.concat(["selector",]).concat(episodes).concat(["cancel",]);
+    //this.selectedIndex = 0;
     this.setState({ refs, }, () => {
-      this.focusCurrent();
+      //this.focusCurrent();
     });
 
     if (this.props.metadataProvider) {
       const metadata = await this.props.metadataProvider.getTvSeasonMetaData(this.props.showName, season);
       this.setState({ metadata, }, () => {
-        this.focusCurrent();
+        //this.focusCurrent();
       });
     }
   }
@@ -86,25 +113,7 @@ export default class ShowPicker extends ScrollableComponent {
       const sources = this.state.episodeSources[index];
       const url = new URL(sources.sources[0]).href + "?download=true";
       window.open(url, "_blank")
-      //alert(url);
-      //Clipboard.copy(url);
-      //window.location = url;
-      //alert("Download url copied to clipboard");
     }
-    /*const folder = this.props.showPath + "/" + this.state.season;
-    const path = `${folder}/${episode}`;
-    const sources = await this.props.episodeLoader.getVideoSource(path);
-    const url = new URL(sources.sources[0]).href;
-    console.log(url);
-    if (navigator && navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
-      alert("copied to clipboard");
-    } else {
-      alert(url);
-    }
-    //await Clipboard.copy(url);
-    //window.open(url, '_blank');*/
-    //alert("Download url copied to clipboard");
   }
 
   downloadLegacy(episode) {
@@ -126,13 +135,13 @@ export default class ShowPicker extends ScrollableComponent {
       path: `TV Shows/${this.props.showName}/${this.state.season}/${episode}`,
       name: `${this.props.showName} ${this.state.season} ${episode}`,
     }, path, (progress) => {
-      this.setState({ downloadProgress$: progress, });
+      //this.setState({ downloadProgress$: progress, });
       this.downloadProgress[episode] = progress;
     });
   }
 
   play(episode) {
-    const files = Object.keys(this.props.showCache.folders[this.state.season].files).sort(window.tvShowSort);
+    const files = Object.keys(this.props.showCache.folders[this.state.season].files).sort(window["tvShowSort"]);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
       if (files[i] == episode) {
@@ -149,12 +158,12 @@ export default class ShowPicker extends ScrollableComponent {
     if (!this.state.season) {
       return <div></div>;
     }
-
-    const seasons = Object.keys(this.props.showCache.folders).sort(window.tvShowSort).map((season) => {
-      return <option key={season} value={season}>{season}</option>;
+    const seasons = Object.keys(this.props.showCache.folders).sort(window["tvShowSort"]).map((season) => {
+      return <option key={season} value={season} > {season} </option>;
     });
+
     let count = 0;
-    const episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).sort(window.tvShowSort).map((episode, index) => {
+    const episodes = this.state.season == null ? null : Object.keys(this.props.showCache.folders[this.state.season].files).sort(window["tvShowSort"]).map((episode, index) => {
       let downloadButton = null;
       let downloadProgress = null;
       let overview = "";
@@ -164,25 +173,26 @@ export default class ShowPicker extends ScrollableComponent {
       }
       const ref = `episode-${index}`;
       if (this.props.offlineStorage.canStoreOffline()) {
-        downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)}></button>;
+        downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)
+        }> </button>;
         const progress = this.downloadProgress[episode];
         if (this.state.episodeSources && this.state.episodeSources.length > index) {
           //downloadButton = <a href={new URL(this.state.episodeSources[index].sources[0]).href + "?download=true"} download>Download</a>;
         }
         if (progress && progress.state) {
-          downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}%</span>;
+          downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}% </span>;
         }
       }
-      return <div style={{ display: "table", margin: "20px", }} key={episode}>
+      return <div style={{ display: "table", margin: "20px", }} key={episode} >
         <MetadataImage style={{ display: "table-cell", verticalAlign: "top", }}
           width={227} height={127} type="episode" name={episode} show={this.props.showName}
-          season={this.state.season}  ></MetadataImage>
+          season={this.state.season} > </MetadataImage>
         <div style={{ display: "table-cell", verticalAlign: "top", }}>
-          <button ref={ref} className="maestroButton roundedButton fa fa-play" onClick={() => this.play(episode)}></button>
-          <span>{episode}</span>
+          <button ref={ref} className="maestroButton roundedButton fa fa-play" onClick={() => this.play(episode)}> </button>
+          <span> {episode} </span>
           {downloadButton}
           {downloadProgress}
-          <div style={{ marginLeft: "20px", }}>{overview}</div>
+          <div style={{ marginLeft: "20px", }}> {overview} </div>
         </div>
       </div>;
 
@@ -192,8 +202,9 @@ export default class ShowPicker extends ScrollableComponent {
     if (this.state.keepWatchingData && this.state.season == this.state.keepWatchingData.season) {
       const episode = this.state.keepWatchingData.episode;
       keepWatchingView = <div>
-        <button ref="keepwatching" className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(episode)}></button>
-        <span>Keep watching: {episode}</span>
+        <button ref="keepwatching" className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(episode)
+        }> </button>
+        < span > Keep watching: {episode} </span>
       </div>;
     }
 
@@ -207,24 +218,26 @@ export default class ShowPicker extends ScrollableComponent {
 
           {keepWatchingView}
           <div>
-            <select ref="selector" defaultValue={this.state.season} onChange={evt => this.setSeason(evt.target.value)}>
+            <select ref="selector" defaultValue={this.state.season} onChange={evt => this.setSeason(evt.target.value)} >
               {seasons}
             </select>
+            <div>
+              <div>
+              </div>
+              {episodes}
+            </div>
           </div>
-          <div>
-          </div>
-          {episodes}
         </Modal.Body>
         <Modal.Footer>
-          <button ref="cancel" className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
+          <button ref="cancel" className="btn btn-secondary" onClick={() => this.props.cancelFunction()}> Cancel </button>
         </Modal.Footer>
       </Modal>
     </div>;
 
-    return (
-      <div>{body}</div>
-    );
+    const parentRefs = () => this.refs;
+    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
   }
+
 }
 
 

@@ -141,13 +141,16 @@ export default class KeyboardNavigation implements INavigation {
 
   focusDialog(dialog) {
     this.currentDialog = dialog;
+    this.index = 0;
   }
 
-  unfocusDialog() {
-    this.currentDialog = null;
-    this.index = 0;
-    if (this.elements[this.index]) {
-      this.elements[this.index].focus();
+  unfocusDialog(dialog) {
+    if (this.currentDialog == dialog) {
+      this.currentDialog = null;
+      this.index = 0;
+      if (this.elements[this.index]) {
+        this.elements[this.index].focus();
+      }
     }
   }
 

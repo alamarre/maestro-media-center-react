@@ -1,8 +1,31 @@
 import React from "react";
 import { Modal, } from "react-bootstrap";
-import ScrollableComponent from "../ScrollableComponent";
+import { INavigation, } from "../../utilities/providers/navigation/INavigation";
+import Scrollable from "../ScrollableComponent";
+import KeepWatching from "../../models/KeepWatchingData";
+import PlaylistEntry from "../../models/PlaylistEntry";
 
-export default class PlaylistPicker extends ScrollableComponent {
+export interface PlaylistPickerProps {
+  navOrder?: number;
+  navigation: INavigation;
+  playlistManager: any;
+  offlineStorage: any;
+  showProgressProvider: any;
+  videoLoader: any;
+  router: any;
+  cancelFunction: () => void;
+  playlistName: string;
+  metadataProvider: any;
+  episodeLoader: any;
+}
+
+export interface PlaylistPickerState {
+  refs: string[];
+  keepWatchingData: KeepWatching;
+  playlist: PlaylistEntry[];
+}
+
+export default class PlaylistPicker extends React.Component<PlaylistPickerProps, PlaylistPickerState> {
 
   constructor(props) {
     super(props, []);
@@ -12,10 +35,10 @@ export default class PlaylistPicker extends ScrollableComponent {
 
   async loadPlaylistData() {
     const playlistInfo = await this.props.playlistManager.getPlaylist(this.props.playlistName);
-    const playlist = playlistInfo.playlist;
+    const playlist: PlaylistEntry[] = playlistInfo.playlist;
     let keepWatchingData = await this.props.showProgressProvider.getShowProgress("playlist");
 
-    let refs =[];
+    let refs = [];
     if (!keepWatchingData || keepWatchingData.season !== this.props.playlistName) {
       keepWatchingData = null;
     } else {
@@ -23,9 +46,9 @@ export default class PlaylistPicker extends ScrollableComponent {
     }
 
     const items = playlist.map((x, index) => `playlist-${index}`);
-    refs = refs.concat(items).concat(["cancel"]);
+    refs = refs.concat(items).concat(["cancel",]);
     this.setState({ playlist, keepWatchingData, refs, }, () => {
-      this.focusCurrent();
+      //this.focusCurrent();
     });
   }
 
@@ -76,9 +99,9 @@ export default class PlaylistPicker extends ScrollableComponent {
         </Modal.Footer>
       </Modal>
     </div>;
-
+    const parentRefs = () => this.refs;
     return (
-      <div>{body}</div>
+      <div><Scrollable refNames={this.state.refs} parentRefs={parentRefs} navigation={this.props.navigation} isDialog={true} >{body}</Scrollable></div>
     );
   }
 }

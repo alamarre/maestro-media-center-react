@@ -15,12 +15,14 @@ export default class App extends React.Component<AppProps, {}> {
 
   constructor(props) {
     super(props);
-    this.state = { };
+    this.state = {};
   }
 
   componentDidMount() {
-    if (!this.props.authTokenManager.isAuthenticated() && this.props.router.location.pathname != "/login") {
-      this.props.router.replace("/login");
+    if (!this.props.authTokenManager.isAuthenticated()) {
+      if (this.props.router.location.pathname != "/login") {
+        this.props.router.replace("/login");
+      }
     } else if (!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profile") {
       this.props.router.replace("/profile");
     } else {
@@ -46,15 +48,28 @@ export default class App extends React.Component<AppProps, {}> {
   }
 
   normalizePath(path) {
-    if(path.indexOf("/") === 0) {
+    if (path.indexOf("/") === 0) {
       path = path.substring(1);
     }
-    return path.toLowerCase();
+    return decodeURIComponent(path.toLowerCase());
   }
 
   componentDidUpdate(prevProps) {
     if (this.normalizePath(this.props.location.pathname) !== this.normalizePath(prevProps.location.pathname)) {
-      this.props.navigation.clear();
+      const oneIsSub = (a: string, b: string) => {
+        a = this.normalizePath(a);
+        b = this.normalizePath(b);
+        if (a.length < b.length) {
+          const c = a;
+          a = b;
+          b = c;
+        }
+        return (a.indexOf(b) == 0);
+
+      }
+      if (!oneIsSub(this.props.location.pathname, prevProps.location.pathname)) {
+        this.props.navigation.clear();
+      }
       if (!window["accountId"]) {
         this.props.accountProvider.getAccountId().then(accountInfo => {
           window["accountId"] = accountInfo.accountId;

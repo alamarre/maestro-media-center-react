@@ -2,7 +2,7 @@ import elasticlunr from "elasticlunr";
 
 function addFilesInFolder(index, currentCache, path) {
   if (currentCache && currentCache.files) {
-    const fileNames = Object.keys(currentCache.files).sort(window.tvShowSort);
+    const fileNames = Object.keys(currentCache.files).sort(window["tvShowSort"]);
     let episodeCount = 0;
     for (const file of fileNames) {
       const filePath = path + "/" + file;
@@ -129,7 +129,7 @@ export default class CacheBasedSearch {
         });
 
         results = results.sort((a, b) => {
-          return window.tvShowSort(a.name, b.name);
+          return window["tvShowSort"](a.name, b.name);
         });
         success(results);
       }, fail);

@@ -55,7 +55,7 @@ export default class CacheBasedEpisodeProvider {
           result.folders = Object.keys(current.folders);
           result.files = Object.keys(current.files);
 
-          result.files = result.files.sort(window.tvShowSort);
+          result.files = result.files.sort(window["tvShowSort"]);
 
           good(result);
         }, bad);

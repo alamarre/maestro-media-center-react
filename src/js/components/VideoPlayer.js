@@ -3,7 +3,6 @@ import React from "react";
 import ChromecastPlayer from "./VideoPlayers/Chromecast";
 import Html5VideoPlayer from "./VideoPlayers/Html5Video";
 import ReloadVideoDialog from "./ReloadVideoDialog";
-import ScrollableComponent from "./ScrollableComponent";
 import Menu from "./generic/Menu";
 
 import TvShowSeriesPlayer from "../utilities/providers/playertypes/TvShow";
@@ -11,7 +10,7 @@ import MoviePlayer from "../utilities/providers/playertypes/Movie";
 import MovieCollection from "../utilities/providers/playertypes/MovieCollection";
 import Playlist from "../utilities/providers/playertypes/Playlist";
 
-export default class VideoPlayer extends ScrollableComponent {
+export default class VideoPlayer extends React.Component {
   constructor(props) {
     super(props, [], true);
     const episodeLoader = this.props.episodeLoader;
@@ -39,6 +38,7 @@ export default class VideoPlayer extends ScrollableComponent {
   }
 
   componentWillUnmount() {
+    this.props.navigation.unfocusDialog(this);
     if (this.preventIdleTimer) {
       clearInterval(this.preventIdleTimer);
     }
@@ -57,7 +57,7 @@ export default class VideoPlayer extends ScrollableComponent {
   }
 
   componentDidMount() {
-    super.componentDidMount();
+    this.props.navigation.focusDialog(this);
     this.props.videoLoader.setRouter(this.props.router);
     if (this.props.location.query.folder) {
       var path = this.props.location.query.folder;

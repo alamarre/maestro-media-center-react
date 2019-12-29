@@ -1,7 +1,7 @@
 import React from "react";
-import ScrollableComponent from "./ScrollableComponent";
+import Scrollable from "./ScrollableComponent";
 
-export default class ChooseProfile extends ScrollableComponent {
+export default class ChooseProfile extends React.Component {
 
   constructor(props) {
     super(props, [], true);
@@ -17,7 +17,7 @@ export default class ChooseProfile extends ScrollableComponent {
     this.profileUpdater = setInterval(() => {
       this.props.profileProvider.getProfiles()
         .then((profiles) => {
-          this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`), }, this.focusCurrent());
+          this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`), });
         }, (err) => {
           throw err;
         });
@@ -38,8 +38,7 @@ export default class ChooseProfile extends ScrollableComponent {
     this.props.profileProvider.createProfile(username, false)
       .then(() => {
         this.setProfile(username);
-      },
-      () => { });
+      }, () => { });
 
   }
 
@@ -57,14 +56,6 @@ export default class ChooseProfile extends ScrollableComponent {
     this.props.search.createIndex();
     this.props.serverProvider.updateServers();
     this.props.router.replace("/");
-  }
-
-  moveLeft() {
-    this.focusPrevious();
-  }
-
-  moveRight() {
-    this.focusNext();
   }
 
   render() {
@@ -106,6 +97,9 @@ export default class ChooseProfile extends ScrollableComponent {
         {addProfileSection}
       </div>;
     }
+
+    const parentRefs = () => this.refs;
+    body = <div><Scrollable scrollOnHorizontal={true} isDialog={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
 
 
     return (

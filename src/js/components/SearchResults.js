@@ -16,7 +16,7 @@ export default class SearchResults extends React.Component {
   search(value) {
     this.currentResult = 0;
     if (!value || value == "") {
-      this.props.navigation.unfocusDialog();
+      this.props.navigation.unfocusDialog(this);
       return this.setState({ "searchResults": [], });
     }
     this.props.searcher.getResults(value).then(results => {
@@ -97,10 +97,10 @@ export default class SearchResults extends React.Component {
   render() {
     let searchResults = this.state.searchResults.map((item, index) => {
       const ref = `searchresult-${index}`;
-      return <div ref={ref} className="list-group-item" key={item.path} onClick={() => this.selectSource(item)}>
+      return <div style={{ backgroundColor: "black", }}><button style={{ width: "100%", textAlign: "left", }} ref={ref} className="maestroButton" key={item.path} onClick={() => this.selectSource(item)}>
         <MetadataImage style={{ display: "inline-block", }} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
-      </div>;
+      </button></div>;
     });
 
     searchResults = <div style={{ position: "absolute", zIndex: 1000, }} className="list-group">{searchResults}</div>;
@@ -171,5 +171,3 @@ export default class SearchResults extends React.Component {
     );
   }
 }
-
-

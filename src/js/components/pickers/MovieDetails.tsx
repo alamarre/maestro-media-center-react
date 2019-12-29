@@ -1,21 +1,42 @@
 import React from "react";
 import { Modal, } from "react-bootstrap";
-import ScrollableComponent from "../ScrollableComponent";
 
 import MetadataImage from "../generic/MetadataImage";
+import KeepWatching from "../../models/KeepWatchingData";
+import { INavigation, } from "../../utilities/providers/navigation/INavigation";
+import Scrollable from "../ScrollableComponent";
+import MovieMetadata from "../../models/MovieMetadata";
 
-export default class MovieDetails extends ScrollableComponent {
+export interface MoviePickerProps {
+  navOrder?: number;
+  navigation: INavigation;
+  offlineStorage: any;
+  showProgressProvider: any;
+  videoLoader: any;
+  router: any;
+  cancelFunction: () => void;
+  movieName: string;
+  metadataProvider: any;
+  episodeLoader: any;
+}
+
+export interface MoviePickerState {
+  refs: string[];
+  movieInfo: MovieMetadata;
+}
+
+export default class MovieDetails extends React.Component<MoviePickerProps, MoviePickerState> {
 
   constructor(props) {
-    super(props, ["playbutton", "cancel"]);
-    this.state = Object.assign(this.state, { "movie": null, playBackgroundColor: "#FF0" });
+    super(props);
+    this.state = { movieInfo: null, refs: ["playbutton", "cancel",], };
     this.loadData();
   }
 
   async loadData() {
     const movieInfo = await this.props.metadataProvider.getMovieMetadata(this.props.movieName);
     this.setState({ movieInfo, }, () => {
-      this.focusCurrent();
+      //this.focusCurrent();
     });
   }
 
@@ -53,10 +74,9 @@ export default class MovieDetails extends ScrollableComponent {
         </Modal.Footer>
       </Modal>
     </div>;
+    const parentRefs = () => this.refs;
+    return <div><Scrollable isDialog={true} parentRefs={parentRefs} navigation={this.props.navigation} refNames={this.state.refs}>{body}</Scrollable></div>
 
-    return (
-      <div>{body}</div>
-    );
   }
 }
 

@@ -15,7 +15,7 @@ export default class TvShowPlayerManager {
 
   async getEpisodes() {
     const listing = await this.episodeLoader.getListingPromise(this.parentPath + "/" + this.subdirectory);
-    this.episodes = listing.files.sort(window.tvShowSort);
+    this.episodes = listing.files.sort(window["tvShowSort"]);
     if (this.index == null) {
       this.index = listing.files.length - 1;
     }
@@ -24,7 +24,7 @@ export default class TvShowPlayerManager {
 
   async getSeasons() {
     const listing = await this.episodeLoader.getListingPromise(this.parentPath);
-    listing.folders.sort(window.tvShowSort);
+    listing.folders.sort(window["tvShowSort"]);
     this.parentFolders = listing.folders;
   }
 
@@ -39,7 +39,7 @@ export default class TvShowPlayerManager {
     const episode = this.episodes[this.index];
     const path = parentPath + "/" + this.subdirectory;
     const sourceInfo = await this.episodeLoader.getVideoSource(parentPath + "/" + this.subdirectory + "/" + episode);
-    const {sources, subtitles,} =  sourceInfo;
+    const { sources, subtitles, } = sourceInfo;
     const name = this.episodes[this.index];
 
     let seekTime = 0;

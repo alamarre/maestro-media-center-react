@@ -3,6 +3,6 @@ export interface INavigation {
   registerElement(element, navOrder): void;
   remove(element): void;
   focusDialog(dialog): void;
-  unfocusDialog(): void;
+  unfocusDialog(dialog): void;
   clear(): void;
 }

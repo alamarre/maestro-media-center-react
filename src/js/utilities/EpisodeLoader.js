@@ -5,16 +5,16 @@ export default class EpisodeLoader {
 
   getListingPromise(folder) {
     var self = this;
-    var promise = new Promise(function(good, bad) {
+    var promise = new Promise(function (good, bad) {
       self.apiRequester.apiRequestPromise("folders", "", {
         data: {
           path: folder,
         },
-      }).then(function(result) {
-        result.files = result.files.sort(window.tvShowSort);
+      }).then(function (result) {
+        result.files = result.files.sort(window["tvShowSort"]);
 
         good(result);
-      }, function(error) {
+      }, function (error) {
         bad(error);
       });
     });
@@ -23,7 +23,7 @@ export default class EpisodeLoader {
   }
 
   getRootPath() {
-    return this.apiRequester.getHost()+"/videos";
+    return this.apiRequester.getHost() + "/videos";
   }
 
 }

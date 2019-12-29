@@ -48,7 +48,7 @@ export default class KeepWatching extends React.Component {
     if (latest.episode.endsWith(".mp4")) {
       latest.episode = latest.episode.substring(0, latest.episode.indexOf(".mp4"));
     }
-    const episode = Object.keys(cachePath.folders[latest.season].files).sort(window.tvShowSort).indexOf(latest.episode);
+    const episode = Object.keys(cachePath.folders[latest.season].files).sort(window["tvShowSort"]).indexOf(latest.episode);
     this.props.videoLoader.loadVideo("tv", folder, episode);
   }
 

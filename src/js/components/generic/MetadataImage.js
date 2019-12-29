@@ -6,21 +6,41 @@ const failedImage = "fallback.png";
 export default class MetadataImage extends Component {
   constructor(props) {
     super(props);
-    this.state={failed: false,};
+    this.state = { failed: false, };
   }
 
   errorHandler() {
-    this.setState({failed: true,});
+    this.setState({ failed: true, });
+  }
+
+  componentDidMount() {
+    if (!window["accountId"]) {
+      this.timer = setInterval(() => {
+        if (!window["accountId"]) {
+          clearInterval(this.timer);
+          this.forceUpdate();
+        }
+      }, 1000);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   }
 
   render() {
+    if (!window["accountId"]) {
+      return <div></div>;
+    }
     const height = this.props.height;
     const width = this.props.width;
     let type = this.props.type.toLowerCase();
-    if(type === "movie") {
+    if (type === "movie") {
       type = "movies";
     }
-    if(type === "collection") {
+    if (type === "collection") {
       type = "collections";
     }
     const name = this.props.name;
@@ -33,7 +53,7 @@ export default class MetadataImage extends Component {
     const image = this.state.failed ? `${dimensions}/${failedImage}` : `${window.accountId}/${dimensions}/${imagePath}.png`;
     const src = `${imageRoot}/${image}`;
 
-    const style = Object.assign({display: "block", width, height,}, this.props.style);
+    const style = Object.assign({ display: "block", width, height, }, this.props.style);
     return <img style={style} src={src} onError={this.errorHandler.bind(this)}></img>;
   }
 }

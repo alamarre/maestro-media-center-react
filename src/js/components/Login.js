@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import ScrollableComponent from "./ScrollableComponent";
+import Scrollable from "./ScrollableComponent";
 
-export default class Login extends ScrollableComponent {
+export default class Login extends React.Component {
 
   constructor(props) {
-    super(props, ["username", "password", "login",]);
-    this.state = Object.assign(this.state, { "error": false, });
+    super(props);
+    this.state = { "error": false, refs: ["username", "password", "login",], };
   }
 
   login() {
@@ -51,10 +51,9 @@ export default class Login extends ScrollableComponent {
       </div>
     </div>;
 
+    const parentRefs = () => this.refs;
+    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
 
-    return (
-      <div>{body}</div>
-    );
   }
 }
 

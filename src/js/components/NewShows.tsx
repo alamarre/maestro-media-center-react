@@ -13,6 +13,8 @@ import FileCache from "../models/FileCache";
 export interface NewShowsProps {
   showProvider: ISimpleDataProvider<RecentlyUpdatedTvShow>;
   navOrder: number;
+  metadataProvider: any;
+  episodeLoader: any;
   cacheProvider: ICacheProvider;
   navigation: INavigation;
   offlineStorage: any;
@@ -89,11 +91,13 @@ export default class NewShows extends React.Component<NewShowsProps, NewShowsSta
       showPicker = <ShowPicker
         router={this.props.router}
         navigation={this.props.navigation}
+        episodeLoader={this.props.episodeLoader}
         offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         showName={this.state.showName}
         showPath={this.state.showPath}
+        metadataProvider={this.props.metadataProvider}
         cancelFunction={this.cancelChooser.bind(this)}
         showCache={this.state.cachePath}
       >

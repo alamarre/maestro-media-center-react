@@ -48,7 +48,7 @@ chromecastListener.initialize();
 const div = document.createElement("div");
 document.body.appendChild(div);
 
-window.tvShowSort = function (a, b) {
+window["tvShowSort"] = function (a, b) {
   if (a.lastIndexOf(".") > -1) {
     a = a.substring(0, a.lastIndexOf("."));
   }

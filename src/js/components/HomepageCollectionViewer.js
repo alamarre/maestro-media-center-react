@@ -13,21 +13,21 @@ export default class HomepageCollectionViewer extends React.Component {
     this.dragging = false;
     props.homepageCollectionManager.getAllCollections().then(collections => {
       collections = collections.filter(c => {
-        if(!c.startDate || !c.endDate) {
+        if (!c.startDate || !c.endDate) {
           return true;
         }
 
         const start = new Date(c.startDate);
         const end = new Date(c.endDate);
         const current = new Date();
-        if(current > start && current < end) {
+        if (current > start && current < end) {
           return true;
         }
         current.setFullYear(start.getFullYear());
         return current > start && current < end;
       })
       for (const collection of collections) {
-        collection.items = collection.items.sort((a, b) => window.tvShowSort(a.name, b.name));
+        collection.items = collection.items.sort((a, b) => window["tvShowSort"](a.name, b.name));
       }
       if (props.updateCount) {
         props.updateCount(collections.length);
