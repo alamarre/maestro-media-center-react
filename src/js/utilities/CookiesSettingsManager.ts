@@ -1,14 +1,18 @@
-export default class CookieSettingsManager {
+import ISettingsManager from "./ISettingsManager";
+import ICookieManager from "./ICookieManager";
 
-  get(name) {
+
+export default class CookieSettingsManager implements ISettingsManager, ICookieManager {
+
+  get(name: string): string {
     return this.getCookie(name);
   }
 
-  set(name, value) {
+  set(name: string, value: string): void {
     this.setCookie(name, value, 1000);
   }
 
-  getCookie(cname) {
+  getCookie(cname: string): string {
     if (localStorage) {
       const item = localStorage.getItem(`cookie-${cname}`);
       if (item) {
@@ -43,15 +47,13 @@ export default class CookieSettingsManager {
     return "";
   }
 
-  setCookie(cname, cvalue, exdays) {
+  setCookie(cname: string, cvalue: string, exdays: number): void {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + d.toGMTString();
+    var expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + "; " + expires;
     if (localStorage) {
       localStorage.setItem(`cookie-${cname}`, JSON.stringify({ expires: d.getTime(), value: cvalue, }));
     }
   }
 }
-
-

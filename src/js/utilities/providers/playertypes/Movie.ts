@@ -1,25 +1,30 @@
-export default class MoviePlayerManager {
-  constructor(episodeLoader, showProgressProvider) {
+import IPlayerManager from "./IPlayerManager";
+
+export default class MoviePlayerManager implements IPlayerManager {
+
+  private movieName: string;
+  private index: number;
+
+  constructor(private episodeLoader, private showProgressProvider) {
     this.episodeLoader = episodeLoader;
     this.showProgressProvider = showProgressProvider;
   }
 
-  async load(parentPath, subdirectory, index, file) {
+  async load(parentPath, subdirectory, index) {
     this.movieName = parentPath;
     this.index = index;
-    this.file = file;
     return await this.updateSource();
   }
 
   async reload() {
-    const result =  await this.updateSource();
+    const result = await this.updateSource();
     result.seekTime = 0;
     return result;
   }
 
   async updateSource() {
     const sourceInfo = await this.episodeLoader.getVideoSource("Movies/" + this.movieName);
-    const {sources, subtitles,} =  sourceInfo;
+    const { sources, subtitles, } = sourceInfo;
     const name = this.movieName;
 
     let seekTime = 0;
@@ -37,7 +42,7 @@ export default class MoviePlayerManager {
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
-  recordProgress(time) {
+  async recordProgress(time) {
     this.showProgressProvider.markStatus("Movies/" + this.movieName, "in progress", time);
   }
 

@@ -1,10 +1,19 @@
+import VideoPlayInformation from "../../../models/VideoPlayInformation";
+
 export default class TvShowPlayerManager {
-  constructor(episodeLoader, showProgressProvider) {
+
+  private parentPath: string;
+  private subdirectory: string;
+  private index: number;
+  private episodes: string[];
+  private parentFolders: string[];
+
+  constructor(private episodeLoader, private showProgressProvider) {
     this.episodeLoader = episodeLoader;
     this.showProgressProvider = showProgressProvider;
   }
 
-  async load(parentPath, subdirectory, index) {
+  async load(parentPath: string, subdirectory: string, index: number): Promise<VideoPlayInformation> {
     this.parentPath = parentPath;
     this.subdirectory = subdirectory;
     this.index = index;
@@ -13,7 +22,7 @@ export default class TvShowPlayerManager {
     return await this.getEpisodes();
   }
 
-  async getEpisodes() {
+  private async getEpisodes(): Promise<VideoPlayInformation> {
     const listing = await this.episodeLoader.getListingPromise(this.parentPath + "/" + this.subdirectory);
     this.episodes = listing.files.sort(window["tvShowSort"]);
     if (this.index == null) {
@@ -22,19 +31,19 @@ export default class TvShowPlayerManager {
     return await this.updateSource();
   }
 
-  async getSeasons() {
+  private async getSeasons(): Promise<void> {
     const listing = await this.episodeLoader.getListingPromise(this.parentPath);
     listing.folders.sort(window["tvShowSort"]);
     this.parentFolders = listing.folders;
   }
 
-  async reload() {
+  async reload(): Promise<VideoPlayInformation> {
     this.subdirectory = this.parentFolders[0];
     this.index = 0;
     return await this.getEpisodes();
   }
 
-  async updateSource() {
+  async updateSource(): Promise<VideoPlayInformation> {
     const parentPath = this.parentPath.startsWith("/") ? this.parentPath : "/" + this.parentPath;
     const episode = this.episodes[this.index];
     const path = parentPath + "/" + this.subdirectory;
@@ -57,18 +66,18 @@ export default class TvShowPlayerManager {
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
-  recordProgress(time) {
+  async recordProgress(time): Promise<void> {
     const parentPath = this.parentPath.startsWith("/") ? this.parentPath : "/" + this.parentPath;
     const episode = this.episodes[this.index];
-    this.showProgressProvider.markStatus(parentPath + "/" + this.subdirectory + "/" + episode, "in progress", time);
+    await this.showProgressProvider.markStatus(parentPath + "/" + this.subdirectory + "/" + episode, "in progress", time);
   }
 
-  async goToNext() {
+  async goToNext(): Promise<VideoPlayInformation> {
     const index = this.index + 1;
 
     if (index < this.episodes.length) {
       this.index = index;
-      return this.updateSource();
+      return await this.updateSource();
     } else {
       for (var i = 0; i + 1 < this.parentFolders.length; i++) {
         if (this.parentFolders[i] == this.subdirectory) {
@@ -77,17 +86,16 @@ export default class TvShowPlayerManager {
           return await this.getEpisodes();
         }
       }
-
       return {};
     }
   }
 
-  async goToPrevious() {
+  async goToPrevious(): Promise<VideoPlayInformation> {
     const index = this.index - 1;
 
     if (index >= 0) {
       this.index = index;
-      return this.updateSource();
+      return await this.updateSource();
     } else {
       for (var i = 0; i + 1 < this.parentFolders.length; i++) {
         if (this.parentFolders[i + 1] == this.subdirectory) {
@@ -99,5 +107,4 @@ export default class TvShowPlayerManager {
     }
   }
 }
-
 

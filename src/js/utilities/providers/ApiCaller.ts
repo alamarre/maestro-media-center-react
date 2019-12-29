@@ -33,9 +33,10 @@ export default class ApiCaller {
     return response;
   }
 
-  async post(module: string, path: string, options: Map<string, any> = new Map()) {
+  async post<T>(module: string, path: string, body: object, options: Map<string, any> = new Map()) {
     const requestOptions: RequestInit = Object.assign({
       method: "POST",
+      body: JSON.stringify(body),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authTokenManager.getToken()}`,
@@ -44,7 +45,8 @@ export default class ApiCaller {
 
     const url = this.getUrl(module, path, options);
     const result = await fetch(url, requestOptions);
-    return await result.json();
+    const response: T = await result.json();
+    return response;
   }
 
   async put(module: string, path: string, options: Map<string, any> = new Map()) {

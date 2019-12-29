@@ -78,37 +78,37 @@ export default class WebSocketRemoteController {
       console.log(message);
       if (message && message.action) {
         switch (message.action) {
-        case "playNext":
-          this.safeRun(self.updateFunctions.next);
-          break;
-        case "playPrevious":
-          this.safeRun(self.updateFunctions.previous);
-          break;
-        case "skipForward":
-          this.safeRun(self.updateFunctions.skipForward);
-          break;
-        case "skipBack":
-          this.safeRun(self.updateFunctions.skipBack);
-          break;
-        case "play":
-          this.safeRun(self.updateFunctions.play);
-          break;
-        case "load":
-          var event = new CustomEvent("maestro-load-video", { detail: message, });
+          case "playNext":
+            this.safeRun(self.updateFunctions.next);
+            break;
+          case "playPrevious":
+            this.safeRun(self.updateFunctions.previous);
+            break;
+          case "skipForward":
+            this.safeRun(self.updateFunctions.skipForward);
+            break;
+          case "skipBack":
+            this.safeRun(self.updateFunctions.skipBack);
+            break;
+          case "play":
+            this.safeRun(self.updateFunctions.play);
+            break;
+          case "load":
+            var event = new CustomEvent("maestro-load-video", { detail: message, });
 
-          document.dispatchEvent(event);
-          break;
-        case "pause":
-          this.safeRun(self.updateFunctions.pause);
-          break;
-        case "seek":
-          if (self.updateFunctions.seek) {
-            self.updateFunctions.seek(parseInt(message.percent));
-          }
-          break;
-        case "toggleVisibility":
-          this.safeRun(self.updateFunctions.toggleVisibility);
-          break;
+            document.dispatchEvent(event);
+            break;
+          case "pause":
+            this.safeRun(self.updateFunctions.pause);
+            break;
+          case "seek":
+            if (self.updateFunctions.seek) {
+              self.updateFunctions.seek(parseInt(message.percent));
+            }
+            break;
+          case "toggleVisibility":
+            this.safeRun(self.updateFunctions.toggleVisibility);
+            break;
         }
       }
 

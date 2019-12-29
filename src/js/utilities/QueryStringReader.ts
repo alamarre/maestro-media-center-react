@@ -1,8 +1,11 @@
-export default class QueryStringReader {
+import IQueryStringReader from "./IQueryStringReader";
+
+export default class QueryStringReader implements IQueryStringReader {
+  private parameters = {};
   constructor() {
 
   }
-  parseParameters(queryString) {
+  private parseParameters(queryString: string): object {
     var params = queryString.split("&");
     var results = {};
     for (var i = 0; i < params.length; i++) {
@@ -12,20 +15,19 @@ export default class QueryStringReader {
     return results;
   }
 
-  readQueryString() {
+  private readQueryString(): void {
     var queryString = window.location.search.substring(1);
     this.parameters = this.parseParameters(queryString);
   }
 
-  getParameter(name) {
+  getParameter(name: string): string {
     this.readQueryString();
     return this.parameters[name];
   }
 
-  getParameterFromUrl(url, name) {
-    var queryString = url.substring(url.indexOf("?") + 1);
-    var parameters = this.parseParameters(queryString);
+  getParameterFromUrl(url: string, name: string): string {
+    const queryString = url.substring(url.indexOf("?") + 1);
+    const parameters = this.parseParameters(queryString);
     return parameters[name];
   }
 }
-

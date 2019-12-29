@@ -1,5 +1,14 @@
-export default class MovieCollectionManager {
-  constructor(rootFolder, collectionsManager, episodeLoader, showProgressProvider) {
+import IPlayerManager from "./IPlayerManager";
+import VideoPlayInformation from "../../../models/VideoPlayInformation";
+
+export default class MovieCollectionManager implements IPlayerManager {
+
+  private collection: string;
+  private index: number;
+  private movies: string[];
+  private parentFolders: string[];
+
+  constructor(private rootFolder, private collectionsManager, private episodeLoader, private showProgressProvider) {
     this.rootFolder = rootFolder;
     this.collectionsManager = collectionsManager;
     this.episodeLoader = episodeLoader;
@@ -10,6 +19,11 @@ export default class MovieCollectionManager {
     this.collection = parentPath;
     this.index = index;
     this.movies = (await this.collectionsManager.getCollection(parentPath)).movies;
+    return await this.updateSource();
+  }
+
+  async reload(): Promise<VideoPlayInformation> {
+    this.index = 0;
     return await this.updateSource();
   }
 
@@ -24,14 +38,14 @@ export default class MovieCollectionManager {
     }
 
     const path = this.collection;
-    const collectionPath =  await this.collectionsManager.getPath(name);
+    const collectionPath = await this.collectionsManager.getPath(name);
     const sourceInfo = await this.episodeLoader.getVideoSource(collectionPath);
-    const {sources, subtitles,} =  sourceInfo;
+    const { sources, subtitles, } = sourceInfo;
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
-  recordProgress(time) {
-    this.showProgressProvider.markStatus(this.rootFolder + "/" + this.collection + "/" + this.index, "in progress", time);
+  async recordProgress(time) {
+    await this.showProgressProvider.markStatus(this.rootFolder + "/" + this.collection + "/" + this.index, "in progress", time);
   }
 
   async goToNext() {
@@ -53,5 +67,3 @@ export default class MovieCollectionManager {
   }
 
 }
-
-

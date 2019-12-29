@@ -1,8 +1,14 @@
+import ICookieManager from "./ICookieManager";
+import IQueryStringReader from "./IQueryStringReader";
+
+
 export default class AuthTokenManager {
+  private queryStringReader: IQueryStringReader;
+  private cookieManager: ICookieManager;
+
   constructor(queryStringReader, cookieManager) {
     this.queryStringReader = queryStringReader;
     this.cookieManager = cookieManager;
-    this.profile = "";
   }
 
   isAuthenticated() {
@@ -10,13 +16,11 @@ export default class AuthTokenManager {
     return token && token !== "null";
   }
 
-  getCookie(cname)
-  {
+  getCookie(cname) {
     return this.cookieManager.getCookie(cname);
   }
 
-  setCookie(cname, cvalue, exdays)
-  {
+  setCookie(cname, cvalue, exdays) {
     return this.cookieManager.setCookie(cname, cvalue, exdays);
   }
 
@@ -25,7 +29,7 @@ export default class AuthTokenManager {
   }
 
   setToken(token) {
-    if (typeof token!="undefined") {
+    if (typeof token != "undefined") {
       this.setCookie("access_token", token, 365);
     }
   }
@@ -37,10 +41,10 @@ export default class AuthTokenManager {
   getProfile() {
     //return this.profile;
     const loc = window.location.hash.indexOf("?");
-    if(loc > -1) {
+    if (loc > -1) {
       const query = window.location.hash.substring(loc);
       const urlParams = new URLSearchParams(query);
-      if(urlParams.has("profile")  && urlParams.get("profile")) {
+      if (urlParams.has("profile") && urlParams.get("profile")) {
         return urlParams.get("profile");
       }
     }
@@ -49,7 +53,7 @@ export default class AuthTokenManager {
 
   setProfile(profile) {
     //this.profile = profile;
-    if (typeof profile!="undefined") {
+    if (typeof profile != "undefined") {
       this.setCookie("user_profile", profile, 365);
     }
   }

@@ -1,5 +1,17 @@
-export default class PlaylistManager {
-  constructor(rootFolder, playlistManager, episodeLoader, showProgressProvider) {
+import IPlayerManager from "./IPlayerManager";
+import PlaylistEntry from "../../../models/PlaylistEntry";
+
+export default class PlaylistManager implements IPlayerManager {
+  private playlist: string;
+  private index: number;
+  private movies: PlaylistEntry[];
+
+  constructor(
+    private rootFolder,
+    private playlistManager,
+    private episodeLoader,
+    private showProgressProvider) {
+
     this.rootFolder = rootFolder;
     this.playlistManager = playlistManager;
     this.episodeLoader = episodeLoader;
@@ -30,11 +42,11 @@ export default class PlaylistManager {
     const name = video.file;
     const path = this.playlist;
     const sourceInfo = await this.episodeLoader.getVideoSource(video.path);
-    const {sources, subtitles,} =  sourceInfo;
+    const { sources, subtitles, } = sourceInfo;
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 
-  recordProgress(time) {
+  async recordProgress(time) {
     this.showProgressProvider.markStatus(this.rootFolder + "/" + this.playlist + "/" + this.index, "in progress", time);
   }
 

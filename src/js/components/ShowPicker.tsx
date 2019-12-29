@@ -149,8 +149,6 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
       }
     }
     const folder = this.props.showPath + "/" + this.state.season;
-    //let url = "view?type=tv&index="+index+"&folder="+encodeURIComponent(folder)+"&file="+encodeURIComponent(episode);
-    //this.props.router.push(url);
     this.props.videoLoader.loadVideo("tv", folder, index);
   }
 

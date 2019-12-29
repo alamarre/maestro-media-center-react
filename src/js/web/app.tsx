@@ -78,7 +78,7 @@ div.id = "app";
 document.body.appendChild(div);
 
 import LoginProvider from "../utilities/LoginProvider";
-const loginProvider = new LoginProvider(apiRequester);
+const loginProvider = new LoginProvider(apiCaller);
 import LoginComponent from "../components/Login";
 
 import ProfileProvider from "../utilities/providers/ProfileProvider";
