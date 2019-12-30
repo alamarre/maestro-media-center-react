@@ -12,26 +12,26 @@ var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http"
 var port = process.env.PORT
   || window.location.port
   || (scheme == "http" ? 80 : 443);
-import jquery from "jquery";
 
-const MAIN_HOST = process.env.MAIN_HOST;
+//const MAIN_HOST = process.env.MAIN_HOST;
 
 
 import Home from "./Home";
 import AuthTokenManger from "../utilities/AuthTokenManager";
 import SettingsManager from "../utilities/CookiesSettingsManager";
-import ApiRequester from "../utilities/ApiRequester";
+//import ApiRequester from "../utilities/ApiRequester";
 import ApiCaller from "../utilities/providers/ApiCaller";
 import QueryStringReader from "../utilities/QueryStringReader";
 // import EpisodeLoader from "../utilities/EpisodeLoader";
 
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), new SettingsManager());
-const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
-const mainHostApiCaller = new ApiCaller(authTokenManager, scheme, MAIN_HOST + ":" + port);
+//const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
+//const mainHostApiCaller = new ApiCaller(authTokenManager, scheme, MAIN_HOST + ":" + port);
+const apiCaller = new ApiCaller(authTokenManager, scheme, host + ":" + port);
 
 
 import LoginProvider from "../utilities/LoginProvider";
-const loginProvider = new LoginProvider(apiRequester);
+const loginProvider = new LoginProvider(apiCaller);
 import LoginComponent from "../components/Login";
 
 const div = document.createElement("div");
@@ -54,7 +54,7 @@ const postLoginFunction = (router) => {
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} >
-      <Route path="metadata" component={(props) => (<Metadata {...props} apiRequester={apiRequester} />)} />
+      <Route path="metadata" component={(props) => (<Metadata {...props} apiCaller={apiCaller} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} postLoginFunction={postLoginFunction} login={loginProvider} />)} />
     </Route>
   </Router>

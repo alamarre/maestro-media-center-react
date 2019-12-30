@@ -49,9 +49,10 @@ export default class ApiCaller {
     return response;
   }
 
-  async put(module: string, path: string, options: Map<string, any> = new Map()) {
+  async put(module: string, path: string, body: object, options: Map<string, any> = new Map()) {
     const requestOptions: RequestInit = Object.assign({
       method: "PUT",
+      body: JSON.stringify(body),
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authTokenManager.getToken()}`,
