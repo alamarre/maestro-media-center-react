@@ -33,8 +33,7 @@ export default class Home extends EasyInputComponent {
           navOrder={0}
           navigation={this.props.navigation}
           episodeLoader={this.props.episodeLoader}
-          offlineStorage={this.props.offlineStorage}
-          collectionsManager={this.props.collectionsManager}
+                    collectionsManager={this.props.collectionsManager}
           playlistManager={this.props.playlistManager}
           imageRoot={this.props.imageRoot}
           router={this.props.router}

@@ -110,7 +110,6 @@ export default class SearchResults extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         showPath={this.state.showPath}
@@ -124,7 +123,6 @@ export default class SearchResults extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         collectionsManager={this.props.collectionsManager}
         showProgressProvider={this.props.showProgressProvider}
@@ -136,7 +134,6 @@ export default class SearchResults extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         playlistManager={this.props.playlistManager}
         showProgressProvider={this.props.showProgressProvider}
@@ -148,7 +145,6 @@ export default class SearchResults extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         playlistManager={this.props.playlistManager}
         showProgressProvider={this.props.showProgressProvider}

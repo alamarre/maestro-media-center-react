@@ -10,7 +10,6 @@ import KeepWatching from "../models/KeepWatchingData";
 export interface ShowPickerProps {
   navOrder?: number;
   navigation: INavigation;
-  offlineStorage: any;
   showProgressProvider: any;
   videoLoader: any;
   router: any;
@@ -117,7 +116,7 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
   }
 
   downloadLegacy(episode) {
-    const files = Object.keys(this.props.showCache.folders[this.state.season].files);
+    /*const files = Object.keys(this.props.showCache.folders[this.state.season].files);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
       if (files[i] == episode) {
@@ -137,7 +136,7 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
     }, path, (progress) => {
       //this.setState({ downloadProgress$: progress, });
       this.downloadProgress[episode] = progress;
-    });
+    });*/
   }
 
   play(episode) {
@@ -170,17 +169,17 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
         overview = metadata.overview;
       }
       const ref = `episode-${index}`;
-      if (this.props.offlineStorage.canStoreOffline()) {
-        downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)
-        }> </button>;
-        const progress = this.downloadProgress[episode];
-        if (this.state.episodeSources && this.state.episodeSources.length > index) {
-          //downloadButton = <a href={new URL(this.state.episodeSources[index].sources[0]).href + "?download=true"} download>Download</a>;
-        }
-        if (progress && progress.state) {
-          downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}% </span>;
-        }
+
+      downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)
+      }> </button>;
+      const progress = this.downloadProgress[episode];
+      if (this.state.episodeSources && this.state.episodeSources.length > index) {
+        //downloadButton = <a href={new URL(this.state.episodeSources[index].sources[0]).href + "?download=true"} download>Download</a>;
       }
+      if (progress && progress.state) {
+        downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}% </span>;
+      }
+
       return <div style={{ display: "table", margin: "20px", }} key={episode} >
         <MetadataImage style={{ display: "table-cell", verticalAlign: "top", }}
           width={227} height={127} type="episode" name={episode} show={this.props.showName}

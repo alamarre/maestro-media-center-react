@@ -9,7 +9,6 @@ export interface PlaylistPickerProps {
   navOrder?: number;
   navigation: INavigation;
   playlistManager: any;
-  offlineStorage: any;
   showProgressProvider: any;
   videoLoader: any;
   router: any;

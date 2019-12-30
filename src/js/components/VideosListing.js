@@ -105,8 +105,7 @@ export default class VideosListing extends React.Component {
         videoLoader={this.props.videoLoader}
         episodeLoader={this.props.episodeLoader}
         showProgressProvider={this.props.showProgressProvider}
-        offlineStorage={this.props.offlineStorage}
-        showName={this.state.showName}
+                showName={this.state.showName}
         showPath={this.state.showPath}
         cancelFunction={this.cancelShowChooser.bind(this)}
         showCache={this.state.cachePath}>
@@ -118,8 +117,7 @@ export default class VideosListing extends React.Component {
         metadataProvider={this.props.metadataProvider}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
-        offlineStorage={this.props.offlineStorage}
-        movieName={this.state.movieName}
+                movieName={this.state.movieName}
         cancelFunction={this.cancelShowChooser.bind(this)}>
       </MoviePicker>;
     }

@@ -17,7 +17,6 @@ export interface NewShowsProps {
   episodeLoader: any;
   cacheProvider: ICacheProvider;
   navigation: INavigation;
-  offlineStorage: any;
   showProgressProvider: any;
   videoLoader: any;
   router: any;
@@ -92,7 +91,6 @@ export default class NewShows extends React.Component<NewShowsProps, NewShowsSta
         router={this.props.router}
         navigation={this.props.navigation}
         episodeLoader={this.props.episodeLoader}
-        offlineStorage={this.props.offlineStorage}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         showName={this.state.showName}

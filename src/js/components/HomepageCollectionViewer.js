@@ -86,8 +86,7 @@ export default class HomepageCollectionViewer extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-        offlineStorage={this.props.offlineStorage}
-        videoLoader={this.props.videoLoader}
+                videoLoader={this.props.videoLoader}
         playlistManager={this.props.playlistManager}
         showProgressProvider={this.props.showProgressProvider}
         metadataProvider={this.props.metadataProvider}

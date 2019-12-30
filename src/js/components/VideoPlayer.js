@@ -164,12 +164,12 @@ export default class VideoPlayer extends React.Component {
       subdirectory = "";
     }
     const { sources, subtitles, name, seekTime, path, } = await this.playerTypeHandlers[this.type].load(parentPath, subdirectory, index);
-    if (this.props.offlineStorage) {
+    /*if (this.props.offlineStorage) {
       const data = await this.props.offlineStorage.getVideo(sources[0]);
       if (data) {
         sources[0] = data;
       }
-    }
+    }*/
 
     const orderedSources = [].concat(sources);
     for (const source of sources) {
