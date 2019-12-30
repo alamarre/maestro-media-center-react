@@ -1,7 +1,7 @@
 
 export default class VideoLoader {
-  constructor(remoteController) {
-    this.remoteController = remoteController;
+  private router;
+  constructor(private remoteController) {
   }
 
   setRouter(router) {

@@ -1,22 +1,44 @@
 import React from "react";
 
-import ScrollableComponent from "./ScrollableComponent";
+import Scrollable from "./ScrollableComponent";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import ISettingsManager from "../utilities/ISettingsManager";
+import WebSocketSender from "../utilities/WebSocketSender";
+import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
 
-export default class Settings extends ScrollableComponent {
+export interface SettingsProps {
+  navOrder?: number;
+  navigation: INavigation;
+  settingsManager: ISettingsManager;
+  router: any;
+  cancelFunction: () => void;
+  remoteController: WebSocketRemoteController;
+  webSocketSender: WebSocketSender;
+}
+
+export interface SettingsState {
+  refs: string[];
+  remoteControl: boolean;
+  myClientName: string;
+  remoteClients: string[];
+  playToRemoteClient: string;
+  lockProfilePin: number;
+}
+
+export default class Settings extends React.Component<SettingsProps, SettingsState> {
 
   constructor(props) {
-    super(props, ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",], true);
+    super(props, true);
+    //this.allRefs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
 
-    this.allRefs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
-
-    this.state = Object.assign({}, this.state, {
-      remoteControl: this.props.settingsManager.get("remoteControl") == "true" || this.props.settingsManager.get("remoteControl") === true,
+    this.state = {
+      remoteControl: this.props.settingsManager.get("remoteControl") == "true",
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
-      lockProfilePin: this.props.settingsManager.get("lockProfilePin"),
-    });
-    this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
+      lockProfilePin: parseInt(this.props.settingsManager.get("lockProfilePin")),
+      refs: ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",],
+    };
     this.handleClientNameChange = this.handleClientNameChange.bind(this);
     this.handleSendToClientNameChange = this.handleSendToClientNameChange.bind(this);
   }
@@ -25,21 +47,20 @@ export default class Settings extends ScrollableComponent {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
-
-    this.setState({ [name]: value, });
     if (this.props.settingsManager) {
       this.props.settingsManager.set(name, value);
     }
+
+    return value;
   }
 
   componentDidMount() {
-    super.componentDidMount();
-    document.addEventListener("maestro-remote-client-list-updated", (event) => {
+    document.addEventListener("maestro-remote-client-list-updated", (event: any) => {
       this.setState({ "remoteClients": event.detail.ids, });
     });
 
     this.setState({
-      remoteControl: this.props.settingsManager.get("remoteControl") == "true" || this.props.settingsManager.get("remoteControl") === true,
+      remoteControl: this.props.settingsManager.get("remoteControl") == "true",
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
@@ -50,7 +71,9 @@ export default class Settings extends ScrollableComponent {
     const value = event.target.value;
 
     this.handleInputChange(event);
+
     if (value) {
+      this.setState({ myClientName: value, });
       this.props.remoteController.updateClientName(value);
     }
   }
@@ -59,12 +82,9 @@ export default class Settings extends ScrollableComponent {
     const value = event.target.value;
 
     this.handleInputChange(event);
+    this.setState({ playToRemoteClient: value, });
     this.props.webSocketSender.setClient(value);
 
-  }
-
-  handleCheckBoxChange(event) {
-    this.handleInputChange(event);
   }
 
   switchProfile() {
@@ -96,19 +116,20 @@ export default class Settings extends ScrollableComponent {
       const pinEntered = window.prompt("Please enter the pin");
       if (pinEntered != pinNeeded) {
         alert("Wrong pin");
-        this.setState({ "lockProfilePin": pinNeeded, });
+        this.setState({ "lockProfilePin": parseInt(pinNeeded), });
         return;
       }
       this.props.settingsManager.set("lockProfilePin", null);
       this.setState({ "lockProfilePin": null, });
       return;
     }
-    const pin = prompt("Set a pin");
-    if (!RegExp("^[1-9]{1}[0-9]*$").test(pin)) {
+    const pinString = prompt("Set a pin");
+    if (!RegExp("^[1-9]{1}[0-9]*$").test(pinString)) {
       alert("PIN must be a number");
       return;
     }
-    this.props.settingsManager.set("lockProfilePin", pin);
+    const pin = parseInt(pinString);
+    this.props.settingsManager.set("lockProfilePin", pinString);
     this.setState({ "lockProfilePin": pin, });
   }
 
@@ -152,9 +173,9 @@ export default class Settings extends ScrollableComponent {
       </div>
 
     </div>;
-    return (
-      <div>{body}</div>
-    );
+    const parentRefs = () => this.refs;
+    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
+
   }
 }
 

@@ -15,10 +15,10 @@ var host = process.env.HOST || window.location.hostname;
 var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http" : "https");
 var port = process.env.PORT
   || window.location.port
-  || (scheme == "http" ? 80 : 443);
+  || (scheme == "http" ? "80" : "443");
 const wsHost = "j5095i3iw3.execute-api.us-east-1.amazonaws.com/main" || process.env.WEBSOCKET_HOST || host;
-var wsPort = process.env.WEBSOCKET_PORT || port;
-import jquery from "jquery";
+const wsPortString = process.env.WEBSOCKET_PORT || port;
+const wsPort = parseInt(wsPortString);
 
 import App from "../components/App";
 
@@ -28,11 +28,9 @@ import VideosListing from "../components/VideosListing";
 import Settings from "../components/Settings";
 
 import AuthTokenManger from "../utilities/AuthTokenManager";
-import ApiRequester from "../utilities/ApiRequester";
 import ApiCaller from "../utilities/providers/ApiCaller";
 import dataProviderFactory from "../utilities/providers/data";
 import QueryStringReader from "../utilities/QueryStringReader";
-import EpisodeLoader from "../utilities/EpisodeLoader";
 import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
 import AccountProvider from "../utilities/providers/AccountProvider";
 import CacheProvider from "../utilities/providers/CacheProvider";
@@ -54,21 +52,19 @@ const keyboardNavigation = new KeyboardNavigation();
 
 const settingsManager = new SettingsManager();
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), settingsManager);
-var apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
 
 const apiCaller = new ApiCaller(authTokenManager, scheme, host + ":" + port);
 const dataProviders = dataProviderFactory(apiCaller);
-const accountProvider = new AccountProvider(apiRequester);
+const accountProvider = new AccountProvider(apiCaller);
 
 import WebSocketSender from "../utilities/WebSocketSender";
 const webSocketSender = new WebSocketSender(wsHost, wsPort, authTokenManager);
 webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
 webSocketSender.connect();
 
-var episodeLoader = new EpisodeLoader(apiRequester);
 const cacheProvider = new CacheProvider(apiCaller);
-const showProgressProvider = new ShowProgressProvider(apiRequester, cacheProvider);
-const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiRequester, cacheProvider, showProgressProvider);
+const showProgressProvider = new ShowProgressProvider(apiCaller, cacheProvider);
+const cacheBasedEpisodeProvider = new CacheBasedEpisodeProvider(apiCaller, cacheProvider, showProgressProvider);
 
 var webSocketRemoteController = new WebSocketRemoteController(wsHost, settingsManager.get("myClientName"), wsPort, authTokenManager);
 var div = document.createElement("div");
@@ -81,23 +77,23 @@ import LoginComponent from "../components/Login";
 
 import ProfileProvider from "../utilities/providers/ProfileProvider";
 import ChooseProfile from "../components/ChooseProfile";
-const profileProvider = new ProfileProvider(apiRequester);
+const profileProvider = new ProfileProvider(apiCaller);
 
 import PlaylistProvider from "../utilities/providers/PlaylistProvider";
-const playlistProvider = new PlaylistProvider(apiRequester, cacheProvider);
+const playlistProvider = new PlaylistProvider(apiCaller, cacheProvider);
 
 import CachedBasedSearch from "../utilities/providers/CacheBasedSearch";
 const cacheBasedSearch = new CachedBasedSearch(cacheProvider, playlistProvider);
 
-const searchBasedShowProvider = new SearchBasedShowProvider(apiRequester, cacheProvider, showProgressProvider, cacheBasedSearch);
+const searchBasedShowProvider = new SearchBasedShowProvider(apiCaller, cacheProvider, showProgressProvider, cacheBasedSearch);
 
 const movieInfoProvider = new MovieInfoProvider(cacheProvider);
-const collectionsManager = new CollectionsManager(apiRequester, movieInfoProvider);
+const collectionsManager = new CollectionsManager(apiCaller, movieInfoProvider);
 
-const homepageCollectionManager = new HomepageCollectionManager(apiRequester);
+const homepageCollectionManager = new HomepageCollectionManager(apiCaller);
 
 import NewMoviesProvider from "../utilities/providers/NewMoviesProvider";
-const newMoviesProvider = new NewMoviesProvider(apiRequester, cacheProvider);
+const newMoviesProvider = new NewMoviesProvider(apiCaller, cacheProvider);
 
 const cordovaOfflineStorage = new CordovaOfflineStorage(cacheBasedEpisodeProvider);
 const offlineStorage = cordovaOfflineStorage.canStoreOffline() ?
@@ -119,9 +115,9 @@ window["tvShowSort"] = function (a, b) {
 const imageRoot = "https://maestro-images.omny.ca";
 
 import MetadataProvider from "../utilities/providers/MetadataProvider";
-const metadataProvider = new MetadataProvider(apiRequester);
+const metadataProvider = new MetadataProvider(apiCaller);
 
-episodeLoader = cacheBasedEpisodeProvider;
+const episodeLoader = cacheBasedEpisodeProvider;
 render((
   <Router history={hashHistory}>
     <Route path="/" component={(props) => (<App {...props} dataProviders={dataProviders} homepageCollectionManager={homepageCollectionManager} navigation={keyboardNavigation} accountProvider={accountProvider} newMoviesProvider={newMoviesProvider} offlineStorage={offlineStorage} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} >

@@ -1,10 +1,11 @@
+import ApiCaller from "./providers/ApiCaller";
+import HomepageCollection from "../models/HomepageCollection";
 export default class HomepageCollectionManager {
-  constructor(apiRequester) {
-    this.apiRequester = apiRequester;
+  constructor(private apiCaller: ApiCaller) {
   }
 
-  async getCollections() {
-    return await this.apiRequester.apiRequestPromise("homepage_collections", "", {});
+  async getCollections(): Promise<HomepageCollection[]> {
+    return await this.apiCaller.get<HomepageCollection[]>("homepage_collections", "");
   }
 
   async getAllCollections() {
@@ -18,7 +19,7 @@ export default class HomepageCollectionManager {
   }
 
   async getCollection(collection) {
-    return await this.apiRequester.apiRequestPromise("homepage_collections", collection, {});
+    return await this.apiCaller.get<HomepageCollection>("homepage_collections", collection);
   }
 }
 

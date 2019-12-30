@@ -1,5 +1,14 @@
+import AuthTokenManager from "./AuthTokenManager";
 export default class WebSocketRemoteController {
-  constructor(host, clientName, webSocketPort, authTokenManager) {
+  private webSocketUrl: string;
+  private webSocket: any;
+  private updateFunctions: { [key: string]: (x: any) => void };
+
+  constructor(
+    private host: string,
+    private clientName: string,
+    webSocketPort: number,
+    private authTokenManager: AuthTokenManager) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
     this.authTokenManager = authTokenManager;
     const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
@@ -13,7 +22,6 @@ export default class WebSocketRemoteController {
     const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
     this.webSocketUrl = `${protocol}://${host}${portString}`;
     this.clientName = clientName;
-    this.guid = clientName;
   }
 
   updateClientName(clientName) {

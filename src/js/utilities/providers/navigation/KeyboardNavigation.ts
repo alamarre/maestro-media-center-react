@@ -1,4 +1,4 @@
-import { INavigation, } from "./INavigation";
+import INavigation from "./INavigation";
 
 export interface FocusableItem {
   selectCurrent();

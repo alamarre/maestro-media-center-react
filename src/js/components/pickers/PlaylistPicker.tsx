@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, } from "react-bootstrap";
-import { INavigation, } from "../../utilities/providers/navigation/INavigation";
+import INavigation from "../../utilities/providers/navigation/INavigation";
 import Scrollable from "../ScrollableComponent";
 import KeepWatching from "../../models/KeepWatchingData";
 import PlaylistEntry from "../../models/PlaylistEntry";

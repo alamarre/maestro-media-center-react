@@ -3,7 +3,7 @@ import { Modal, } from "react-bootstrap";
 
 import MetadataImage from "../generic/MetadataImage";
 import KeepWatching from "../../models/KeepWatchingData";
-import { INavigation, } from "../../utilities/providers/navigation/INavigation";
+import INavigation from "../../utilities/providers/navigation/INavigation";
 import Scrollable from "../ScrollableComponent";
 import MovieMetadata from "../../models/MovieMetadata";
 

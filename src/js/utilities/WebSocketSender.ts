@@ -1,13 +1,18 @@
+import AuthTokenManager from "./AuthTokenManager";
+
 export default class WebSocketSender {
-  constructor(host, webSocketPort, authTokenManager) {
+  private webSocketUrl: string;
+  private webSocket: any;
+  private devices: string[];
+  private client: string;
+  constructor(host, webSocketPort, private authTokenManager: AuthTokenManager) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
     const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
     this.webSocketUrl = `${protocol}://${host}${portString}`;
     this.authTokenManager = authTokenManager;
-    this.updateFunctions = {};
     this.devices = [];
   }
-  
+
   updateSettings(host, webSocketPort) {
     const protocol = (webSocketPort == 443) ? "wss" : "ws";
     const portString = (webSocketPort == 80 || webSocketPort == 443) ? "" : `:${webSocketPort}`;
@@ -19,28 +24,28 @@ export default class WebSocketSender {
   }
 
   connect() {
-    if(!this.webSocketUrl) {
+    if (!this.webSocketUrl) {
       return;
     }
     this.webSocket = new WebSocket(this.webSocketUrl);
     var ws = this.webSocket;
-    ws.onopen =  () => {
+    ws.onopen = () => {
       ws.send(JSON.stringify({
-        "action" : "list",
+        "action": "list",
         "keepUpdating": true,
         token: this.authTokenManager.getToken(),
       }));
     };
-        
+
     ws.onclose = () => {
       this.connect();
     };
     ws.onmessage = (evt) => {
       var received_msg = evt.data;
       var message = JSON.parse(received_msg);
-      if(message.action == "list") {
+      if (message.action == "list") {
         this.devices = message.ids;
-        const event = new CustomEvent("maestro-remote-client-list-updated", {detail:message,});
+        const event = new CustomEvent("maestro-remote-client-list-updated", { detail: message, });
         document.dispatchEvent(event);
       }
     };
@@ -116,8 +121,8 @@ export default class WebSocketSender {
 
   sendMessage(message) {
     message.client = this.client;
-    message.token = this.authTokenManager.getToken(),
+    message.token = this.authTokenManager.getToken();
     this.webSocket.send(JSON.stringify(message));
   }
 }
-  
+

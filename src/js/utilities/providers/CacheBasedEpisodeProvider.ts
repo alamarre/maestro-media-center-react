@@ -1,4 +1,9 @@
-function timeoutPromise(ms, promise) {
+import ApiCaller from "./ApiCaller";
+import Server from "../../models/Server";
+import VideoSourceInformation from "../../models/VideoSourceInformation";
+import ICacheProvider from "./ICacheProvider";
+
+function timeoutPromise(ms, promise): Promise<any> {
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       reject(new Error("promise timeout"));
@@ -16,27 +21,25 @@ function timeoutPromise(ms, promise) {
   });
 }
 
-
 export default class CacheBasedEpisodeProvider {
-  constructor(apiRequester, cacheProvider, showProgressProvider) {
-    this.apiRequester = apiRequester;
-    this.cacheProvider = cacheProvider;
-    this.showProgressProvider = showProgressProvider;
+  private serverPromise: Promise<Server[]>;
+  constructor(
+    private apiCaller: ApiCaller, private cacheProvider: ICacheProvider, private showProgressProvider) {
     this.serverPromise = this.updateServers();
   }
 
-  async updateServers() {
-    const result = await this.getAvailableServers();
+  async updateServers(): Promise<Server[]> {
+    const result = this.getAvailableServers();
     this.serverPromise = result;
     setTimeout(() => this.updateServers(), 30000);
-    return result;
+    return await result;
   }
 
-  getRootPath() {
-    return this.apiRequester.getHost() + "/videos";
+  getRootPath(): string {
+    return this.apiCaller.getHost() + "/videos";
   }
 
-  getListingPromise(folder) {
+  getListingPromise(folder): Promise<any> {
     var promise = new Promise((good, bad) => {
       this.cacheProvider.getCache()
         .then((cache) => {
@@ -51,7 +54,7 @@ export default class CacheBasedEpisodeProvider {
             }
           }
 
-          const result = {};
+          const result = { folders: {}, files: [], };
           result.folders = Object.keys(current.folders);
           result.files = Object.keys(current.files);
 
@@ -64,7 +67,7 @@ export default class CacheBasedEpisodeProvider {
     return promise;
   }
 
-  recordProgress(video, status) {
+  async recordProgress(video, status): Promise<void> {
     this.cacheProvider.getRootFolders().then((rootFolders) => {
       if (video.startsWith("/")) {
         video = video.substring(1);
@@ -86,17 +89,17 @@ export default class CacheBasedEpisodeProvider {
     });
   }
 
-  async getVideoSource(path) {
-    return await this.apiRequester.apiRequestPromise("folders", `sources?path=${encodeURIComponent(path)}`, {});
+  async getVideoSource(path): Promise<VideoSourceInformation> {
+    return await this.apiCaller.get("folders", `sources?path=${encodeURIComponent(path)}`);
   }
 
-  async getServers() {
-    return await this.apiRequester.apiRequestPromise("servers", "", {});
+  async getServers(): Promise<Server[]> {
+    return await this.apiCaller.get<Server[]>("servers", "");
   }
 
-  async getAvailableServers() {
+  async getAvailableServers(): Promise<Server[]> {
     const servers = await this.getServers();
-    const availableServers = [];
+    const availableServers: Server[] = [];
 
     for (const server of servers) {
       try {
@@ -114,7 +117,7 @@ export default class CacheBasedEpisodeProvider {
     return availableServers;
   }
 
-  async getAvailableLocalSource(source) {
+  async getAvailableLocalSource(source): Promise<string> {
     const url = new URL(source);
     const servers = await this.serverPromise;
     const matching = servers.filter(s => s.publicHostname === url.hostname);

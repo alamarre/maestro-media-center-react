@@ -1,7 +1,7 @@
 import FileCache from "../../models/FileCache";
 import RootFolder from "../../models/RootFolder";
 
-export interface ICacheProvider {
+export default interface ICacheProvider {
   getCache(): Promise<FileCache>;
   fetchCache(): Promise<FileCache>;
   reload(): Promise<void>;

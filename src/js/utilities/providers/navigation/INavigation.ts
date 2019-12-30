@@ -1,4 +1,4 @@
-export interface INavigation {
+export default interface INavigation {
   registerElementCollection(collection, navOrder): void;
   registerElement(element, navOrder): void;
   remove(element): void;

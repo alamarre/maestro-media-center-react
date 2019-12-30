@@ -1,8 +1,9 @@
 import normalizedMatch from "../NormalizedMatch";
+import ICacheProvider from "./ICacheProvider";
 
 export default class MovieInfoProvider {
 
-  constructor(cacheProvider) {
+  constructor(private cacheProvider: ICacheProvider) {
     this.cacheProvider = cacheProvider;
   }
 

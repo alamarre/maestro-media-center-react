@@ -6,8 +6,8 @@ import MetadataImage from "./generic/MetadataImage";
 
 import ISimpleDataProvider from "../utilities/providers/data/ISimpleDataProvider";
 import RecentlyUpdatedTvShow from "../models/RecentlyUpdatedTvShow";
-import { INavigation, } from "../utilities/providers/navigation/INavigation";
-import { ICacheProvider, } from "../utilities/providers/ICacheProvider";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import ICacheProvider from "../utilities/providers/ICacheProvider";
 import FileCache from "../models/FileCache";
 
 export interface NewShowsProps {

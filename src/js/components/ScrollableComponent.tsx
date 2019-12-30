@@ -1,5 +1,5 @@
 import React, { ReactInstance, } from "react";
-import { INavigation, } from "../utilities/providers/navigation/INavigation";
+import INavigation from "../utilities/providers/navigation/INavigation";
 
 export type ScrollableProps = {
   navigation: INavigation;

@@ -1,4 +1,6 @@
 import elasticlunr from "elasticlunr";
+import ICacheProvider from "./ICacheProvider";
+import PlaylistProvider from "./PlaylistProvider";
 
 function addFilesInFolder(index, currentCache, path) {
   if (currentCache && currentCache.files) {
@@ -25,11 +27,12 @@ function addFilesInFolder(index, currentCache, path) {
 }
 
 export default class CacheBasedSearch {
-  constructor(cacheProvider, playlistProvider) {
-    this.cacheProvider = cacheProvider;
+  private cacheIndex: any;
+  private indexPromise: Promise<any>;
+
+  constructor(private cacheProvider: ICacheProvider, private playlistProvider: PlaylistProvider) {
     this.cacheIndex = null;
     this.indexPromise = null;
-    this.playlistProvider = playlistProvider;
 
     this.createIndex();
   }
