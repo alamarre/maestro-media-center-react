@@ -2,8 +2,26 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import Scrollable from "./ScrollableComponent";
+import LoginProvider from "../utilities/LoginProvider";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import { Router, } from "react-router";
+import AuthTokenManager from "../utilities/AuthTokenManager";
 
-export default class Login extends React.Component {
+export interface LoginProps {
+  navigation: INavigation;
+  login: LoginProvider;
+  router: any;
+  authTokenManager: AuthTokenManager;
+  postLoginFunction: (router: Router, token: string) => void;
+}
+
+export interface LoginState {
+  refs: string[];
+  error: boolean;
+}
+
+
+export default class LoginComponent extends React.Component<LoginProps, LoginState> {
 
   constructor(props) {
     super(props);
@@ -11,8 +29,8 @@ export default class Login extends React.Component {
   }
 
   login() {
-    const usernameInput = ReactDOM.findDOMNode(this.refs.username);
-    const passwordInput = ReactDOM.findDOMNode(this.refs.password);
+    const usernameInput = ReactDOM.findDOMNode<HTMLInputElement>(this.refs.username);
+    const passwordInput = ReactDOM.findDOMNode<HTMLInputElement>(this.refs.password);
     this.props.login.loginPromise(usernameInput.value, passwordInput.value)
       .then((token) => {
         this.props.authTokenManager.setToken(token);
@@ -44,7 +62,7 @@ export default class Login extends React.Component {
         <div style={{ textAlign: "center", }} className="form-group" >
           <label style={{ textAlign: "left", width: "50%", }}>Password</label>
           <div>
-            <input type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" name="password" type="password" ref="password" />
+            <input type="password" style={{ display: "inline-block", width: "50%", }} className="form-control" name="password" ref="password" />
           </div>
         </div>
         <button ref="login" className="btn btn-primary" onClick={this.login.bind(this)}>Login</button>

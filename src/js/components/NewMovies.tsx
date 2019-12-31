@@ -3,8 +3,35 @@ import React from "react";
 import Carousel from "./generic/Carousel";
 import MoviePicker from "./pickers/MovieDetails";
 import MetadataImage from "./generic/MetadataImage";
+import NewMoviesProvider from "../utilities/providers/NewMoviesProvider";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import { Router, } from "react-router";
+import VideoLoader from "../utilities/VideoLoader";
+import PlaylistManager from "../utilities/providers/playertypes/Playlist";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import MetadataProvider from "../utilities/providers/MetadataProvider";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
 
-export default class NewMovies extends React.Component {
+export interface NewMoviesProps {
+  newMoviesProvider: NewMoviesProvider;
+  navigation: INavigation;
+  navOrder?: number;
+  router: Router;
+  videoLoader: VideoLoader;
+  playlistManager: PlaylistManager;
+  showProgressProvider: ShowProgressProvider;
+  metadataProvider: MetadataProvider;
+  episodeLoader: CacheBasedEpisodeProvider;
+}
+
+export interface NewMoviesState {
+  videos: string[];
+  movieName?: string;
+
+}
+
+export default class NewMovies extends React.Component<NewMoviesProps, NewMoviesState> {
+  private dragging: boolean;
   constructor(props) {
     super(props);
     this.state = { videos: [], };
@@ -63,8 +90,7 @@ export default class NewMovies extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-                videoLoader={this.props.videoLoader}
-        playlistManager={this.props.playlistManager}
+        videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         metadataProvider={this.props.metadataProvider}
         movieName={this.state.movieName}

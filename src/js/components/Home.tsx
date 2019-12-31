@@ -1,6 +1,5 @@
 import React from "react";
-import { Link, } from "react-router";
-import EasyInputComponent from "./EasyInputComponent";
+import { Link, Router, } from "react-router";
 
 import SearchResults from "./SearchResults";
 import KeepWatching from "./KeepWatching";
@@ -9,12 +8,44 @@ import NewMovies from "./NewMovies";
 import NewShows from "./NewShows";
 import HomePageCollectionViewer from "./HomePageCollectionViewer";
 import ClickableButton from "./generic/ClickableButton";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import ISettingsManager from "../utilities/ISettingsManager";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import CollectionsManager from "../utilities/CollectionsManager";
+import PlaylistManager from "../utilities/providers/playertypes/Playlist";
+import VideoLoader from "../utilities/VideoLoader";
+import CacheBasedSearch from "../utilities/providers/CacheBasedSearch";
+import CacheProvider from "../utilities/providers/CacheProvider";
+import MetadataProvider from "../utilities/providers/MetadataProvider";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import NewMoviesProvider from "../utilities/providers/NewMoviesProvider";
 
-export default class Home extends EasyInputComponent {
+export interface HomeProps {
+  navigation: INavigation;
+  settingsManager: ISettingsManager;
+  episodeLoader: CacheBasedEpisodeProvider;
+  collectionsManager: CollectionsManager;
+  playlistManager: PlaylistManager;
+  imageRoot: string;
+  router: Router;
+  videoLoader: VideoLoader;
+  searcher: CacheBasedSearch;
+  cacheProvider: CacheProvider;
+  metadataProvider: MetadataProvider;
+  showProgressProvider: ShowProgressProvider;
+  dataProviders: any;
+  newMoviesProvider: NewMoviesProvider;
+}
+
+export interface HomeState {
+  collectionCount: number;
+}
+
+export default class Home extends React.Component<HomeProps, HomeState> {
 
   constructor(props) {
     super(props);
-    this.state = { showSettings: false, collectionCount: 0, hasOfflineVideos: false, hideSettings: !(window.maestroSettings && window.maestroSettings.NEVER_HIDE_SETTINGS), };
+    this.state = { collectionCount: 0, };
   }
 
   updateCollectionCount(count) {
@@ -33,9 +64,8 @@ export default class Home extends EasyInputComponent {
           navOrder={0}
           navigation={this.props.navigation}
           episodeLoader={this.props.episodeLoader}
-                    collectionsManager={this.props.collectionsManager}
+          collectionsManager={this.props.collectionsManager}
           playlistManager={this.props.playlistManager}
-          imageRoot={this.props.imageRoot}
           router={this.props.router}
           videoLoader={this.props.videoLoader}
           searcher={this.props.searcher}
@@ -44,7 +74,15 @@ export default class Home extends EasyInputComponent {
           showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
-        <KeepWatching navOrder={1} navigation={this.props.navigation} imageRoot={this.props.imageRoot} metadataProvider={this.props.metadataProvider} router={this.props.router} videoLoader={this.props.videoLoader} searcher={this.props.searcher} cacheProvider={this.props.cacheProvider} showProgressProvider={this.props.showProgressProvider} />
+        <KeepWatching
+          navOrder={1}
+          navigation={this.props.navigation}
+          episodeLoader={this.props.episodeLoader}
+          metadataProvider={this.props.metadataProvider}
+          router={this.props.router}
+          videoLoader={this.props.videoLoader}
+          cacheProvider={this.props.cacheProvider}
+          showProgressProvider={this.props.showProgressProvider} />
       </div>
       <div>
         <NewMovies navOrder={2} {...this.props} ></NewMovies>

@@ -4,12 +4,42 @@ import ShowPicker from "./ShowPicker";
 
 import Carousel from "./generic/Carousel";
 import MetadataImage from "./generic/MetadataImage";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import KeepWatching from "../models/KeepWatchingData";
+import VideoLoader from "../utilities/VideoLoader";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import CacheProvider from "../utilities/providers/CacheProvider";
+import { Router, } from "react-router";
+import FileCache from "../models/FileCache";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import MetadataProvider from "../utilities/providers/MetadataProvider";
 
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
 }
 
-export default class KeepWatching extends React.Component {
+export interface KeepWatchingProps {
+  navigation: INavigation;
+  videoLoader: VideoLoader;
+  showProgressProvider: ShowProgressProvider;
+  cacheProvider: CacheProvider;
+  router: Router;
+  navOrder?: number;
+  episodeLoader: CacheBasedEpisodeProvider;
+  metadataProvider: MetadataProvider;
+}
+
+
+export interface KeepWatchingState {
+  root: string;
+  videos: KeepWatching[];
+  showName?: string;
+  showPath?: string;
+  cachePath?: FileCache;
+}
+
+export default class KeepWatchingComponent extends React.Component<KeepWatchingProps, KeepWatchingState> {
+  private dragging: boolean;
   constructor(props) {
     super(props);
     this.state = { root: "", videos: [], };
@@ -92,6 +122,8 @@ export default class KeepWatching extends React.Component {
     if (this.state.showName) {
       showPicker = <ShowPicker
         router={this.props.router}
+        metadataProvider={this.props.metadataProvider}
+        episodeLoader={this.props.episodeLoader}
         navigation={this.props.navigation}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}

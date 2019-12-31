@@ -115,8 +115,8 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
     }
   }
 
-  downloadLegacy(episode) {
-    /*const files = Object.keys(this.props.showCache.folders[this.state.season].files);
+  /*downloadLegacy(episode) {
+    const files = Object.keys(this.props.showCache.folders[this.state.season].files);
     let index = -1;
     for (let i = 0; i < files.length; i++) {
       if (files[i] == episode) {
@@ -136,8 +136,8 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
     }, path, (progress) => {
       //this.setState({ downloadProgress$: progress, });
       this.downloadProgress[episode] = progress;
-    });*/
-  }
+    });
+  }*/
 
   play(episode) {
     const files = Object.keys(this.props.showCache.folders[this.state.season].files).sort(window["tvShowSort"]);

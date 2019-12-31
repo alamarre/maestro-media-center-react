@@ -2,7 +2,6 @@ import React from "react";
 import { Modal, } from "react-bootstrap";
 
 import MetadataImage from "../generic/MetadataImage";
-import KeepWatching from "../../models/KeepWatchingData";
 import INavigation from "../../utilities/providers/navigation/INavigation";
 import Scrollable from "../ScrollableComponent";
 import MovieMetadata from "../../models/MovieMetadata";
@@ -10,7 +9,6 @@ import MovieMetadata from "../../models/MovieMetadata";
 export interface MoviePickerProps {
   navOrder?: number;
   navigation: INavigation;
-  offlineStorage: any;
   showProgressProvider: any;
   videoLoader: any;
   router: any;

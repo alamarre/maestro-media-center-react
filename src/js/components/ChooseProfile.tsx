@@ -1,28 +1,49 @@
 import React from "react";
 import Scrollable from "./ScrollableComponent";
+import ProfileProvider from "../utilities/providers/ProfileProvider";
+import CacheProvider from "../utilities/providers/CacheProvider";
+import CacheBasedSearch from "../utilities/providers/CacheBasedSearch";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import AuthTokenManager from "../utilities/AuthTokenManager";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import Profile from "../models/Profile";
 
-export default class ChooseProfile extends React.Component {
+export interface ChooseProfileProps {
+  navigation: INavigation;
+  profileProvider: ProfileProvider;
+  router: any;
+  cache: CacheProvider;
+  search: CacheBasedSearch;
+  serverProvider: CacheBasedEpisodeProvider;
+  authTokenManager: AuthTokenManager;
+}
+
+export interface ChooseProfileState {
+  profiles: Profile[];
+  addingProfile: boolean;
+  refs: string[];
+  newUsername: string;
+}
+export default class ChooseProfile extends React.Component<ChooseProfileProps, ChooseProfileState> {
+
+  private profileUpdater: any;
 
   constructor(props) {
-    super(props, [], true);
+    super(props);
     this.state = Object.assign({}, this.state, {
       "addingProfile": false,
       "profiles": null,
       "newUsername": "",
+      refs: [],
     });
 
   }
 
-  componentWillMount() {
-    this.profileUpdater = setInterval(() => {
-      this.props.profileProvider.getProfiles()
-        .then((profiles) => {
-          this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`), });
-        }, (err) => {
-          throw err;
-        });
+  async componentDidMount() {
+    this.profileUpdater = setInterval(async () => {
+      const profiles = await this.props.profileProvider.getProfiles();
+      this.setState({ "profiles": profiles, refs: profiles.map((p, i) => `profile-${i}`), });
     }, 1000);
-
   }
 
   componentWillUnmount() {
@@ -80,20 +101,21 @@ export default class ChooseProfile extends React.Component {
         </div>
       </div>;
     } else if (this.state.profiles) {
-      let profiles = this.state.profiles.map((profile, i) => {
+      const profiles = this.state.profiles.map((profile, i) => {
         const ref = `profile-${i}`;
         return <button ref={ref} className="maestroButton fa fa-user fa-3x" style={{ border: "solid 1px white", width: "300px", fontSize: "100px", }} key={profile.profileName} onClick={this.setProfile.bind(this, profile.profileName)}>
           <div style={{ textOverflow: "ellipsis", overflow: "hidden", }}>{profile.profileName}</div>
         </button>;
       });
 
+      let profileSection = <div>{profiles}</div>
       if (this.state.profiles.length == 0) {
-        profiles = <div>No profiles yet.</div>;
+        profileSection = <div>No profiles yet.</div>;
       }
 
       body = <div>
         <div>Who are you?</div>
-        {profiles}
+        {profileSection}
         {addProfileSection}
       </div>;
     }

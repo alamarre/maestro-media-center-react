@@ -1,9 +1,27 @@
 import React from "react";
 import { Component, } from "react";
+import CSS from "csstype";
+
+export interface MetadataImageProps {
+  navOrder?: number;
+  height: number;
+  width: number;
+  type: string;
+  name: string;
+  show?: string;
+  season?: string;
+  style: CSS.Properties;
+}
+
+export interface MetadataImageState {
+  failed: boolean;
+}
 
 const imageRoot = process.env.IMAGE_ROOT || "https://maestro-images.omny.ca";
 const failedImage = "fallback.png";
-export default class MetadataImage extends Component {
+export default class MetadataImage extends Component<MetadataImageProps, MetadataImageState> {
+  private timer: any;
+
   constructor(props) {
     super(props);
     this.state = { failed: false, };
@@ -50,7 +68,7 @@ export default class MetadataImage extends Component {
         `tv/show/${name}` :
         `${type}/${name}`;
     const dimensions = `${width}x${height}`;
-    const image = this.state.failed ? `${dimensions}/${failedImage}` : `${window.accountId}/${dimensions}/${imagePath}.png`;
+    const image = this.state.failed ? `${dimensions}/${failedImage}` : `${window["accountId"]}/${dimensions}/${imagePath}.png`;
     const src = `${imageRoot}/${image}`;
 
     const style = Object.assign({ display: "block", width, height, }, this.props.style);

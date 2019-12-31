@@ -1,6 +1,7 @@
 import elasticlunr from "elasticlunr";
 import ICacheProvider from "./ICacheProvider";
 import PlaylistProvider from "./PlaylistProvider";
+import SearchResult from "../../models/SearchResult";
 
 function addFilesInFolder(index, currentCache, path) {
   if (currentCache && currentCache.files) {
@@ -139,7 +140,7 @@ export default class CacheBasedSearch {
     });
   }
 
-  getResults(value) {
+  getResults(value): Promise<SearchResult[]> {
     return new Promise((success, fail) => {
       this.indexPromise.then(() => {
         const result = this.cacheIndex.search(value, {

@@ -8,7 +8,7 @@ export default class VideoLoader {
     this.router = router;
   }
 
-  loadVideo(type, folder, index, profile) {
+  loadVideo(type, folder, index, profile = null) {
     if (this.remoteController && this.remoteController.hasClient()) {
       this.remoteController.load(type, folder, index);
       this.router.push("/remote");

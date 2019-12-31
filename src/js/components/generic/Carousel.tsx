@@ -1,5 +1,7 @@
 import React from "react";
 import { Component, } from "react";
+import INavigation from "../../utilities/providers/navigation/INavigation";
+import ReactDOM from "react-dom";
 
 // from https://stackoverflow.com/questions/3944122/detect-left-mouse-button-press
 function detectLeftButton(evt) {
@@ -11,7 +13,31 @@ function detectLeftButton(evt) {
   return button == 1;
 }
 
-export default class Carousel extends Component {
+export interface CarouselProps {
+  navOrder?: number;
+  navigation: INavigation;
+  height: number;
+  width?: number;
+  itemWidth?: number;
+  isDragging: (dragging: boolean) => void;
+}
+
+export interface CarouselState {
+  refs: string[];
+  current: number;
+  xOffset: number;
+  noButtons: boolean;
+  showArrows: boolean;
+}
+
+export default class Carousel extends Component<CarouselProps, CarouselState> {
+  private startingX: number;
+  private lastOffset: number;
+  private currentOffset: number;
+  private disableScroll: boolean;
+  private fullWidth: number;
+  private dragged: boolean;
+  private root: Element;
   constructor(props) {
     super(props);
     this.state = { current: 1, xOffset: 0, noButtons: true, showArrows: false, refs: [], };
@@ -37,20 +63,21 @@ export default class Carousel extends Component {
   goPrevious() {
     let current = this.state.current - 1;
     if (current === -1) {
-      const currentNode = this.refs[`child-${this.state.current}`];
+      const currentNode = ReactDOM.findDOMNode(this.refs[`child-${this.state.current}`]);
       const rect = currentNode.getBoundingClientRect();
       if (rect.x - 2 * this.props.itemWidth < 0) {
         this.currentOffset += this.props.itemWidth;
       }
 
-      current = this.props.children.length - 1;
+      current = React.Children.count(this.props.children) - 1;
       this.currentOffset -= this.fullWidth;
       this.lastOffset = this.currentOffset;
 
     }
-    const currentNode = this.refs[`child-${current}`];
+    const currentNode = ReactDOM.findDOMNode(this.refs[`child-${current}`]);
     const rect = currentNode.getBoundingClientRect();
-    console.log(this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
+
+    //console.log(this.currentOffset, this.lastOffset, ReactDOM.findDOMNode(this.refs.scroller).style.transform);
     if (rect.x - 1.1 * this.props.itemWidth < 0) {
       console.log("slide to the left");
       this.lastOffset += this.props.itemWidth;
@@ -61,17 +88,18 @@ export default class Carousel extends Component {
     //this.normalize();
 
     this.setState({ current, }, () => {
-      this.refs[`child-${current}`].focus();
-      console.log("focused", current, this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
+      ReactDOM.findDOMNode<HTMLButtonElement>(this.refs[`child-${current}`]).focus();
+      //console.log("focused", current, this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
     });
   }
 
   goNext() {
-    const maxWidth = this.props.width || (this.refs.root && this.refs.root.clientWidth) || (window.innerWidth - itemWidth);
+    const root = ReactDOM.findDOMNode(this.refs.root);
+    const maxWidth = this.props.width || (root && root.clientWidth) || (window.innerWidth - this.props.itemWidth);
 
     let current = this.state.current + 1;
-    if (current >= this.props.children.length) {
-      const currentNode = this.refs[`child-${this.state.current}`];
+    if (current >= React.Children.count(this.props.children)) {
+      const currentNode = ReactDOM.findDOMNode(this.refs[`child-${this.state.current}`]);
       const rect = currentNode.getBoundingClientRect();
       if (rect.x + 2 * this.props.itemWidth >= maxWidth) {
         this.currentOffset -= this.props.itemWidth;
@@ -82,9 +110,9 @@ export default class Carousel extends Component {
       this.lastOffset = this.currentOffset;
     }
     //this.props.children[current].focus();
-    const currentNode = this.refs[`child-${current}`];
+    const currentNode = ReactDOM.findDOMNode(this.refs[`child-${current}`]);
     const rect = currentNode.getBoundingClientRect();
-    console.log(this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
+    //console.log(this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
     if (rect.x + 1.1 * this.props.itemWidth >= maxWidth) {
       this.lastOffset -= this.props.itemWidth;
 
@@ -94,8 +122,8 @@ export default class Carousel extends Component {
     //this.normalize();
 
     this.setState({ current, }, () => {
-      this.refs[`child-${current}`].focus();
-      console.log("focused", current, this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
+      ReactDOM.findDOMNode<HTMLButtonElement>(this.refs[`child-${current}`]).focus();
+      //console.log("focused", current, this.currentOffset, this.lastOffset, this.refs.scroller.style.transform);
     });
   }
 
@@ -103,7 +131,7 @@ export default class Carousel extends Component {
     if (this.state.current >= 0 && this.state.refs.length > 0) {
       //this.props.children[this.state.current].focus();
       //this.state.refs[this.state.current].focus();
-      this.refs[`child-${this.state.current}`].focus();
+      ReactDOM.findDOMNode<HTMLButtonElement>(this.refs[`child-${this.state.current}`]).focus();
       /*setInterval(() => {
         this.set
       }, 200);*/
@@ -149,7 +177,8 @@ export default class Carousel extends Component {
     }
     this.lastOffset = offset;
     console.log(offset);
-    this.refs.scroller.style.transform = `translate3d(${offset}px, 0px, 0px)`;
+    const scroller = ReactDOM.findDOMNode<HTMLDivElement>(this.refs.scroller);
+    scroller.style.transform = `translate3d(${offset}px, 0px, 0px)`;
   }
 
   moveEnd() {
@@ -188,7 +217,8 @@ export default class Carousel extends Component {
 
   componentDidMount() {
     this.props.navigation.registerElementCollection(this, this.props.navOrder);
-    this.setState({ refs: this.props.children.map((a, index) => `child-${index}`), });
+    this.root = ReactDOM.findDOMNode(this.refs.root);
+    this.setState({ refs: React.Children.map(this.props.children, (a, index) => `child-${index}`), });
   }
 
   componentWillUnmount() {
@@ -197,7 +227,7 @@ export default class Carousel extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.children !== prevProps.children) {
-      this.setState({ refs: this.props.children.map((a, index) => `child-${index}`), });
+      this.setState({ refs: React.Children.map(this.props.children, (a, index) => `child-${index}`), });
     }
     if (this.props.navOrder) {
       this.props.navigation.registerElementCollection(this, this.props.navOrder);
@@ -206,16 +236,18 @@ export default class Carousel extends Component {
 
   selectCurrent() {
     const current = this.state.current;
-    const currentNode = this.refs[`child-${current}`];
-    currentNode.children[0].click();
+    const currentNode = ReactDOM.findDOMNode(this.refs[`child-${current}`]);
+    const child = currentNode.childNodes[0] as HTMLButtonElement;
+    child.click();
   }
 
   render() {
     if (!this.props.children) {
       return <div></div>;
     }
+
     const itemWidth = this.props.itemWidth || 200;
-    const maxWidth = this.props.width || (this.refs.root && this.refs.root.clientWidth) || (window.innerWidth - itemWidth);
+    const maxWidth = this.props.width || (this.root && this.root.clientWidth) || (window.innerWidth - itemWidth);
     const workingWidth = maxWidth;
 
     let leftArrow = <div style={{ position: "absolute", top: 0, bottom: 0, backgroundColor: "rgba(128,128,128,0.5)", zIndex: 10, }}>
@@ -229,8 +261,8 @@ export default class Carousel extends Component {
       rightArrow = null;
     }
     let itemCount = workingWidth <= itemWidth ? 1 : Math.trunc(workingWidth / itemWidth);
-    if (itemCount >= this.props.children.length) {
-      itemCount = this.props.children.length;
+    if (itemCount >= React.Children.count(this.props.children)) {
+      itemCount = React.Children.count(this.props.children);
       leftArrow = null;
       rightArrow = null;
       this.disableScroll = true;
@@ -239,7 +271,7 @@ export default class Carousel extends Component {
     } else {
       this.disableScroll = false;
     }
-    const actual = this.props.children.map((a, index) => {
+    const actual = React.Children.map(this.props.children, (a, index) => {
       return <span key={index} ref={this.state.refs[index]} tabIndex={0}>{a}</span>;
     })
     let children = <div>
@@ -258,12 +290,12 @@ export default class Carousel extends Component {
       </div>;
     }
     if (this.currentOffset == null) {
-      this.fullWidth = itemWidth * this.props.children.length;
+      this.fullWidth = itemWidth * React.Children.count(this.props.children);
       this.currentOffset = -2 * this.fullWidth;
       this.lastOffset = this.currentOffset;
     }
     return (
-      <div ref="root" onMouseEnter={() => this.setState({ showArrows: true, })} onMouseLeave={(event) => { this.setState({ showArrows: false, }); this.moveEnd(event); }} onMouseDown={this.moveStart} onMouseMove={this.moving} onMouseUp={this.moveEnd} onTouchStart={this.moveStart} onTouchEnd={this.moveEnd} onTouchMove={this.moving}
+      <div ref="root" onMouseEnter={() => this.setState({ showArrows: true, })} onMouseLeave={() => { this.setState({ showArrows: false, }); this.moveEnd(); }} onMouseDown={this.moveStart} onMouseMove={this.moving} onMouseUp={this.moveEnd} onTouchStart={this.moveStart} onTouchEnd={this.moveEnd} onTouchMove={this.moving}
         style={{ position: "relative", width: "100%", height: this.props.height, overflow: "hidden", }}>
         {leftArrow}
         <div ref="scroller"

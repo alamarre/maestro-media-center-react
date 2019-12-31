@@ -8,16 +8,53 @@ import TvShowSeriesPlayer from "../utilities/providers/playertypes/TvShow";
 import MoviePlayer from "../utilities/providers/playertypes/Movie";
 import MovieCollection from "../utilities/providers/playertypes/MovieCollection";
 import Playlist from "../utilities/providers/playertypes/Playlist";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
+import IPlayerManager from "../utilities/providers/playertypes/IPlayerManager";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import PlaylistManager from "../utilities/providers/playertypes/Playlist";
+import CollectionsManager from "../utilities/CollectionsManager";
+import VideoLoader from "../utilities/VideoLoader";
+import { RouteProps, } from "react-router";
 
-export default class VideoPlayer extends React.Component {
+export interface VideoPlayerProps extends RouteProps {
+  navigation: INavigation;
+  episodeLoader: CacheBasedEpisodeProvider;
+  remoteController: WebSocketRemoteController;
+  location: any;
+  router: any;
+  showProgressProvider: ShowProgressProvider;
+  playlistManager: PlaylistManager;
+  collectionsManager: CollectionsManager;
+  videoLoader: VideoLoader;
+}
+
+export interface VideoPlayerState {
+  refs: string[];
+  overlayVisibility: boolean;
+  showMenu: boolean;
+  seekTime: number;
+  promptReload: boolean;
+  sources?: string[],
+  subtitles?: string[];
+  name?: string;
+  showEpisodeInfo: boolean;
+}
+
+export default class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
+  private type: string;
+  private profile: string;
+  private preventIdleTimer: any;
+  private progressTimer: any;
+  private playerTypeHandlers: { [key: string]: IPlayerManager };
+
   constructor(props) {
-    super(props, [], true);
-    const episodeLoader = this.props.episodeLoader;
-    this.episodeLoader = episodeLoader;
+    super(props);
     this.type = this.props.location.query.type;
     this.profile = this.props.location.query.profile;
     this.preventIdleTimer = null;
-    this.state = { "overlayVisibility": false, showMenu: false, seekTime: -1, promptReload: false, };
+    this.state = { refs: [], "overlayVisibility": false, showEpisodeInfo: false, showMenu: false, seekTime: -1, promptReload: false, };
     this.progressTimer = null;
     if (this.props.remoteController) {
       this.props.remoteController.mapUpdateFunctions({
@@ -66,7 +103,7 @@ export default class VideoPlayer extends React.Component {
       this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
     }
 
-    document.addEventListener("maestro-load-video", (event) => {
+    document.addEventListener("maestro-load-video", (event: any) => {
       event = event.detail;
       var path = event.folder;
       var parentPath = path.substring(0, path.lastIndexOf("/"));
@@ -89,12 +126,12 @@ export default class VideoPlayer extends React.Component {
       };
       return <ReloadVideoDialog navigation={this.props.navigation} reload={reload} goHome={goHome}></ReloadVideoDialog>
     }
-    var currentEpisodeStyle = {
+    var currentEpisodeStyle: React.CSSProperties = {
       position: "absolute",
-      left: 100,
-      right: 100,
-      bottom: 20,
-      fontSize: 36,
+      left: "100px",
+      right: "100px",
+      bottom: "20px",
+      fontSize: "36px",
       color: "white",
       backgroundColor: "black",
       zIndex: 100,
@@ -102,12 +139,11 @@ export default class VideoPlayer extends React.Component {
       opacity: 0,
     };
 
-    const overlayStyle = {
+    const overlayStyle: React.CSSProperties = {
       position: "absolute",
-      left: 0,
-      center: 0,
-      right: 0,
-      top: 0,
+      left: "0px",
+      right: "0px",
+      top: "0px",
       backgroundColor: "black",
       width: "100%",
       height: "100%",

@@ -1,20 +1,23 @@
 import React from "react";
 import { Modal, } from "react-bootstrap";
 
-import ScrollableComponent from "./ScrollableComponent";
+import Scrollable from "./ScrollableComponent";
+import INavigation from "../utilities/providers/navigation/INavigation";
 
-export default class ReloadVideoDialog extends ScrollableComponent {
+export interface ReloadProps {
+  reload: () => void;
+  goHome: () => void;
+  navigation: INavigation;
+}
+
+export interface ReloadState {
+  refs: string[];
+}
+
+export default class ReloadVideoDialog extends React.Component<ReloadProps, ReloadState> {
   constructor(props) {
-    super(props, ["reload", "home"]);
-    this.state=Object.assign({}, this.state);
-  }
-
-  moveRight() {
-    this.focusNext();
-  }
-
-  moveLeft() {
-    this.focusPrevious();
+    super(props);
+    this.state = Object.assign({ refs: ["reload", "home",], }, this.state);
   }
 
   render() {
@@ -38,9 +41,9 @@ export default class ReloadVideoDialog extends ScrollableComponent {
       </Modal>
     </div>;
 
-    return (
-      <div>{body}</div>
-    );
+    const parentRefs = () => this.refs;
+    return <div><Scrollable isDialog={true} scrollOnHorizontal={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
+
   }
 }
 

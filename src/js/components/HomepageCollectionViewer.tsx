@@ -5,8 +5,39 @@ import ShowPicker from "./ShowPicker";
 import Carousel from "./generic/Carousel";
 import MoviePicker from "./pickers/MovieDetails";
 import MetadataImage from "./generic/MetadataImage";
+import INavigation from "../utilities/providers/navigation/INavigation";
+import HomepageCollection from "../models/HomepageCollection";
+import FileCache from "../models/FileCache";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import VideoLoader from "../utilities/VideoLoader";
+import PlaylistManager from "../utilities/providers/playertypes/Playlist";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import MetadataProvider from "../utilities/providers/MetadataProvider";
 
-export default class HomepageCollectionViewer extends React.Component {
+export interface HomepageCollectionViewerProps {
+  navOrder?: number;
+  navigation: INavigation;
+  router: any;
+  episodeLoader: CacheBasedEpisodeProvider;
+  videoLoader: VideoLoader;
+  playlistManager: PlaylistManager;
+  showProgressProvider: ShowProgressProvider;
+  metadataProvider: MetadataProvider;
+  updateCount: (count: number) => void;
+}
+
+export interface HomepageCollectionViewerState {
+  root: string;
+  collections: HomepageCollection[];
+  movieName?: string;
+  showName?: string;
+  showPath?: string;
+  cachePath?: FileCache;
+}
+
+export default class HomepageCollectionViewer extends React.Component<HomepageCollectionViewerProps, HomepageCollectionViewerState> {
+  private dragging: boolean;
+
   constructor(props) {
     super(props);
     this.state = { root: "", collections: [], };
@@ -86,8 +117,7 @@ export default class HomepageCollectionViewer extends React.Component {
         navigation={this.props.navigation}
         router={this.props.router}
         episodeLoader={this.props.episodeLoader}
-                videoLoader={this.props.videoLoader}
-        playlistManager={this.props.playlistManager}
+        videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         metadataProvider={this.props.metadataProvider}
         movieName={this.state.movieName}
@@ -97,6 +127,9 @@ export default class HomepageCollectionViewer extends React.Component {
     if (this.state.showName) {
       showPicker = <ShowPicker
         router={this.props.router}
+        navigation={this.props.navigation}
+        metadataProvider={this.props.metadataProvider}
+        episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
         showName={this.state.showName}

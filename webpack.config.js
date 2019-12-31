@@ -3,6 +3,8 @@ var webpack = require("webpack");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 const WebpackPwaManifest = require("webpack-pwa-manifest");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+
 
 var path = require("path");
 var BUILD_DIR = path.resolve(__dirname, "build");
@@ -12,6 +14,9 @@ var jquery = require("jquery");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 var alwaysPlugins = [
+  new ForkTsCheckerWebpackPlugin({
+    tsconfig: "./src/js/tsconfig.json",
+  }),
   //new BundleAnalyzerPlugin(),
   new HtmlWebpackPlugin({
     "title": "Maestro Media Center",
@@ -85,17 +90,10 @@ module.exports = {
         test: /\.tsx?$/,
         include: APP_DIR,
         exclude: /node_modules/,
-        use: "ts-loader",
-      },
-      {
-        test: /\.jsx?/,
-        include: APP_DIR,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env", "@babel/preset-react",],
-          },
+        loader: "ts-loader",
+        options: {
+          // disable type checker - we will use it in fork plugin
+          transpileOnly: false,
         },
       },
       {

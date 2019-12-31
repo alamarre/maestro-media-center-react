@@ -1,14 +1,38 @@
 import React from "react";
 
 import Home from "./Home";
+import ISettingsManager from "../utilities/ISettingsManager";
+import CollectionsManager from "../utilities/CollectionsManager";
+import PlaylistManager from "../utilities/providers/playertypes/Playlist";
+import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
+import CacheProvider from "../utilities/providers/CacheProvider";
+import CacheBasedSearch from "../utilities/providers/CacheBasedSearch";
+import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
+import MetadataProvider from "../utilities/providers/MetadataProvider";
+import NewMoviesProvider from "../utilities/providers/NewMoviesProvider";
+import AuthTokenManager from "../utilities/AuthTokenManager";
+import AccountProvider from "../utilities/providers/AccountProvider";
+import VideoLoader from "../utilities/VideoLoader";
+import INavigation from "../utilities/providers/navigation/INavigation";
 
 export interface AppProps {
   router: any,
-  authTokenManager: any,
-  accountProvider: any,
-  videoLoader: any,
-  navigation: any,
-  location: any
+  authTokenManager: AuthTokenManager,
+  accountProvider: AccountProvider,
+  videoLoader: VideoLoader,
+  navigation: INavigation,
+  location: any;
+  settingsManager: ISettingsManager;
+  collectionsManager: CollectionsManager;
+  playlistManager: PlaylistManager;
+  imageRoot: string;
+  episodeLoader: CacheBasedEpisodeProvider;
+  cacheProvider: CacheProvider;
+  searcher: CacheBasedSearch;
+  showProgressProvider: ShowProgressProvider;
+  metadataProvider: MetadataProvider;
+  newMoviesProvider: NewMoviesProvider;
+  dataProviders: any;
 }
 
 export default class App extends React.Component<AppProps, {}> {

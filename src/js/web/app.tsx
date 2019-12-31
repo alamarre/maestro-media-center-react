@@ -6,7 +6,6 @@ import React from "react";
 import { render, } from "react-dom";
 import { Router, Route, hashHistory, } from "react-router";
 
-require("./clipboard");
 require("../style.scss");
 
 var host = process.env.HOST || window.location.hostname;

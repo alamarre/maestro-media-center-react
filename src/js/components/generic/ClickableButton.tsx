@@ -1,8 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Link, } from "react-router";
+import INavigation from "../../utilities/providers/navigation/INavigation";
 
-export default class ClickableButton extends React.Component {
+export interface ClickableButtonProps {
+  navOrder?: number;
+  navigation: INavigation;
+  to: string;
+}
+
+export interface ClickableButtonState {
+  refs: string[];
+}
+
+export default class ClickableButton extends React.Component<ClickableButtonProps, ClickableButtonState> {
 
   componentDidMount() {
     const node = ReactDOM.findDOMNode(this.refs.link);
@@ -11,7 +22,7 @@ export default class ClickableButton extends React.Component {
 
   componentDidUpdate() {
     const node = ReactDOM.findDOMNode(this.refs.link);
-    if(this.props.navOrder) {
+    if (this.props.navOrder) {
       this.props.navigation.registerElement(node, this.props.navOrder);
     }
   }

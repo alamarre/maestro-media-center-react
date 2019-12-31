@@ -4,4 +4,10 @@ export default interface HomepageCollection {
   created: number;
   startDate: string;
   name: string;
+  items: HomepageCollectionItem[];
+}
+
+export interface HomepageCollectionItem {
+  name: string;
+  type: string;
 }

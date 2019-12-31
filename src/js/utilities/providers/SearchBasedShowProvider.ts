@@ -1,5 +1,6 @@
 import ApiCaller from "./ApiCaller";
 import ICacheProvider from "./ICacheProvider";
+import SearchCache from "../../models/SearchCache";
 export default class SearchBasedShowProvider {
   constructor(
     private apiCaller: ApiCaller,
@@ -8,21 +9,16 @@ export default class SearchBasedShowProvider {
     private searchProvider) {
   }
 
-  getListingPromise(folder) {
-    var promise = new Promise((good, bad) => {
-      if (!folder || folder === "") {
-        good({ files: [], folders: ["TV Shows", "Movies",], });
-      } else {
-        const type = (folder == "Movies" || folder == "/Movies") ? "movie" : "tv";
+  async getListingPromise(folder): Promise<SearchCache> {
+    if (!folder || folder === "") {
+      return { files: [], folders: ["TV Shows", "Movies",], };
+    } else {
+      const type = (folder == "Movies" || folder == "/Movies") ? "movie" : "tv";
 
-        this.searchProvider.getByType(type).then((results) => {
-          good({ folders: [], files: results, });
-        }, bad);
+      const results = await this.searchProvider.getByType(type);
 
-      }
-    });
-
-    return promise;
+      return { folders: [], files: results, };
+    }
   }
 
   async getVideoSource(path) {
