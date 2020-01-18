@@ -1,8 +1,10 @@
 var debug = process.env.NODE_ENV !== "production";
-const appId = process.env.CHROMECAST_DEBUG ? "D8828ECA" : "C3639C8B";
 var webpack = require("webpack");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+const WebpackPwaManifest = require("webpack-pwa-manifest");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+
 
 var path = require("path");
 var BUILD_DIR = path.resolve(__dirname, "build");
@@ -12,10 +14,40 @@ var jquery = require("jquery");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 var alwaysPlugins = [
+  /*new ForkTsCheckerWebpackPlugin({
+    tsconfig: "./src/js/tsconfig.json",
+  }),*/
   //new BundleAnalyzerPlugin(),
   new HtmlWebpackPlugin({
     "title": "Maestro Media Center",
     template: "template.html",
+  }),
+  new WebpackPwaManifest({
+    name: "Maestro Media Center",
+    short_name: process.env.PWA_NAME || "Maestro",
+    description: "",
+    background_color: "#ff0000",
+    crossorigin: "use-credentials", //can be null, use-credentials or anonymous
+    icons: [
+      {
+        src: path.resolve("m-maestro.png"),
+        sizes: [96, 128, 192, 256, 384, 512, 1024,], // multiple sizes,
+        destination: path.join("icons", "ios"),
+        ios: true,
+      },
+      {
+        src: path.resolve("m-maestro.png"),
+        size: 1024, // multiple sizes,
+        destination: path.join("icons", "ios"),
+        ios: "startup",
+      },
+    ],
+    inject: true,
+    ios: {
+      "apple-mobile-web-app-title": "Maestro",
+      "apple-mobile-web-app-status-bar-style": "black",
+    },
+
   }),
   new webpack.ProvidePlugin({
     jQuery: "jquery",
@@ -26,7 +58,6 @@ var alwaysPlugins = [
   }),
   new webpack.DefinePlugin({
     "process.env": {
-      "CHROMECAST_APP_ID": JSON.stringify(appId),
     },
   }),
   new ExtractTextPlugin({
@@ -34,23 +65,36 @@ var alwaysPlugins = [
     allChunks: true,
   }),];
 module.exports = {
+  devServer: {
+    compress: true,
+    host: "0.0.0.0",
+    port: process.env.LOCAL_PORT || 3000,
+  },
   context: __dirname,
   devtool: debug ? "inline-sourcemap" : "sourcemap",
-  entry: APP_DIR + "/web/app.js",
+  entry: APP_DIR + "/web/app.tsx",
   mode: debug ? "development" : "production",
   output: {
     path: BUILD_DIR,
     filename: "app.js",
   },
   optimization: {
-    minimize: debug ? false: true,
+    minimize: debug ? false : true,
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js", ".jsx",],
   },
   module: {
     rules: [
       {
-        test: /\.jsx?/,
+        test: /\.tsx?$/,
         include: APP_DIR,
-        loader: "babel-loader",
+        exclude: /node_modules/,
+        loader: "ts-loader",
+        options: {
+          // disable type checker - we will use it in fork plugin
+          transpileOnly: false,
+        },
       },
       {
         test: /\.json$/,
@@ -84,7 +128,6 @@ module.exports = {
             plugins: function () { // post css plugins, can be exported to postcss.config.js
               return [
                 require("precss"),
-                require("autoprefixer"),
               ];
             },
           },

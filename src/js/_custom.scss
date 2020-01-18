@@ -10,3 +10,17 @@ $modal-content-bg: black;
 $list-group-bg:  black;
 
 $modal-md: 90%;
+
+button:focus {
+    background-color: #FF0;
+    border: 1px solid #FF0;
+}
+
+li:focus {
+  background-color: #FF0;
+  border: 1px solid #FF0;
+}
+
+div:focus {
+  background-color: #FF0;
+}

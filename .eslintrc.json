@@ -1,36 +1,72 @@
 {
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "ecmaVersion": 8,
-        "sourceType": "module",
-        "ecmaFeatures": {
-            "jsx": true
-        }
-    },
-    "env" : {
-        "node" : false,
-        "browser": true
-    },
-    "globals": {
-        "Promise": true,
-        "require": true,
-        "module": true,
-        "process": true
-    },
-    "plugins": [
-        "react"
-    ],
-    "rules": {
-        "linebreak-style": ["error", "unix"],
-        "quotes": ["error", "double"],
-        "semi": ["error", "always"],
-        "indent": ["error", 2],
-        "comma-dangle": ["error", "always"],
-        "no-cond-assign": ["error", "always"],
-        "no-console": "off",
-        "prefer-const": "error",
-        "strict": ["error", "global"],
-        "react/jsx-uses-react": "error",
-        "react/jsx-uses-vars": "error"
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 10,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
     }
+  },
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "node": false,
+    "es6": true,
+    "browser": true
+  },
+  "globals": {
+    "Promise": true,
+    "require": true,
+    "module": true,
+    "process": true
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "no-cond-assign": [
+      "error",
+      "always"
+    ],
+    "no-console": "off",
+    "prefer-const": "error",
+    "strict": [
+      "error",
+      "global"
+    ],
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "*.js"
+      ],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "error",
+        "semi": "off"
+      }
+    }
+  ]
 }
