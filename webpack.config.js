@@ -14,9 +14,9 @@ var jquery = require("jquery");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 var alwaysPlugins = [
-  new ForkTsCheckerWebpackPlugin({
+  /*new ForkTsCheckerWebpackPlugin({
     tsconfig: "./src/js/tsconfig.json",
-  }),
+  }),*/
   //new BundleAnalyzerPlugin(),
   new HtmlWebpackPlugin({
     "title": "Maestro Media Center",
@@ -128,7 +128,6 @@ module.exports = {
             plugins: function () { // post css plugins, can be exported to postcss.config.js
               return [
                 require("precss"),
-                require("autoprefixer"),
               ];
             },
           },

@@ -1,15 +1,16 @@
 import React from "react";
 import INavigation from "../utilities/providers/navigation/INavigation";
 import WebSocketSender from "../utilities/WebSocketSender";
+import { RouteComponentProps, } from "react-router-dom";
 const Slider = require("rc-slider").default;
 require("rc-slider/assets/index.css");
 
-export interface RemoteProps {
+export interface RemoteProps extends RouteComponentProps {
   reload: () => void;
   goHome: () => void;
   navigation: INavigation;
   remote: WebSocketSender;
-  router: any;
+
 }
 
 export interface RemoteState {
@@ -38,7 +39,7 @@ export default class RemoteController extends React.Component<RemoteProps, Remot
       <div style={{ display: "table-row", }}>
         <div className="remoteContainer">
           <button className="remoteButton toggleVisibility" onClick={this.props.remote.toggleVisibility.bind(this.props.remote)}><i className="fa fa-adjust fa-3x"></i></button>
-          <button className="remoteButton" onClick={this.props.router.push.bind(this.props.router, "/")}><i className="fa fa-home fa-3x"></i></button>
+          <button className="remoteButton" onClick={this.props.history.push.bind(this.props.history, "/")}><i className="fa fa-home fa-3x"></i></button>
         </div>
       </div>
     </div>;

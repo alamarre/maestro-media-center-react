@@ -1,11 +1,10 @@
 import React from "react";
 
-import { Link, } from "react-router";
+import { Link, RouteComponentProps, } from "react-router-dom";
 import AuthTokenManager from "../utilities/AuthTokenManager";
 
-export interface HomeProps {
+export interface HomeProps extends RouteComponentProps {
   authTokenManager: AuthTokenManager;
-  router: any;
 }
 export interface HomeState {
 
@@ -19,8 +18,8 @@ export default class Home extends React.Component<HomeProps, HomeState> {
   }
 
   componentWillMount() {
-    if (!this.props.authTokenManager.isAuthenticated() && this.props.router.location.pathname != "/login") {
-      this.props.router.push("/login");
+    if (!this.props.authTokenManager.isAuthenticated() && this.props.location.pathname != "/login") {
+      this.props.history.push("/login");
     }
   }
 

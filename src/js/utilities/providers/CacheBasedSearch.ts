@@ -43,7 +43,7 @@ export default class CacheBasedSearch {
       Promise.all([this.cacheProvider.getCache(), this.cacheProvider.getRootFolders(),]).then((values) => {
         const cache = values[0];
         const rootFolders = values[1];
-        const index = elasticlunr(function () {
+        const index: any = elasticlunr(function () {
           this.addField("title");
           this.addField("type");
           this.addField("index");
@@ -65,7 +65,6 @@ export default class CacheBasedSearch {
                   type: "tv",
                   index: 0,
                 };
-
                 index.addDoc(doc);
               }
             }
@@ -80,7 +79,7 @@ export default class CacheBasedSearch {
                 title: collection,
               };
 
-              index.addDoc(doc);
+              index.documentStore.addDoc(doc);
             }
           } else {
             // loop through all folders and add shows

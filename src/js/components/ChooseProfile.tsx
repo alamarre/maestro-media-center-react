@@ -7,11 +7,12 @@ import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeP
 import AuthTokenManager from "../utilities/AuthTokenManager";
 import INavigation from "../utilities/providers/navigation/INavigation";
 import Profile from "../models/Profile";
+import { RouteComponentProps, } from "react-router-dom";
 
-export interface ChooseProfileProps {
+export interface ChooseProfileProps extends RouteComponentProps {
   navigation: INavigation;
   profileProvider: ProfileProvider;
-  router: any;
+
   cache: CacheProvider;
   search: CacheBasedSearch;
   serverProvider: CacheBasedEpisodeProvider;
@@ -76,7 +77,7 @@ export default class ChooseProfile extends React.Component<ChooseProfileProps, C
     this.props.cache.reload();
     this.props.search.createIndex();
     this.props.serverProvider.updateServers();
-    this.props.router.replace("/");
+    this.props.history.replace("/");
   }
 
   render() {

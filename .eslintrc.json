@@ -43,10 +43,6 @@
         "SwitchCase": 1
       }
     ],
-    "comma-dangle": [
-      "error",
-      "always"
-    ],
     "no-cond-assign": [
       "error",
       "always"

@@ -11,7 +11,6 @@ export interface MoviePickerProps {
   navigation: INavigation;
   showProgressProvider: any;
   videoLoader: any;
-  router: any;
   cancelFunction: () => void;
   movieName: string;
   metadataProvider: any;

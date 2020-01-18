@@ -1,18 +1,17 @@
 import React from "react";
-import ReactDOM from "react-dom";
 
 import Scrollable from "./ScrollableComponent";
 import LoginProvider from "../utilities/LoginProvider";
 import INavigation from "../utilities/providers/navigation/INavigation";
-import { Router, } from "react-router";
 import AuthTokenManager from "../utilities/AuthTokenManager";
+import { RouteComponentProps, } from "react-router-dom";
 
-export interface LoginProps {
+export interface LoginProps extends RouteComponentProps {
   navigation: INavigation;
   login: LoginProvider;
-  router: any;
+
   authTokenManager: AuthTokenManager;
-  postLoginFunction: (router: Router, token: string) => void;
+  postLoginFunction: (token: string) => void;
 }
 
 export interface LoginState {
@@ -23,22 +22,25 @@ export interface LoginState {
 
 export default class LoginComponent extends React.Component<LoginProps, LoginState> {
 
+  private userNameRef = React.createRef<HTMLInputElement>();
+  private passwordRef = React.createRef<HTMLInputElement>();
+  private loginButtonRef = React.createRef<HTMLButtonElement>();
   constructor(props) {
     super(props);
     this.state = { "error": false, refs: ["username", "password", "login",], };
   }
 
   login() {
-    const usernameInput = ReactDOM.findDOMNode<HTMLInputElement>(this.refs.username);
-    const passwordInput = ReactDOM.findDOMNode<HTMLInputElement>(this.refs.password);
-    this.props.login.loginPromise(usernameInput.value, passwordInput.value)
+    const usernameInput = this.userNameRef;
+    const passwordInput = this.passwordRef;
+    this.props.login.loginPromise(usernameInput.current.value, passwordInput.current.value)
       .then((token) => {
         this.props.authTokenManager.setToken(token);
         if (this.props.postLoginFunction) {
-          return this.props.postLoginFunction(this.props.router, token);
+          return this.props.postLoginFunction(token);
         }
 
-        this.props.router.replace("/profile");
+        this.props.history.replace("/profile");
       }, (error) => {
         console.log(error);
         this.setState({ error: true, });
@@ -56,21 +58,20 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
         {errorMessage}
         <div style={{ textAlign: "center", }} className="form-group">
           <label style={{ textAlign: "left", width: "50%", }}>Username</label>
-          <div><input autoCorrect="off" autoCapitalize="none" type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" ref="username" />
+          <div><input autoCorrect="off" autoCapitalize="none" type="text" style={{ display: "inline-block", width: "50%", }} className="form-control" ref={this.userNameRef} />
           </div>
         </div>
         <div style={{ textAlign: "center", }} className="form-group" >
           <label style={{ textAlign: "left", width: "50%", }}>Password</label>
           <div>
-            <input type="password" style={{ display: "inline-block", width: "50%", }} className="form-control" name="password" ref="password" />
+            <input type="password" style={{ display: "inline-block", width: "50%", }} className="form-control" name="password" ref={this.passwordRef} />
           </div>
         </div>
-        <button ref="login" className="btn btn-primary" onClick={this.login.bind(this)}>Login</button>
+        <button ref={this.loginButtonRef} className="btn btn-primary" onClick={this.login.bind(this)}>Login</button>
       </div>
     </div>;
 
-    const parentRefs = () => this.refs;
-    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
+    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refs={[this.userNameRef, this.passwordRef, this.loginButtonRef,]}>{body}</Scrollable></div >;
 
   }
 }

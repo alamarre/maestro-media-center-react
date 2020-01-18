@@ -9,7 +9,6 @@ import KeepWatching from "../models/KeepWatchingData";
 import VideoLoader from "../utilities/VideoLoader";
 import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
 import CacheProvider from "../utilities/providers/CacheProvider";
-import { Router, } from "react-router";
 import FileCache from "../models/FileCache";
 import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
 import MetadataProvider from "../utilities/providers/MetadataProvider";
@@ -23,7 +22,6 @@ export interface KeepWatchingProps {
   videoLoader: VideoLoader;
   showProgressProvider: ShowProgressProvider;
   cacheProvider: CacheProvider;
-  router: Router;
   navOrder?: number;
   episodeLoader: CacheBasedEpisodeProvider;
   metadataProvider: MetadataProvider;
@@ -121,7 +119,6 @@ export default class KeepWatchingComponent extends React.Component<KeepWatchingP
 
     if (this.state.showName) {
       showPicker = <ShowPicker
-        router={this.props.router}
         metadataProvider={this.props.metadataProvider}
         episodeLoader={this.props.episodeLoader}
         navigation={this.props.navigation}

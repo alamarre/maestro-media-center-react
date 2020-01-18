@@ -11,7 +11,6 @@ export interface PlaylistPickerProps {
   playlistManager: any;
   showProgressProvider: any;
   videoLoader: any;
-  router: any;
   cancelFunction: () => void;
   playlistName: string;
   metadataProvider: any;

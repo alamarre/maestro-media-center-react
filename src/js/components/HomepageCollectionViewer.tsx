@@ -13,11 +13,12 @@ import VideoLoader from "../utilities/VideoLoader";
 import PlaylistManager from "../utilities/providers/playertypes/Playlist";
 import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
 import MetadataProvider from "../utilities/providers/MetadataProvider";
+import HomepageCollectionManager from "../utilities/HomepageCollectionManager";
 
 export interface HomepageCollectionViewerProps {
   navOrder?: number;
   navigation: INavigation;
-  router: any;
+  homepageCollectionManager: HomepageCollectionManager;
   episodeLoader: CacheBasedEpisodeProvider;
   videoLoader: VideoLoader;
   playlistManager: PlaylistManager;
@@ -42,7 +43,10 @@ export default class HomepageCollectionViewer extends React.Component<HomepageCo
     super(props);
     this.state = { root: "", collections: [], };
     this.dragging = false;
-    props.homepageCollectionManager.getAllCollections().then(collections => {
+  }
+
+  componentDidMount() {
+    this.props.homepageCollectionManager.getAllCollections().then(collections => {
       collections = collections.filter(c => {
         if (!c.startDate || !c.endDate) {
           return true;
@@ -60,15 +64,11 @@ export default class HomepageCollectionViewer extends React.Component<HomepageCo
       for (const collection of collections) {
         collection.items = collection.items.sort((a, b) => window["tvShowSort"](a.name, b.name));
       }
-      if (props.updateCount) {
-        props.updateCount(collections.length);
+      if (this.props.updateCount) {
+        this.props.updateCount(collections.length);
       }
       this.setState({ collections, });
     });
-  }
-
-  componentDidMount() {
-
   }
 
   isDragging(dragging) {
@@ -115,7 +115,6 @@ export default class HomepageCollectionViewer extends React.Component<HomepageCo
     if (this.state.movieName) {
       showPicker = <MoviePicker
         navigation={this.props.navigation}
-        router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
@@ -126,7 +125,6 @@ export default class HomepageCollectionViewer extends React.Component<HomepageCo
     }
     if (this.state.showName) {
       showPicker = <ShowPicker
-        router={this.props.router}
         navigation={this.props.navigation}
         metadataProvider={this.props.metadataProvider}
         episodeLoader={this.props.episodeLoader}

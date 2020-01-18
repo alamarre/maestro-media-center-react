@@ -90,7 +90,17 @@ export default class CacheBasedEpisodeProvider {
   }
 
   async getVideoSource(path): Promise<VideoSourceInformation> {
-    return await this.apiCaller.get("folders", `sources?path=${encodeURIComponent(path)}`);
+    const servers = await this.getServers();
+
+    const result = await this.apiCaller.get<VideoSourceInformation>("folders", `sources?path=${encodeURIComponent(path)}`);
+
+    for(let i=0; i< result.sources.length; i++) {
+      if(result.sources[i].indexOf("gladiator.omny.ca")) {
+        result.sources[i] = result.sources[i].replace("gladiator.omny.ca", servers[0].publicHostname);
+      }
+    }
+
+    return result;
   }
 
   async getServers(): Promise<Server[]> {

@@ -12,8 +12,11 @@ import VideoLoader from "../utilities/VideoLoader";
 import FileCache from "../models/FileCache";
 import SearchResult from "../models/SearchResult";
 
-export interface VideosListingProps {
-  router: any;
+import { RouteComponentProps, } from "react-router-dom";
+
+type TParams = { videoType: string };
+
+export interface VideosListingProps extends RouteComponentProps<TParams> {
   episodeLoader: CacheBasedEpisodeProvider;
   cacheProvider: CacheProvider;
   navigation: INavigation;
@@ -41,16 +44,16 @@ export default class VideosListing extends React.Component<VideosListingProps, V
   }
 
   componentDidMount() {
-    if (this.props.router.params && this.props.router.params.videoType) {
-      this.fetchFolder(this.props.router.params.videoType);
+    if (this.props.match.params && this.props.match.params.videoType) {
+      this.fetchFolder(this.props.match.params.videoType);
     } else if (this.props.episodeLoader) {
       this.props.episodeLoader.getListingPromise("").then(this.loadFolder.bind(this));
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.router.params) {
-      const newRoot = nextProps.router.params.videoType || "";
+  componentDidUpdate(prevProps: VideosListingProps) {
+    if (prevProps.match.params?.videoType != this.props.match.params?.videoType) {
+      const newRoot = this.props.match.params.videoType || "";
       this.setState({ rootPath: newRoot, }, () => {
         this.props.episodeLoader.getListingPromise(newRoot).then(this.loadFolder.bind(this));
       });
@@ -60,11 +63,11 @@ export default class VideosListing extends React.Component<VideosListingProps, V
   async fetchFolder(folder) {
     var newRoot = this.state.rootPath + "/" + folder;
 
-    if (this.props.router.params && this.props.router.params.videoType != folder) {
-      this.props.router.push(`/videos${newRoot}`);
+    if (this.props.match.params && this.props.match.params.videoType != folder) {
+      this.props.history.push(`/videos${newRoot}`);
     }
     this.setState({ rootPath: newRoot, });
-    const data = await this.props.episodeLoader.getListingPromise(newRoot);
+    const data = await this.props.episodeLoader.getListingPromise(decodeURIComponent(newRoot));
     await this.loadFolder(data);
   }
 
@@ -131,7 +134,6 @@ export default class VideosListing extends React.Component<VideosListingProps, V
     if (this.state.showName) {
       showPicker = <ShowPicker
         navigation={this.props.navigation}
-        router={this.props.router}
         metadataProvider={this.props.metadataProvider}
         videoLoader={this.props.videoLoader}
         episodeLoader={this.props.episodeLoader}
@@ -145,7 +147,6 @@ export default class VideosListing extends React.Component<VideosListingProps, V
       showPicker = <MoviePicker
         episodeLoader={this.props.episodeLoader}
         navigation={this.props.navigation}
-        router={this.props.router}
         metadataProvider={this.props.metadataProvider}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}

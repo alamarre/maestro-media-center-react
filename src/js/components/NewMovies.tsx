@@ -5,7 +5,6 @@ import MoviePicker from "./pickers/MovieDetails";
 import MetadataImage from "./generic/MetadataImage";
 import NewMoviesProvider from "../utilities/providers/NewMoviesProvider";
 import INavigation from "../utilities/providers/navigation/INavigation";
-import { Router, } from "react-router";
 import VideoLoader from "../utilities/VideoLoader";
 import PlaylistManager from "../utilities/providers/playertypes/Playlist";
 import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
@@ -16,7 +15,6 @@ export interface NewMoviesProps {
   newMoviesProvider: NewMoviesProvider;
   navigation: INavigation;
   navOrder?: number;
-  router: Router;
   videoLoader: VideoLoader;
   playlistManager: PlaylistManager;
   showProgressProvider: ShowProgressProvider;
@@ -88,7 +86,6 @@ export default class NewMovies extends React.Component<NewMoviesProps, NewMovies
     if (this.state.movieName) {
       showPicker = <MoviePicker
         navigation={this.props.navigation}
-        router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}

@@ -36,7 +36,7 @@ export default class MetadataPossibility extends React.Component<MetadataPossibi
       <div>
         <div>{name}</div>
         <hr />
-        <div style={{ display: "table", overflowStyle: "text-wrap", }}>
+        <div style={{ display: "table", overflow: "text-wrap", }}>
           <img style={{ display: "table-cell", verticalAlign: "top", margin: "10px", }} width={this.props.width} height={this.props.height} src={image} />
           <div style={{ display: "table-cell", verticalAlign: "top", margin: "10px", }}>
             <select value={this.state.selectedPossibility} style={{ width: "80vw", }} onChange={this.selectItem.bind(this)}>{selectOptions}</select>

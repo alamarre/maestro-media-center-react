@@ -16,14 +16,14 @@ import ShowProgressProvider from "../utilities/providers/ShowProgressProvider";
 import PlaylistManager from "../utilities/providers/playertypes/Playlist";
 import CollectionsManager from "../utilities/CollectionsManager";
 import VideoLoader from "../utilities/VideoLoader";
-import { RouteProps, } from "react-router";
+import QueryStringReader from "../utilities/QueryStringReader";
+import { RouteComponentProps, } from "react-router-dom";
 
-export interface VideoPlayerProps extends RouteProps {
+export interface VideoPlayerProps extends RouteComponentProps {
   navigation: INavigation;
   episodeLoader: CacheBasedEpisodeProvider;
   remoteController: WebSocketRemoteController;
-  location: any;
-  router: any;
+  queryStringReader: QueryStringReader;
   showProgressProvider: ShowProgressProvider;
   playlistManager: PlaylistManager;
   collectionsManager: CollectionsManager;
@@ -48,11 +48,13 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
   private preventIdleTimer: any;
   private progressTimer: any;
   private playerTypeHandlers: { [key: string]: IPlayerManager };
+  private query: { [key: string]: string };
 
   constructor(props) {
     super(props);
-    this.type = this.props.location.query.type;
-    this.profile = this.props.location.query.profile;
+    this.query = this.props.queryStringReader.parseParameters(this.props.location.search);
+    this.type = this.query["type"];
+    this.profile = this.query["profile"];
     this.preventIdleTimer = null;
     this.state = { refs: [], "overlayVisibility": false, showEpisodeInfo: false, showMenu: false, seekTime: -1, promptReload: false, };
     this.progressTimer = null;
@@ -94,13 +96,12 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
 
   componentDidMount() {
     this.props.navigation.focusDialog(this);
-    this.props.videoLoader.setRouter(this.props.router);
-    if (this.props.location.query.folder) {
-      var path = this.props.location.query.folder;
+    if (this.query["folder"]) {
+      var path = this.query["folder"];
       var parentPath = path.substring(0, path.lastIndexOf("/"));
       var subdirectory = path.substring(path.lastIndexOf("/") + 1);
 
-      this.setSourcePath(parentPath, subdirectory, this.props.location.query.index);
+      this.setSourcePath(parentPath, subdirectory, this.query["index"]);
     }
 
     document.addEventListener("maestro-load-video", (event: any) => {
@@ -122,7 +123,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
         this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
       };
       const goHome = () => {
-        this.props.router.push("/");
+        this.props.history.push("/");
       };
       return <ReloadVideoDialog navigation={this.props.navigation} reload={reload} goHome={goHome}></ReloadVideoDialog>
     }
@@ -168,7 +169,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     let menu = null;
     if (this.state.showMenu) {
       const items = [
-        { name: "Go Home", action: () => this.props.router.push("/"), },
+        { name: "Go Home", action: () => this.props.history.push("/"), },
         { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.closeMenu(); }, },
         { name: "Previous episode", action: () => { this.goToPrevious(); this.closeMenu(); }, },
         { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }, },
@@ -247,14 +248,28 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     if (sources == null && this.props.navigation) {
       this.setState({ promptReload: true, });
     } else {
-      this.setState({ sources, subtitles, name, seekTime, });
+      const orderedSources = [].concat(sources);
+      for (const source of sources) {
+        const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+        if (newSource) {
+          orderedSources.unshift(newSource);
+        }
+      }
+      this.setState({ sources: orderedSources, subtitles, name, seekTime, });
       this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
     }
   }
 
   async goToPrevious() {
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToPrevious();
-    this.setState({ sources, subtitles, name, seekTime, });
+    const orderedSources = [].concat(sources);
+    for (const source of sources) {
+      const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+      if (newSource) {
+        orderedSources.unshift(newSource);
+      }
+    }
+    this.setState({ sources: orderedSources, subtitles, name, seekTime, });
     this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
   }
 }

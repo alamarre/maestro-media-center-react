@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import WebSocketRemoteController from "../../utilities/WebSocketRemoteController";
 
 export interface Html5VideoPlayerProps {
@@ -17,8 +16,12 @@ export interface Html5VideoPlayerState {
 }
 
 export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerProps, Html5VideoPlayerState> {
-  constructor(props) {
+  private video = React.createRef<HTMLVideoElement>();
+  private started: boolean;
+
+  constructor(props, ) {
     super(props);
+    this.started = false;
     if (this.props.remoteController) {
       this.props.remoteController.mapPartialUpdateFunctions({
         play: this.play.bind(this),
@@ -31,8 +34,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
   }
 
   getVideoElement() {
-    const video: HTMLVideoElement = ReactDOM.findDOMNode(this.refs.video);
-    return video;
+    return this.video.current;
   }
 
   componentDidMount() {
@@ -73,20 +75,32 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     return this.getVideoElement() && this.getVideoElement().currentTime;
   }
 
-  seek(percent) {
+  seek(percent, ) {
     this.getVideoElement().currentTime = (this.getVideoElement().duration * percent) / 100;
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, ) {
     if (prevProps.sources[0] !== this.props.sources[0]) {
+      this.started = false;
       this.getVideoElement().load();
     }
+  }
+
+  playStarted() {
+    if (!this.started) {
+      this.started = true;
+      if (this.getVideoElement().currentTime < this.props.startTime) {
+        this.seekToTime(this.props.startTime);
+      }
+
+    }
+    this.props.onPlay(this);
   }
 
   render() {
     const subtitles = this.props.subtitles ?
       <track src={this.props.subtitles[0]} kind="subtitles" srcLang="en" label="English" default></track> : null;
-    const sources = this.props.sources.map(s => {
+    const sources = this.props.sources.map((s: any, ) => {
       return <source src={s} key={s} type="video/mp4"></source>;
     });
 
@@ -94,13 +108,13 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
       onClick={() => this.playPause()}
       onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }}
       onEnded={() => this.props.onEnded(this)}
-      onPlay={() => this.props.onPlay(this)}
+      onPlay={() => this.playStarted()}
       onPause={() => this.props.onPause(this)}
       style={{
         margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute",
         background: "#000", display: this.props.sources != null ? "block" : "none", outline: "none",
       }}
-      ref='video' data-source={this.props.sources[0]} controls={true} autoPlay={true}>
+      ref={this.video} data-source={this.props.sources[0]} controls={true} autoPlay={true}>
       {sources}
       {subtitles}
     </video>;

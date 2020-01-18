@@ -19,7 +19,7 @@ export interface NewShowsProps {
   navigation: INavigation;
   showProgressProvider: any;
   videoLoader: any;
-  router: any;
+
 }
 
 export interface NewShowsState {
@@ -88,7 +88,6 @@ export default class NewShows extends React.Component<NewShowsProps, NewShowsSta
 
     if (this.state.showName) {
       showPicker = <ShowPicker
-        router={this.props.router}
         navigation={this.props.navigation}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}

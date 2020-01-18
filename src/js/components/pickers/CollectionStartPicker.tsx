@@ -9,7 +9,6 @@ export interface CollectionPickerProps {
   navigation: INavigation;
   showProgressProvider: any;
   videoLoader: any;
-  router: any;
   cancelFunction: () => void;
   collectionName: string;
   metadataProvider: any;

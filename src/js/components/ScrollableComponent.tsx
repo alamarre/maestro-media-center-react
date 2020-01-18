@@ -3,8 +3,9 @@ import INavigation from "../utilities/providers/navigation/INavigation";
 
 export type ScrollableProps = {
   navigation: INavigation;
-  parentRefs: () => { [key: string]: ReactInstance };
-  refNames: string[];
+  parentRefs?: () => { [key: string]: ReactInstance };
+  refNames?: string[];
+  refs?: React.RefObject<HTMLButtonElement | HTMLInputElement | HTMLDivElement>[];
   isDialog: boolean;
   scrollOnHorizontal?: boolean;
 }
@@ -53,6 +54,10 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
     if (this.state && this.props.refNames && this.props.refNames.length > 0 && Object.keys(this.props.parentRefs()).length > 0) {
       this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
     }
+
+    if (this.props.refs && this.props.refs.length > 0) {
+      this.props.refs[this.selectedIndex].current.focus();
+    }
   }
 
   componentWillUnmount() {
@@ -77,6 +82,10 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
     if (this.state && this.props.refNames && this.props.refNames.length > 0 && Object.keys(this.props.parentRefs()).length > 0) {
       this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["click"]();
     }
+
+    if (this.props.refs && this.props.refs.length > 0) {
+      this.props.refs[this.selectedIndex].current.click();
+    }
   }
 
   focusNext() {
@@ -85,7 +94,11 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
       this.selectedIndex = 0;
     }
 
-    this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
+    if (this.props.refs && this.props.refs.length > 0) {
+      this.props.refs[this.selectedIndex].current.focus();
+    } else {
+      this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
+    }
   }
 
   focusPrevious() {
@@ -94,7 +107,11 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
       this.selectedIndex = this.props.refNames.length - 1;
     }
 
-    this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
+    if (this.props.refs && this.props.refs.length > 0) {
+      this.props.refs[this.selectedIndex].current.focus();
+    } else {
+      this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
+    }
   }
 
   render() {

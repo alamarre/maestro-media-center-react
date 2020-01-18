@@ -5,12 +5,12 @@ import INavigation from "../utilities/providers/navigation/INavigation";
 import ISettingsManager from "../utilities/ISettingsManager";
 import WebSocketSender from "../utilities/WebSocketSender";
 import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
+import { RouterProps, } from "react-router";
 
-export interface SettingsProps {
+export interface SettingsProps extends RouterProps {
   navOrder?: number;
   navigation: INavigation;
   settingsManager: ISettingsManager;
-  router: any;
   cancelFunction: () => void;
   remoteController: WebSocketRemoteController;
   webSocketSender: WebSocketSender;
@@ -98,16 +98,16 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
       this.props.settingsManager.set("lockProfilePin", null);
     }
 
-    this.props.router.push("/profile");
+    this.props.history.push("/profile");
   }
 
   close() {
-    this.props.router.push("/");
+    this.props.history.push("/");
   }
 
   logout() {
     document.cookie = "";
-    this.props.router.push("/login");
+    this.props.history.push("/login");
   }
 
   togglePin() {

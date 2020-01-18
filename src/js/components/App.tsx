@@ -1,6 +1,5 @@
 import React from "react";
 
-import Home from "./Home";
 import ISettingsManager from "../utilities/ISettingsManager";
 import CollectionsManager from "../utilities/CollectionsManager";
 import PlaylistManager from "../utilities/providers/playertypes/Playlist";
@@ -14,14 +13,13 @@ import AuthTokenManager from "../utilities/AuthTokenManager";
 import AccountProvider from "../utilities/providers/AccountProvider";
 import VideoLoader from "../utilities/VideoLoader";
 import INavigation from "../utilities/providers/navigation/INavigation";
+import { RouteComponentProps, } from "react-router-dom";
 
-export interface AppProps {
-  router: any,
+export interface AppProps extends RouteComponentProps {
   authTokenManager: AuthTokenManager,
   accountProvider: AccountProvider,
   videoLoader: VideoLoader,
   navigation: INavigation,
-  location: any;
   settingsManager: ISettingsManager;
   collectionsManager: CollectionsManager;
   playlistManager: PlaylistManager;
@@ -44,11 +42,11 @@ export default class App extends React.Component<AppProps, {}> {
 
   componentDidMount() {
     if (!this.props.authTokenManager.isAuthenticated()) {
-      if (this.props.router.location.pathname != "/login") {
-        this.props.router.replace("/login");
+      if (this.props.location.pathname != "/login") {
+        this.props.history.replace("/login");
       }
-    } else if (!this.props.authTokenManager.isProfileSet() && this.props.router.location.pathname != "/profile") {
-      this.props.router.replace("/profile");
+    } else if (!this.props.authTokenManager.isProfileSet() && this.props.location.pathname != "/profile") {
+      this.props.history.replace("/profile");
     } else {
       this.props.accountProvider.getAccountId().then(accountInfo => {
         window["accountId"] = accountInfo.accountId;
@@ -56,12 +54,12 @@ export default class App extends React.Component<AppProps, {}> {
       });
     }
 
-    this.props.videoLoader.setRouter(this.props.router);
+    this.props.videoLoader.setRouter(this.props.history);
 
     document.addEventListener("maestro-load-video", (event) => {
       event = event["detail"];
       //this.props.videoLoader.loadVideo(event["type"], event["folder"], event["index"]);
-      this.props.router.push(`/view?type=${event["type"]}&index=${event["index"]}&folder=${event["folder"]}&profile=${event["profile"]}`);
+      this.props.history.push(`/view?type=${event["type"]}&index=${event["index"]}&folder=${event["folder"]}&profile=${event["profile"]}`);
     });
 
     document.addEventListener("maestro-offline-change", (event) => {
@@ -108,7 +106,7 @@ export default class App extends React.Component<AppProps, {}> {
   }
 
   render() {
-    const body = this.props.children || <Home {...this.props} ></Home>
+    const body = this.props.children;
     return (
       <div>{body}</div>
     );

@@ -12,7 +12,7 @@ export interface ShowPickerProps {
   navigation: INavigation;
   showProgressProvider: any;
   videoLoader: any;
-  router: any;
+
   cancelFunction: () => void;
   showName: string;
   showPath: string;

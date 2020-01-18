@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { Link, } from "react-router";
+import { Link, } from "react-router-dom";
 import INavigation from "../../utilities/providers/navigation/INavigation";
 
 export interface ClickableButtonProps {
@@ -14,21 +13,24 @@ export interface ClickableButtonState {
 }
 
 export default class ClickableButton extends React.Component<ClickableButtonProps, ClickableButtonState> {
+  private ref = React.createRef<Link>();
 
+  constructor(props) {
+    super(props);
+  }
   componentDidMount() {
-    const node = ReactDOM.findDOMNode(this.refs.link);
-    this.props.navigation.registerElement(node, this.props.navOrder);
+
+    this.props.navigation.registerElement(this.ref.current, this.props.navOrder);
   }
 
   componentDidUpdate() {
-    const node = ReactDOM.findDOMNode(this.refs.link);
     if (this.props.navOrder) {
-      this.props.navigation.registerElement(node, this.props.navOrder);
+      this.props.navigation.registerElement(this.ref.current, this.props.navOrder);
     }
   }
 
   render() {
-    return <div><Link ref="link" className="nostyle" to={this.props.to}>{this.props.children}</Link></div>
+    return <div><Link ref={this.ref} className="nostyle" to={this.props.to}>{this.props.children}</Link></div>
   }
 }
 

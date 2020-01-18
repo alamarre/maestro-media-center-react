@@ -86,11 +86,17 @@ export default class ApiCaller {
       url += `/${path}`;
     }
 
+    if (url.indexOf("?") < 0) {
+      url += `?profile=${this.authTokenManager.getProfile()}`;
+    } else {
+      url += `&profile=${this.authTokenManager.getProfile()}`;
+    }
+
     if (options["queryParameters"]) {
-      url += "?";
+      //url += "?";
       for (const key of Object.keys(options["queryParametets"])) {
-        const prefix = url.endsWith("?") ? "" : "&";
-        url += `${prefix}${key}=${options["queryParametets"][key]}`;
+        //const prefix = url.endsWith("?") ? "" : "&";
+        url += `${key}=${options["queryParametets"][key]}`;
       }
     }
 

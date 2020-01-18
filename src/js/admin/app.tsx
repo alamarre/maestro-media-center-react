@@ -1,7 +1,8 @@
 require("@babel/polyfill");
 import React from "react";
 import { render, } from "react-dom";
-import { Router, Route, hashHistory, } from "react-router";
+import { Route, } from "react-router";
+import { HashRouter, } from "react-router-dom";
 import Metadata from "./components/Metadata";
 
 require("../style.scss");
@@ -52,11 +53,11 @@ const postLoginFunction = (router) => {
 };
 
 render((
-  <Router history={hashHistory}>
+  <HashRouter>
     <Route path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} >
       <Route path="metadata" component={(props) => (<Metadata {...props} apiCaller={apiCaller} />)} />
       <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} postLoginFunction={postLoginFunction} login={loginProvider} />)} />
     </Route>
-  </Router>
+  </HashRouter>
 ), div);
 

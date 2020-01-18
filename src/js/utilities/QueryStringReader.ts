@@ -5,7 +5,11 @@ export default class QueryStringReader implements IQueryStringReader {
   constructor() {
 
   }
-  private parseParameters(queryString: string): object {
+
+  parseParameters(queryString: string): { [key: string]: string } {
+    if (queryString.indexOf("?") >= 0) {
+      queryString = queryString.substring(queryString.indexOf("?") + 1);
+    }
     var params = queryString.split("&");
     var results = {};
     for (var i = 0; i < params.length; i++) {

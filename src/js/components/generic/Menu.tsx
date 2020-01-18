@@ -26,7 +26,6 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
   }
   componentDidMount() {
     this.setState({ refs: this.props.items.map((item, i) => `item-${i}`), });
-    super.componentDidMount();
   }
 
   componentWillUpdate() {

@@ -5,7 +5,6 @@ import PlaylistPicker from "./pickers/PlaylistPicker";
 import MoviePicker from "./pickers/MovieDetails";
 import MetadataImage from "./generic/MetadataImage";
 import INavigation from "../utilities/providers/navigation/INavigation";
-import { Router, } from "react-router";
 import SearchResult from "../models/SearchResult";
 import CacheBasedSearch from "../utilities/providers/CacheBasedSearch";
 import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
@@ -15,13 +14,11 @@ import MetadataProvider from "../utilities/providers/MetadataProvider";
 import CollectionsManager from "../utilities/CollectionsManager";
 import CacheProvider from "../utilities/providers/CacheProvider";
 import FileCache from "../models/FileCache";
-import ReactDOM from "react-dom";
 import PlaylistManager from "../utilities/providers/playertypes/Playlist";
 
 export interface SearchResultsProps {
   navOrder?: number;
   navigation: INavigation;
-  router: Router;
   searcher: CacheBasedSearch;
   episodeLoader: CacheBasedEpisodeProvider;
   showProgressProvider: ShowProgressProvider;
@@ -33,7 +30,7 @@ export interface SearchResultsProps {
 }
 
 export interface SearchResultsState {
-  refs: string[];
+  refs: React.RefObject<HTMLButtonElement>[];
   searchResults: SearchResult[];
   showName?: string;
   showPath?: string;
@@ -45,6 +42,7 @@ export interface SearchResultsState {
 
 export default class SearchResults extends React.Component<SearchResultsProps, SearchResultsState> {
   private currentResult: number;
+  private searchbox = React.createRef<HTMLInputElement>();
   constructor(props) {
     super(props);
     this.state = { "searchResults": [], refs: [], };
@@ -55,10 +53,11 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
     this.currentResult = 0;
     if (!value || value == "") {
       this.props.navigation.unfocusDialog(this);
-      return this.setState({ "searchResults": [], });
+      return this.setState({ "searchResults": [], refs: [], });
     }
     this.props.searcher.getResults(value).then(results => {
-      this.setState({ "searchResults": results, });
+      const refs = results.map(() => React.createRef<HTMLButtonElement>());
+      this.setState({ "searchResults": results, refs, });
       this.props.navigation.focusDialog(this);
     });
   }
@@ -70,10 +69,10 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
 
     }
     if (this.currentResult == 0) {
-      ReactDOM.findDOMNode<HTMLInputElement>(this.refs["searchbox"]).focus();
+      this.searchbox.current.focus();
     }
     else {
-      ReactDOM.findDOMNode<HTMLButtonElement>(this.refs[`searchresult-${this.currentResult - 1}`]).focus();
+      this.state.refs[this.currentResult - 1]?.current?.focus();
     }
   }
 
@@ -83,15 +82,15 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
       this.currentResult = this.state.searchResults.length;
     }
     if (this.currentResult == 0) {
-      ReactDOM.findDOMNode<HTMLInputElement>(this.refs["searchbox"]).focus();
+      this.searchbox?.current?.focus();
     } else {
-      ReactDOM.findDOMNode<HTMLButtonElement>(this.refs[`searchresult-${this.currentResult - 1}`]).focus();
+      this.state.refs[this.currentResult - 1]?.current?.focus();
     }
   }
 
   selectCurrent() {
     if (this.currentResult > 0) {
-      ReactDOM.findDOMNode<HTMLButtonElement>(this.refs[`searchresult-${this.currentResult - 1}`]).click();
+      this.state.refs[this.currentResult - 1]?.current?.click();
     }
   }
 
@@ -117,25 +116,24 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
   }
 
   cancelShowChooser() {
-    ReactDOM.findDOMNode<HTMLInputElement>(this.refs["searchbox"]).value = "";
+    this.searchbox.current.value = "";
     this.search("");
     this.setState({ "showName": null, "collectionName": null, "playlistName": null, movieName: null, });
   }
 
   componentDidMount() {
-    this.props.navigation.registerElement(this.refs.searchbox, this.props.navOrder);
+    this.props.navigation.registerElement(this.searchbox.current, this.props.navOrder);
   }
 
   componentDidUpdate() {
     if (this.props.navOrder > -1) {
-      this.props.navigation.registerElement(this.refs.searchbox, this.props.navOrder);
+      this.props.navigation.registerElement(this.searchbox.current, this.props.navOrder);
     }
   }
 
   render() {
     const searchResults = this.state.searchResults.map((item, index) => {
-      const ref = `searchresult-${index}`;
-      return <div style={{ backgroundColor: "black", }}><button style={{ width: "100%", textAlign: "left", }} ref={ref} className="maestroButton" key={item.path} onClick={() => this.selectSource(item)}>
+      return <div style={{ backgroundColor: "black", }}><button style={{ width: "100%", textAlign: "left", }} ref={this.state.refs[index]} className="maestroButton" key={item.path} onClick={() => this.selectSource(item)}>
         <MetadataImage style={{ display: "inline-block", }} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
       </button></div>;
@@ -146,7 +144,6 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
     if (this.state.showName) {
       showPicker = <ShowPicker
         navigation={this.props.navigation}
-        router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
@@ -160,7 +157,6 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
       showPicker = <CollectionPicker
         navigation={this.props.navigation}
         metadataProvider={this.props.metadataProvider}
-        router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         collectionsManager={this.props.collectionsManager}
@@ -172,7 +168,6 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
       showPicker = <PlaylistPicker
         navigation={this.props.navigation}
         metadataProvider={this.props.metadataProvider}
-        router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         playlistManager={this.props.playlistManager}
@@ -183,7 +178,6 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
     } else if (this.state.movieName) {
       showPicker = <MoviePicker
         navigation={this.props.navigation}
-        router={this.props.router}
         episodeLoader={this.props.episodeLoader}
         videoLoader={this.props.videoLoader}
         showProgressProvider={this.props.showProgressProvider}
@@ -194,7 +188,7 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
     }
     var body = <div>
       <div>
-        <label>Search:</label><input ref="searchbox" type="text" onChange={evt => this.search(evt.target.value)} />
+        <label>Search:</label><input ref={this.searchbox} type="text" onChange={evt => this.search(evt.target.value)} />
       </div>
       {searchResultSection}
       {showPicker}
