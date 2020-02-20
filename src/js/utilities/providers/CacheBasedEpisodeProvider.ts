@@ -94,11 +94,11 @@ export default class CacheBasedEpisodeProvider {
 
     const result = await this.apiCaller.get<VideoSourceInformation>("folders", `sources?path=${encodeURIComponent(path)}`);
 
-    for(let i=0; i< result.sources.length; i++) {
+    /*for(let i=0; i< result.sources.length; i++) {
       if(result.sources[i].indexOf("gladiator.omny.ca")) {
         result.sources[i] = result.sources[i].replace("gladiator.omny.ca", servers[0].publicHostname);
       }
-    }
+    }*/
 
     return result;
   }

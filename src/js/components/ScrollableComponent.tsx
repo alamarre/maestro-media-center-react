@@ -26,7 +26,7 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
   }
 
   componentDidMount() {
-    if (this.props.isDialog) {
+    if (this.props.isDialog && this.props.navigation) {
       this.props.navigation.focusDialog(this);
     }
 
@@ -38,7 +38,7 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
   }
 
   componentDidUpdate(prevProps) {
-    if (this.isDialog) {
+    if (this.isDialog && this.props.navigation) {
       this.props.navigation.focusDialog(this);
     }
     if (this.props.refNames != prevProps.refNames) {
@@ -51,6 +51,9 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
   }
 
   focusCurrent() {
+    if(!this.props.navigation) {
+      return;
+    }
     if (this.state && this.props.refNames && this.props.refNames.length > 0 && Object.keys(this.props.parentRefs()).length > 0) {
       this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
     }

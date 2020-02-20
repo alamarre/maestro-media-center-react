@@ -34,8 +34,11 @@ const apiCaller = new ApiCaller(authTokenManager, scheme, host + ":" + port);
 import LoginProvider from "../utilities/LoginProvider";
 const loginProvider = new LoginProvider(apiCaller);
 import LoginComponent from "../components/Login";
+import Uploader from "./components/Uploader";
+import App from "./components/App";
 
 const div = document.createElement("div");
+div.className = "app";
 document.body.appendChild(div);
 
 window["tvShowSort"] = function (a, b) {
@@ -48,16 +51,18 @@ window["tvShowSort"] = function (a, b) {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base", });
 };
 
-const postLoginFunction = (router) => {
-  router.push("/");
+const postLoginFunction = (history) => {
+  history.replace("/");
 };
 
 render((
   <HashRouter>
-    <Route path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} >
-      <Route path="metadata" component={(props) => (<Metadata {...props} apiCaller={apiCaller} />)} />
-      <Route path="login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} postLoginFunction={postLoginFunction} login={loginProvider} />)} />
-    </Route>
+    <Route path="/" component={(props) => (<App {...props} authTokenManager={authTokenManager} />)} />
+    <Route exact path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} />
+    <Route path="/metadata" component={(props) => (<Metadata {...props} apiCaller={apiCaller} />)} />
+    <Route path="/upload" component={(props) => (<Uploader {...props} apiCaller={apiCaller} />)} />
+    <Route path="/login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} postLoginFunction={postLoginFunction} login={loginProvider} />)} />
+
   </HashRouter>
 ), div);
 

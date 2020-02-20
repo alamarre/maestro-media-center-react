@@ -11,7 +11,7 @@ export interface LoginProps extends RouteComponentProps {
   login: LoginProvider;
 
   authTokenManager: AuthTokenManager;
-  postLoginFunction: (token: string) => void;
+  postLoginFunction: (history: any, token: string) => void;
 }
 
 export interface LoginState {
@@ -37,7 +37,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
       .then((token) => {
         this.props.authTokenManager.setToken(token);
         if (this.props.postLoginFunction) {
-          return this.props.postLoginFunction(token);
+          return this.props.postLoginFunction(this.props.history, token);
         }
 
         this.props.history.replace("/profile");
