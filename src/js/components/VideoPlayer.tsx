@@ -123,7 +123,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
         this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
       };
       const goHome = () => {
-        this.props.history.push("/");
+        this.props.history.replace("/");
       };
       return <ReloadVideoDialog navigation={this.props.navigation} reload={reload} goHome={goHome}></ReloadVideoDialog>
     }
@@ -169,7 +169,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     let menu = null;
     if (this.state.showMenu) {
       const items = [
-        { name: "Go Home", action: () => this.props.history.push("/"), },
+        { name: "Go Home", action: () => this.props.history.replace("/"), },
         { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.closeMenu(); }, },
         { name: "Previous episode", action: () => { this.goToPrevious(); this.closeMenu(); }, },
         { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }, },

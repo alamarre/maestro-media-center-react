@@ -40,18 +40,26 @@ export default class App extends React.Component<AppProps, {}> {
     this.state = {};
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (!this.props.authTokenManager.isAuthenticated()) {
       if (this.props.location.pathname != "/login") {
         this.props.history.replace("/login");
       }
-    } else if (!this.props.authTokenManager.isProfileSet() && this.props.location.pathname != "/profile") {
+      return;
+    }
+
+    if (!this.props.authTokenManager.isProfileSet() && this.props.location.pathname != "/login" && this.props.location.pathname != "/profile") {
       this.props.history.replace("/profile");
     } else {
-      this.props.accountProvider.getAccountId().then(accountInfo => {
+      try {
+        const accountInfo = await this.props.accountProvider.getAccountId();
         window["accountId"] = accountInfo.accountId;
         this.forceUpdate();
-      });
+      } catch(e) {
+        if (this.props.location.pathname != "/login") {
+          this.props.history.replace("/login");
+        }
+      }
     }
 
     this.props.videoLoader.setRouter(this.props.history);
