@@ -97,6 +97,14 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     this.props.onPlay(this);
   }
 
+  onPause() {
+    const video = this.getVideoElement();
+    if(video.error && video.duration - video.currentTime < 2) {
+      return this.props.onEnded(this);
+    }
+    this.props.onPause(this);
+  }
+
   render() {
     const subtitles = this.props.subtitles ?
       <track src={this.props.subtitles[0]} kind="subtitles" srcLang="en" label="English" default></track> : null;
@@ -109,7 +117,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
       onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }}
       onEnded={() => this.props.onEnded(this)}
       onPlay={() => this.playStarted()}
-      onPause={() => this.props.onPause(this)}
+      onPause={() => this.onPause()}
       style={{
         margin: 0, padding: 0, left: 0, top: 0, width: "100%", height: "100%", position: "absolute",
         background: "#000", display: this.props.sources != null ? "block" : "none", outline: "none",

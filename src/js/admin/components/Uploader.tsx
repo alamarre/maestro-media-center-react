@@ -145,7 +145,7 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
 
 
       let i = 1;
-      const partSize = Math.min(5*1024*1024, file.size / 2);
+      const partSize = Math.min(1*1024*1024, file.size / 2);
       let start = 0;
 
       while(start < file.size) {

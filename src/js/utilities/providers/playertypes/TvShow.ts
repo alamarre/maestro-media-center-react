@@ -1,4 +1,5 @@
 import VideoPlayInformation from "../../../models/VideoPlayInformation";
+import IEpisodeProvider from "../IEpisodeProvider";
 
 export default class TvShowPlayerManager {
 
@@ -8,7 +9,7 @@ export default class TvShowPlayerManager {
   private episodes: string[];
   private parentFolders: string[];
 
-  constructor(private episodeLoader, private showProgressProvider) {
+  constructor(private episodeLoader: IEpisodeProvider, private showProgressProvider) {
     this.episodeLoader = episodeLoader;
     this.showProgressProvider = showProgressProvider;
   }

@@ -1,5 +1,6 @@
 import IPlayerManager from "./IPlayerManager";
 import PlaylistEntry from "../../../models/PlaylistEntry";
+import IEpisodeProvider from "../IEpisodeProvider";
 
 export default class PlaylistManager implements IPlayerManager {
   private playlist: string;
@@ -9,7 +10,7 @@ export default class PlaylistManager implements IPlayerManager {
   constructor(
     private rootFolder,
     private playlistManager,
-    private episodeLoader,
+    private episodeLoader: IEpisodeProvider,
     private showProgressProvider) {
 
     this.rootFolder = rootFolder;

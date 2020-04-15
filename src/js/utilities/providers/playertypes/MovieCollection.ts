@@ -1,5 +1,6 @@
 import IPlayerManager from "./IPlayerManager";
 import VideoPlayInformation from "../../../models/VideoPlayInformation";
+import IEpisodeProvider from "../IEpisodeProvider";
 
 export default class MovieCollectionManager implements IPlayerManager {
 
@@ -8,7 +9,7 @@ export default class MovieCollectionManager implements IPlayerManager {
   private movies: string[];
   private parentFolders: string[];
 
-  constructor(private rootFolder, private collectionsManager, private episodeLoader, private showProgressProvider) {
+  constructor(private rootFolder, private collectionsManager, private episodeLoader : IEpisodeProvider, private showProgressProvider) {
     this.rootFolder = rootFolder;
     this.collectionsManager = collectionsManager;
     this.episodeLoader = episodeLoader;

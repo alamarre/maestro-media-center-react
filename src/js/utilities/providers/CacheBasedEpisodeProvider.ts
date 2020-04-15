@@ -2,6 +2,7 @@ import ApiCaller from "./ApiCaller";
 import Server from "../../models/Server";
 import VideoSourceInformation from "../../models/VideoSourceInformation";
 import ICacheProvider from "./ICacheProvider";
+import IEpisodeProvider from "./IEpisodeProvider";
 
 function timeoutPromise(ms, promise): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -21,7 +22,7 @@ function timeoutPromise(ms, promise): Promise<any> {
   });
 }
 
-export default class CacheBasedEpisodeProvider {
+export default class CacheBasedEpisodeProvider implements IEpisodeProvider {
   private serverPromise: Promise<Server[]>;
   constructor(
     private apiCaller: ApiCaller, private cacheProvider: ICacheProvider, private showProgressProvider) {

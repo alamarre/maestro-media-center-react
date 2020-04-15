@@ -1,11 +1,12 @@
 import IPlayerManager from "./IPlayerManager";
+import IEpisodeProvider from "../IEpisodeProvider";
 
 export default class MoviePlayerManager implements IPlayerManager {
 
   private movieName: string;
   private index: number;
 
-  constructor(private episodeLoader, private showProgressProvider) {
+  constructor(private episodeLoader: IEpisodeProvider, private showProgressProvider) {
     this.episodeLoader = episodeLoader;
     this.showProgressProvider = showProgressProvider;
   }

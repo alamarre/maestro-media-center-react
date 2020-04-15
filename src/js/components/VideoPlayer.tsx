@@ -8,7 +8,6 @@ import TvShowSeriesPlayer from "../utilities/providers/playertypes/TvShow";
 import MoviePlayer from "../utilities/providers/playertypes/Movie";
 import MovieCollection from "../utilities/providers/playertypes/MovieCollection";
 import Playlist from "../utilities/providers/playertypes/Playlist";
-import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
 import INavigation from "../utilities/providers/navigation/INavigation";
 import WebSocketRemoteController from "../utilities/WebSocketRemoteController";
 import IPlayerManager from "../utilities/providers/playertypes/IPlayerManager";
@@ -18,10 +17,11 @@ import CollectionsManager from "../utilities/CollectionsManager";
 import VideoLoader from "../utilities/VideoLoader";
 import QueryStringReader from "../utilities/QueryStringReader";
 import { RouteComponentProps, } from "react-router-dom";
+import IEpisodeProvider from "../utilities/providers/IEpisodeProvider";
 
 export interface VideoPlayerProps extends RouteComponentProps {
   navigation: INavigation;
-  episodeLoader: CacheBasedEpisodeProvider;
+  episodeLoader: IEpisodeProvider;
   remoteController: WebSocketRemoteController;
   queryStringReader: QueryStringReader;
   showProgressProvider: ShowProgressProvider;
@@ -210,7 +210,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
 
     const orderedSources = [].concat(sources);
     for (const source of sources) {
-      const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+      const newSource = null;//await this.props.episodeLoader.getAvailableLocalSource(source);
       if (newSource) {
         orderedSources.unshift(newSource);
       }
@@ -250,7 +250,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     } else {
       const orderedSources = [].concat(sources);
       for (const source of sources) {
-        const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+        const newSource = null;//await this.props.episodeLoader.getAvailableLocalSource(source);
         if (newSource) {
           orderedSources.unshift(newSource);
         }
@@ -264,7 +264,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToPrevious();
     const orderedSources = [].concat(sources);
     for (const source of sources) {
-      const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+      const newSource = null; //await this.props.episodeLoader.getAvailableLocalSource(source);
       if (newSource) {
         orderedSources.unshift(newSource);
       }
