@@ -4,6 +4,7 @@ import { render, } from "react-dom";
 import { Route, } from "react-router";
 import { HashRouter, } from "react-router-dom";
 import Metadata from "./components/Metadata";
+import CustomizeMetadata from "./components/CustomizeMetadata";
 
 require("../style.scss");
 require("./style.scss");
@@ -14,7 +15,7 @@ var port = process.env.PORT
   || window.location.port
   || (scheme == "http" ? 80 : 443);
 
-//const MAIN_HOST = process.env.MAIN_HOST;
+const MAIN_HOST = process.env.MAIN_HOST;
 
 
 import Home from "./Home";
@@ -27,7 +28,7 @@ import QueryStringReader from "../utilities/QueryStringReader";
 
 const authTokenManager = new AuthTokenManger(new QueryStringReader(), new SettingsManager());
 //const apiRequester = new ApiRequester(jquery, authTokenManager, scheme, host + ":" + port);
-//const mainHostApiCaller = new ApiCaller(authTokenManager, scheme, MAIN_HOST + ":" + port);
+const mainHostApiCaller = new ApiCaller(authTokenManager, scheme, MAIN_HOST + ":" + port);
 const apiCaller = new ApiCaller(authTokenManager, scheme, host + ":" + port);
 
 
@@ -60,7 +61,8 @@ render((
     <Route path="/" component={(props) => (<App {...props} authTokenManager={authTokenManager} />)} />
     <Route exact path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} />
     <Route path="/metadata" component={(props) => (<Metadata {...props} apiCaller={apiCaller} />)} />
-    <Route path="/upload" component={(props) => (<Uploader {...props} apiCaller={apiCaller} />)} />
+    <Route path="/custom-metadata" component={(props) => (<CustomizeMetadata {...props} apiCaller={apiCaller} />)} />
+    <Route path="/upload" component={(props) => (<Uploader {...props} apiCaller={apiCaller} userApiCaller={mainHostApiCaller} />)} />
     <Route path="/login" component={(props) => (<LoginComponent {...props} authTokenManager={authTokenManager} postLoginFunction={postLoginFunction} login={loginProvider} />)} />
 
   </HashRouter>

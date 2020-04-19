@@ -32,7 +32,7 @@ export default class CacheBasedEpisodeProvider implements IEpisodeProvider {
   async updateServers(): Promise<Server[]> {
     const result = this.getAvailableServers();
     this.serverPromise = result;
-    setTimeout(() => this.updateServers(), 30000);
+    //setTimeout(() => this.updateServers(), 30000);
     return await result;
   }
 

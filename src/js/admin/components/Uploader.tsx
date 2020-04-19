@@ -1,6 +1,7 @@
 import React from "react";
 
 import ApiCaller from "../../utilities/providers/ApiCaller";
+import MovieMetadata from "../../models/MovieMetadata";
 import uuid from "uuid/v4";
 
 const tvPattern = /s?([0-9]{1,3})(\s|[.exEX-])+([0-9]{1,3})/i;
@@ -17,24 +18,24 @@ interface EpisodeData {
 
 function cleanup(value) {
   const result = removeLeadingPattern.exec(value);
-  const [,,output,] = result;
+  const [, , output,] = result;
   return output;
 }
 function parseByName(value) {
   const result = tvPattern.exec(value);
-  if(result) {
-    const [fullMatch,season,,episode,] = result;
-    let show ="";
-    if(value.indexOf(fullMatch) > 0) {
+  if (result) {
+    const [fullMatch, season, , episode,] = result;
+    let show = "";
+    if (value.indexOf(fullMatch) > 0) {
       show = value.substring(0, value.indexOf(fullMatch)).trim();
     }
 
     const name = cleanup(value.substring(value.indexOf(fullMatch) + fullMatch.length));
 
-    return {show, movieName: value, season, name, episode, type: "tv",};
+    return { show, movieName: value, season, name, episode, type: "tv", };
   }
 
-  return {type: "movie", moveieName: value, name: value,};
+  return { type: "movie", moveieName: value, name: value, };
 }
 
 interface File {
@@ -46,6 +47,8 @@ interface File {
   data: EpisodeData;
   videoType: string;
   enqueued: boolean;
+  metadata: MovieMetadata;
+  possibleMetadata: any;
   slice: (start: number, end: number, contentType?: string) => Blob;
   arrayBuffer: () => ArrayBuffer;
 }
@@ -57,18 +60,18 @@ interface Blob {
 
 export interface UploaderProps {
   apiCaller: ApiCaller;
+  userApiCaller: ApiCaller;
 }
 
 export interface UploaderState {
   files: any[];
 }
 
-
-
 export default class Uploader extends React.Component<UploaderProps, UploaderState> {
   private toUpload;
   private currentIndex = 0;
   private uploading = false;
+
   constructor(props) {
     super(props);
     this.state = { files: [] };
@@ -79,15 +82,29 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
 
   }
 
+  async updateMetadataInfo(file: File) {
+    const prefix = file.type == "movie" ? `movie` : `tv/show`;
+    try {
+      const actualMetadata = await this.props.userApiCaller.get<MovieMetadata>("metadata", `${prefix}/${file.name}`);
+      file.metadata = actualMetadata;
+    } catch (e) {
+      const possibleMetadata = await this.props.apiCaller.get("metadata", `${file.type}/${file.name}`);
+      file.possibleMetadata = possibleMetadata;
+    }
+
+    this.setState(this.state);
+  }
+
   async handleFileSelect(evt) {
 
-    const files : File[] = Array.from(evt.target.files);
-    files.forEach(file => {
+    const files: File[] = Array.from(evt.target.files);
+    await Promise.all(files.map(async file => {
       const data = parseByName(file.name);
       file.data = data;
       file.videoType = data.type;
-    });
-    this.setState({files: this.state.files.concat(files)});
+      await this.updateMetadataInfo(file);
+    }))
+    this.setState({ files: this.state.files.concat(files) });
   }
 
   async enqueueFile(file: File) {
@@ -96,36 +113,36 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
     file.progress = 0;
 
 
-    this.setState({files: this.state.files});
+    this.setState({ files: this.state.files });
 
-    if(!this.uploading) {
+    if (!this.uploading) {
       this.startUpload();
     }
   }
 
   async startUpload() {
-    while(this.currentIndex <= this.toUpload.length) {
-      const file : File = this.toUpload[this.currentIndex++];
+    while (this.currentIndex <= this.toUpload.length) {
+      const file: File = this.toUpload[this.currentIndex++];
       const bucket = "lamarre-videos";
-      const extension = file.name.substring(file.name.lastIndexOf(".")+1);
-      const fileName = uuid()+"."+extension;
+      const extension = file.name.substring(file.name.lastIndexOf(".") + 1);
+      const fileName = uuid() + "." + extension;
 
-      if(file.size < 5*1024*1024) {
+      if (file.size < 5 * 1024 * 1024) {
         const shaArray = await crypto.subtle.digest("SHA-1", await file.arrayBuffer());
         const hashArray = Array.from(new Uint8Array(shaArray));                     // convert buffer to byte array
         const sha = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-        const uploadInfo : any = await this.props.apiCaller.post("b2", "files/get_upload_url", {bucket});
-        const {uploadUrl, authorizationToken, fileId} = uploadInfo;
+        const uploadInfo: any = await this.props.apiCaller.post("b2", "files/get_upload_url", { bucket });
+        const { uploadUrl, authorizationToken, fileId } = uploadInfo;
         let status = -1;
-        const headers : any = {
+        const headers: any = {
           "Authorization": authorizationToken,
           "X-Bz-File-Name": fileName,
           "Content-Type": file.type,
           "Content-Length": file.size,
           "X-Bz-Content-Sha1": sha
         };
-        const blob : any = file;
-        while(status != 200) {
+        const blob: any = file;
+        while (status != 200) {
           const result = await fetch(`https://cors-proxy.al.workers.dev/?${uploadUrl}`, {
             method: "POST",
             mode: "cors",
@@ -137,34 +154,34 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
         continue;
       }
 
-      const startInfo : object = await this.props.apiCaller.post("b2", `files/${bucket}/${fileName}`, {});
-      const uploadInfo : any = await this.props.apiCaller.post("b2", "files/get_upload_part_url", startInfo);
-      const {uploadUrl, authorizationToken, fileId} = uploadInfo;
+      const startInfo: object = await this.props.apiCaller.post("b2", `files/${bucket}/${fileName}`, {});
+      const uploadInfo: any = await this.props.apiCaller.post("b2", "files/get_upload_part_url", startInfo);
+      const { uploadUrl, authorizationToken, fileId } = uploadInfo;
       const shas = [];
 
 
 
       let i = 1;
-      const partSize = Math.min(1*1024*1024, file.size / 2);
+      const partSize = Math.min(1 * 1024 * 1024, file.size / 2);
       let start = 0;
 
-      while(start < file.size) {
+      while (start < file.size) {
 
-        const current : any = file.slice(start, Math.min(start+partSize, file.size), file.type);
+        const current: any = file.slice(start, Math.min(start + partSize, file.size), file.type);
 
         const shaArray = await crypto.subtle.digest("SHA-1", await current.arrayBuffer());
         const hashArray = Array.from(new Uint8Array(shaArray));                     // convert buffer to byte array
         const sha = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
         start += partSize;
         shas.push(sha);
-        const headers : any = {
+        const headers: any = {
           "Authorization": authorizationToken,
           "X-Bz-Part-Number": i++,
           "Content-Length": current.size,
           "X-Bz-Content-Sha1": sha
         };
         let status = -1;
-        while(status != 200) {
+        while (status != 200) {
           const result = await fetch(`https://cors-proxy.al.workers.dev/?${uploadUrl}`, {
             method: "POST",
             mode: "cors",
@@ -173,14 +190,14 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
           });
           status = result.status;
         }
-        file.progress = Math.round((100 * start/file.size) * 100) / 100;
-        if(file.progress > 100) {
+        file.progress = Math.round((100 * start / file.size) * 100) / 100;
+        if (file.progress > 100) {
           file.progress = 100;
         }
-        this.setState({files: this.state.files});
+        this.setState({ files: this.state.files });
       }
 
-      const completeInfo = await this.props.apiCaller.put("b2", "files/complete", Object.assign(startInfo, {shas}));
+      const completeInfo = await this.props.apiCaller.put("b2", "files/complete", Object.assign(startInfo, { shas }));
       //return completeInfo;
     }
     this.uploading = false;
@@ -190,7 +207,7 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
     const files = this.state.files.map((f: File) => {
       const bottom = f.enqueued ? <div>{f.progress}%</div> : <button onClick={() => this.enqueueFile(f)}>Upload</button>;
 
-      const selector = <select onChange={(evt) => {f.videoType = evt.target.value; this.setState({files: this.state.files})}} defaultValue={f.videoType}>
+      const selector = <select onChange={(evt) => { f.videoType = evt.target.value; this.setState({ files: this.state.files }) }} defaultValue={f.videoType}>
         <option value="tv">TV Show</option>
         <option value="movie">Movie</option>
       </select>;
@@ -207,7 +224,7 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
           <div>Name: <input onChange={(evt) => f.data.movieName = evt.target.name} defaultValue={f.data.movieName}></input></div>
         </div> : null;
 
-      const formWrapper = f.videoType ? <div>{selector}{form}</div>: null;
+      const formWrapper = f.videoType ? <div>{selector}{form}</div> : null;
       return <div key={f.name}>
         <div>{f.name}</div>
         {formWrapper}
@@ -221,8 +238,9 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
           fontWeight: 700,
           color: "white",
           backgroundColor: "red",
-          display: "inline-block"}}>Choose files
-          <input style={{position: "absolute", top: 0, left: 0, width: "0.1px", height: "0.1px", opacity: 0, overflow: "hidden", zIndex: -1}} type="file" onChange={(evt) => this.handleFileSelect(evt)} name="filefield" multiple={true} />
+          display: "inline-block"
+        }}>Choose files
+          <input style={{ position: "absolute", top: 0, left: 0, width: "0.1px", height: "0.1px", opacity: 0, overflow: "hidden", zIndex: -1 }} type="file" onChange={(evt) => this.handleFileSelect(evt)} name="filefield" multiple={true} />
         </label>
 
         <div>{files}</div>

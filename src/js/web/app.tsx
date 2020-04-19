@@ -57,7 +57,7 @@ const accountProvider = new AccountProvider(apiCaller);
 import WebSocketSender from "../utilities/WebSocketSender";
 const webSocketSender = new WebSocketSender(wsHost, wsPort, authTokenManager);
 webSocketSender.setClient(settingsManager.get("playToRemoteClient"));
-webSocketSender.connect();
+//webSocketSender.connect();
 
 const cacheProvider = new CacheProvider(apiCaller);
 const showProgressProvider = new ShowProgressProvider(apiCaller, cacheProvider);
@@ -129,4 +129,4 @@ ReactDOM.render((
   </HashRouter>
 ), div);
 
-webSocketRemoteController.connect();
+//webSocketRemoteController.connect();

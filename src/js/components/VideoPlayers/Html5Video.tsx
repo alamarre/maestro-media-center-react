@@ -99,7 +99,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
 
   onPause() {
     const video = this.getVideoElement();
-    if(video.error && video.duration - video.currentTime < 2) {
+    if (video.error && video.duration - video.currentTime < 2) {
       return this.props.onEnded(this);
     }
     this.props.onPause(this);

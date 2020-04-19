@@ -24,7 +24,7 @@ export default class TvShowPlayerManager {
   }
 
   private async getEpisodes(): Promise<VideoPlayInformation> {
-    const listing = await this.episodeLoader.getListingPromise(this.parentPath + "/" + this.subdirectory);
+    const listing = await this.episodeLoader.getListingPromise(encodeURIComponent(this.parentPath + "/" + this.subdirectory));
     this.episodes = listing.files.sort(window["tvShowSort"]);
     if (this.index == null) {
       this.index = listing.files.length - 1;
@@ -62,7 +62,6 @@ export default class TvShowPlayerManager {
         this.showProgressProvider.markStatus(parentPath + "/" + this.subdirectory + "/" + episode, "started", 0);
       }
     }
-
 
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }

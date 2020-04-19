@@ -25,8 +25,15 @@ export default class Home extends React.Component<HomeProps, HomeState> {
 
   render() {
     var body = this.props.children || <div>
-      <Link className="nostyle" to="metadata">Metadata</Link>
-      <Link className="nostyle" to="upload">Upload</Link>
+      <div>
+        <Link className="nostyle" to="metadata">Approve Metadata</Link>
+      </div>
+      <div>
+        <Link className="nostyle" to="custom-metadata">Customize Metadata</Link>
+      </div>
+      <div>
+        <Link className="nostyle" to="upload">Upload</Link>
+      </div>
     </div>;
     return (
       <div>{body}</div>
