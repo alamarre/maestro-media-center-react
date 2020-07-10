@@ -68,18 +68,17 @@ export default class NewShows extends React.Component<NewShowsProps, NewShowsSta
     const shows = this.state.shows.slice(0, 30).map((show) => {
 
       const name = show;
-      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "225px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
         key={show} onClick={this.play.bind(this, show)}>
-        <MetadataImage style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type="tv" name={show}></MetadataImage>
-        {name}
+        <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type="tv" name={show}></MetadataImage>
       </div>;
     });
 
-    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{shows}</Carousel>;
+    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={225}>{shows}</Carousel>;
 
     if (this.state.shows.length > 0) {
       videosView = <div>
-        <div>New Episodes</div>
+        <div className="homeHeader">New Episodes</div>
         {videosView}
       </div>;
     }

@@ -99,18 +99,17 @@ export default class KeepWatchingComponent extends React.Component<KeepWatchingP
           video.show === "playlist" ?
             video.season :
             video.show;
-      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
+      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "225px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video.show} onClick={this.play.bind(this, video)}>
-        <MetadataImage style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={type} name={name} ></MetadataImage>
-        {name}
+        <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={type} name={name} ></MetadataImage>
       </div>;
     });
 
-    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>;
+    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={225}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>
-        <div>Keep Watching</div>
+        <div className="homeHeader">Keep Watching</div>
         {videosView}
       </div>;
     }

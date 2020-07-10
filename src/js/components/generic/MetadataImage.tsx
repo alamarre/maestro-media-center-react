@@ -11,6 +11,7 @@ export interface MetadataImageProps {
   show?: string;
   season?: string;
   style: CSS.Properties;
+  displayNameOnFail?: boolean;
 }
 
 export interface MetadataImageState {
@@ -67,6 +68,12 @@ export default class MetadataImage extends Component<MetadataImageProps, Metadat
       type === "tv" ?
         `tv/show/${name}` :
         `${type}/${name}`;
+
+
+    if(this.props.displayNameOnFail && this.state.failed) {
+      const divStyle = Object.assign({ display: "block", width, height, textAlign: "center" }, this.props.style);
+      return <div style={divStyle}>{name}</div>
+    }
     const dimensions = `${width}x${height}`;
     const image = this.state.failed ? `${dimensions}/${failedImage}` : `${window["accountId"]}/${dimensions}/${imagePath}.png`;
     const src = `${imageRoot}/${image}`;

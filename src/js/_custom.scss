@@ -11,16 +11,12 @@ $list-group-bg:  black;
 
 $modal-md: 90%;
 
-button:focus {
-    background-color: #FF0;
-    border: 1px solid #FF0;
+*:focus {
+  outline: 5px solid;
+  outline-offset: -5px;
 }
 
-li:focus {
-  background-color: #FF0;
-  border: 1px solid #FF0;
-}
-
-div:focus {
-  background-color: #FF0;
+.homeHeader {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

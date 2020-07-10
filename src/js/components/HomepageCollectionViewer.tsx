@@ -97,16 +97,15 @@ export default class HomepageCollectionViewer extends React.Component<HomepageCo
 
     const collectionsView = this.state.collections.map((collection, index) => {
       const videos = collection.items.map(video => {
-        return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "350px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
+        return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "225px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
           key={video.name} onClick={this.play.bind(this, video)}>
-          <MetadataImage style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={video.type} name={video.name} ></MetadataImage>
-          {video.name}
+          <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={video.type} name={video.name} ></MetadataImage>
         </div>
       });
       const navOrder = this.props.navOrder ? this.props.navOrder + index : null;
       return <div key={collection.name}>
-        <div>{collection.name}</div>
-        <Carousel navOrder={navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={350}>{videos}</Carousel>
+        <div className="homeHeader">{collection.name}</div>
+        <Carousel navOrder={navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={225}>{videos}</Carousel>
       </div>
     });
 
