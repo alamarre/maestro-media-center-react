@@ -22,7 +22,7 @@
     "babelify": "^10.0.0",
     "elasticlunr": "^0.9.5",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "localforage": "^1.7.3",
     "rc-slider": "^8.7.1",
     "react": "^16.12.0",
