@@ -71,7 +71,7 @@ export default class MetadataImage extends Component<MetadataImageProps, Metadat
 
 
     if(this.props.displayNameOnFail && this.state.failed) {
-      const divStyle = Object.assign({ display: "block", width, height, textAlign: "center" }, this.props.style);
+      const divStyle = Object.assign({ display: "block", verticalAlign: "top", width, height, textAlign: "center" }, this.props.style);
       return <div style={divStyle}>{name}</div>
     }
     const dimensions = `${width}x${height}`;

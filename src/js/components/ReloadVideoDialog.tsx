@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, } from "react-bootstrap";
+import { Button, Dialog, DialogActions, DialogTitle, DialogContent } from "@material-ui/core";
 
 import Scrollable from "./ScrollableComponent";
 import INavigation from "../utilities/providers/navigation/INavigation";
@@ -15,6 +15,9 @@ export interface ReloadState {
 }
 
 export default class ReloadVideoDialog extends React.Component<ReloadProps, ReloadState> {
+
+  private reloadRef : React.RefObject<HTMLButtonElement> = React.createRef<HTMLButtonElement>();
+  private goHomeRef : React.RefObject<HTMLButtonElement> = React.createRef<HTMLButtonElement>();
   constructor(props) {
     super(props);
     this.state = Object.assign({ refs: ["reload", "home",], }, this.state);
@@ -22,27 +25,25 @@ export default class ReloadVideoDialog extends React.Component<ReloadProps, Relo
 
   render() {
     const body = <div>
-      <Modal show={true} animation={false} onHide={() => this.props.goHome()}>
-        <Modal.Header>
-          <Modal.Title>The video has ended</Modal.Title>
-        </Modal.Header>
+      <Dialog open={true} fullScreen={true}>
 
-        <Modal.Body>
+        <DialogTitle>
+          The video has ended
+        </DialogTitle>
 
+        <DialogContent>
           <label>Reload</label>
-          <button ref="reload" className="remoteButton" onClick={() => this.props.reload()}><i className="fa fa-refresh fa-3x"></i></button>
+          <button ref={this.reloadRef} className="remoteButton" onClick={() => this.props.reload()}><i className="fa fa-sync fa-3x"></i></button>
 
           <label>Go Home</label>
-          <button ref="home" className="remoteButton" onClick={() => this.props.goHome()}><i className="fa fa-home fa-3x"></i></button>
+          <button ref={this.goHomeRef} className="remoteButton" onClick={() => this.props.goHome()}><i className="fa fa-home fa-3x"></i></button>
 
-        </Modal.Body>
-        <Modal.Footer>
-        </Modal.Footer>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>;
 
     const parentRefs = () => this.refs;
-    return <div><Scrollable isDialog={true} scrollOnHorizontal={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
+    return <div><Scrollable isDialog={true} scrollOnHorizontal={true} navigation={this.props.navigation} refs={[[this.reloadRef],[this.goHomeRef]]}>{body}</Scrollable></div >;
 
   }
 }

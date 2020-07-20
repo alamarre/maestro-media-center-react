@@ -1,5 +1,5 @@
 import React from "react";
-import ShowPicker from "./ShowPicker";
+import ShowPicker from "./pickers/ShowPicker";
 import CollectionPicker from "./pickers/CollectionStartPicker";
 import PlaylistPicker from "./pickers/PlaylistPicker";
 import MoviePicker from "./pickers/MovieDetails";
@@ -133,7 +133,7 @@ export default class SearchResults extends React.Component<SearchResultsProps, S
 
   render() {
     const searchResults = this.state.searchResults.map((item, index) => {
-      return <div style={{ backgroundColor: "black", }}><button style={{ width: "100%", textAlign: "left", }} ref={this.state.refs[index]} className="maestroButton" key={item.path} onClick={() => this.selectSource(item)}>
+      return <div key={item.path + item.name} style={{ backgroundColor: "black", }}><button style={{ width: "100%", textAlign: "left", }} ref={this.state.refs[index]} className="maestroButton" key={item.path} onClick={() => this.selectSource(item)}>
         <MetadataImage style={{ display: "inline-block", }} type={item.type} name={item.name} width={50} height={75}></MetadataImage>
         {item.name}
       </button></div>;

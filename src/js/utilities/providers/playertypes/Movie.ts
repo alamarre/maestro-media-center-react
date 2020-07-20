@@ -39,7 +39,7 @@ export default class MoviePlayerManager implements IPlayerManager {
       }
     }
 
-    const path = "Movies";
+    const path = name;
     return { sources, subtitles, name, seekTime, path, index: this.index, };
   }
 

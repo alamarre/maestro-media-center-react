@@ -54,7 +54,6 @@ var alwaysPlugins = [
     $: "jquery",
     jquery: "jquery",
     "window.jQuery": "jquery",
-    Popper: ["popper.js", "default",],
   }),
   new webpack.DefinePlugin({
     "process.env": {
@@ -117,7 +116,7 @@ module.exports = {
         use: "file-loader",
       },
       {
-        test: /\.(s?css)$/,
+        test: /\.(css)$/,
         use: [{
           loader: "style-loader", // inject CSS to page
         }, {
@@ -131,9 +130,7 @@ module.exports = {
               ];
             },
           },
-        }, {
-          loader: "sass-loader", // compiles SASS to CSS
-        },],
+        }],
       },
 
     ],
@@ -143,6 +140,7 @@ module.exports = {
       "process.env": {
         "PORT": process.env.PORT || 3000,
         "HOST": JSON.stringify(process.env.HOST),
+        "MAIN_HOST": JSON.stringify(process.env.MAIN_HOST),
         "SCHEME": JSON.stringify(process.env.SCHEME),
         "WEBSOCKET_HOST": JSON.stringify(process.env.WEBSOCKET_HOST),
         "WEBSOCKET_PORT": JSON.stringify(process.env.WEBSOCKET_PORT),
@@ -152,6 +150,7 @@ module.exports = {
     new webpack.DefinePlugin({
       "process.env": {
         "HOST": JSON.stringify(process.env.HOST),
+        "MAIN_HOST": JSON.stringify(process.env.MAIN_HOST),
         "SCHEME": JSON.stringify(process.env.SCHEME),
         "WEBSOCKET_HOST": JSON.stringify(process.env.WEBSOCKET_HOST),
         "WEBSOCKET_PORT": JSON.stringify(process.env.WEBSOCKET_PORT),

@@ -71,7 +71,7 @@ export default class LoginComponent extends React.Component<LoginProps, LoginSta
       </div>
     </div>;
 
-    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refs={[this.userNameRef, this.passwordRef, this.loginButtonRef,]}>{body}</Scrollable></div >;
+    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refs={[[this.userNameRef], [this.passwordRef], [this.loginButtonRef]]}>{body}</Scrollable></div >;
 
   }
 }

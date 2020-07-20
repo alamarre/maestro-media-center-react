@@ -6,8 +6,8 @@ import { HashRouter, } from "react-router-dom";
 import Metadata from "./components/Metadata";
 import CustomizeMetadata from "./components/CustomizeMetadata";
 
-require("../style.scss");
-require("./style.scss");
+//require("../style.scss");
+require("./style.css");
 
 const host = process.env.HOST;
 var scheme = process.env.SCHEME || (window.location.protocol == "http:" ? "http" : "https");
@@ -37,6 +37,7 @@ const loginProvider = new LoginProvider(apiCaller);
 import LoginComponent from "../components/Login";
 import Uploader from "./components/Uploader";
 import App from "./components/App";
+import AccountProvider from "../utilities/providers/AccountProvider";
 
 const div = document.createElement("div");
 div.className = "app";
@@ -56,9 +57,11 @@ const postLoginFunction = (history) => {
   history.replace("/");
 };
 
+const accountProvider = new AccountProvider(mainHostApiCaller);
+
 render((
   <HashRouter>
-    <Route path="/" component={(props) => (<App {...props} authTokenManager={authTokenManager} />)} />
+    <Route path="/" component={(props) => (<App {...props} authTokenManager={authTokenManager} accountProvider={accountProvider} />)} />
     <Route exact path="/" component={(props) => (<Home {...props} authTokenManager={authTokenManager} />)} />
     <Route path="/metadata" component={(props) => (<Metadata {...props} apiCaller={apiCaller} />)} />
     <Route path="/custom-metadata" component={(props) => (<CustomizeMetadata {...props} apiCaller={apiCaller} />)} />

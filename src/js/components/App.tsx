@@ -115,8 +115,11 @@ export default class App extends React.Component<AppProps, {}> {
 
   render() {
     const body = this.props.children;
+
     return (
-      <div>{body}</div>
+      <div>
+        {body}
+      </div>
     );
   }
 }

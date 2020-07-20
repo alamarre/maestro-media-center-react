@@ -1,11 +1,12 @@
 import React from "react";
-import { Modal, } from "react-bootstrap";
 
-import MetadataImage from "./generic/MetadataImage";
-import FileCache from "../models/FileCache";
-import INavigation from "../utilities/providers/navigation/INavigation";
-import Scrollable from "./ScrollableComponent";
-import KeepWatching from "../models/KeepWatchingData";
+import { Button, Dialog, DialogTitle, DialogActions, DialogContent, NativeSelect } from "@material-ui/core";
+
+import FileCache from "../../models/FileCache";
+import INavigation from "../../utilities/providers/navigation/INavigation";
+import Scrollable from "../ScrollableComponent";
+import KeepWatching from "../../models/KeepWatchingData";
+import {PlayCircleOutline} from "@material-ui/icons";
 
 export interface ShowPickerProps {
   navOrder?: number;
@@ -27,15 +28,22 @@ export interface ShowPickerState {
   keepWatchingData: KeepWatching;
   episodeSources: any;
   metadata: any[];
-  refs: string[];
+  refs: React.RefObject<HTMLButtonElement | HTMLInputElement | HTMLDivElement>[][];
+  showMore: boolean[];
 }
 
 export default class ShowPicker extends React.Component<ShowPickerProps, ShowPickerState> {
 
   private downloadProgress: any;
+  private episodeRefs : React.RefObject<HTMLDivElement>[]=[];
+  private showMoreRefs : React.RefObject<HTMLDivElement>[]=[];
+  private selectorRef : React.RefObject<HTMLSelectElement> = React.createRef<HTMLSelectElement>();
+  private keepWatchingRef : React.RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
+  private cancelRef : React.RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
+
   constructor(props) {
     super(props);
-    this.state = Object.assign({ "season": null, "episode": null, refs: ["cancel",], }, this.state);
+    this.state = Object.assign({ "season": null, "episode": null, refs: [], showMore: [] }, this.state);
     this.downloadProgress = {};
 
     props.showProgressProvider.getShowsInProgress().then(shows => {
@@ -70,7 +78,10 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
   }
 
   async loadSeasonMetadata(season) {
-    const episodes = Object.keys(this.props.showCache.folders[season].files).map((episode, index) => `episode-${index}`);
+    this.episodeRefs = Object.keys(this.props.showCache.folders[season].files).map(
+      () => React.createRef<HTMLDivElement>());
+    this.showMoreRefs = Object.keys(this.props.showCache.folders[season].files).map(
+      () => React.createRef<HTMLDivElement>());
     const downloadPromises = [];
     for (const episode of Object.keys(this.props.showCache.folders[this.state.season].files)) {
       const folder = this.props.showPath + "/" + this.state.season;
@@ -80,9 +91,10 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
     Promise.all(downloadPromises).then((episodeSources) => this.setState({ episodeSources, }));
     let refs = [];
     if (this.state.keepWatchingData && season == this.state.keepWatchingData.season) {
-      refs.push("keepwatching");
+      refs.push([this.keepWatchingRef]);
     }
-    refs = refs.concat(["selector",]).concat(episodes).concat(["cancel",]);
+    const showRefs = this.episodeRefs.map((a,i) => [this.episodeRefs[i], this.showMoreRefs[i]]);
+    refs = refs.concat([[this.selectorRef]],showRefs,[[this.cancelRef]]);
     //this.selectedIndex = 0;
     this.setState({ refs, }, () => {
       //this.focusCurrent();
@@ -90,7 +102,7 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
 
     if (this.props.metadataProvider) {
       const metadata = await this.props.metadataProvider.getTvSeasonMetaData(this.props.showName, season);
-      this.setState({ metadata, }, () => {
+      this.setState({ metadata, showMore: this.episodeRefs.map(() => false) }, () => {
         //this.focusCurrent();
       });
     }
@@ -168,7 +180,7 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
         const metadata = this.state.metadata[count++];
         overview = metadata.overview;
       }
-      const ref = `episode-${index}`;
+      const ref = this.episodeRefs[index];
 
       downloadButton = <button className="maestroButton roundedButton fa fa-arrow-circle-down" onClick={() => this.download(episode)
       }> </button>;
@@ -180,16 +192,24 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
         downloadProgress = <span>{progress.state}: {parseFloat(progress.progress).toFixed(2)}% </span>;
       }
 
+      const showMoreButton =  <div ref={this.showMoreRefs[index]} tabIndex={0} style={{display: "inline-block"}} className="maestroLabelButton" onClick={() => {this.state.showMore[index] = !this.state.showMore[index]; this.setState({showMore: this.state.showMore});}} >
+        <Button variant="contained" color="primary"> {this.state.showMore[index] ? "Show Less" : "Show More"} </Button>
+      </div>;
+
+      const overviewSection = this.state.showMore[index]
+        ? <div style={{ marginLeft: "20px", }}> {overview} </div>
+        : null;
       return <div style={{ display: "table", margin: "20px", }} key={episode} >
-        <MetadataImage style={{ display: "table-cell", verticalAlign: "top", }}
-          width={227} height={127} type="episode" name={episode} show={this.props.showName}
-          season={this.state.season} > </MetadataImage>
         <div style={{ display: "table-cell", verticalAlign: "top", }}>
-          <button ref={ref} className="maestroButton roundedButton fa fa-play" onClick={() => this.play(episode)}> </button>
+          <div tabIndex={0} ref={ref} className="nooutline" onClick={() => this.play(episode)} >
+            <PlayCircleOutline color="primary" ></PlayCircleOutline>
+          </div>
           <span> {episode} </span>
+          {showMoreButton}
           {downloadButton}
           {downloadProgress}
-          <div style={{ marginLeft: "20px", }}> {overview} </div>
+
+          {overviewSection}
         </div>
       </div>;
 
@@ -199,40 +219,42 @@ export default class ShowPicker extends React.Component<ShowPickerProps, ShowPic
     if (this.state.keepWatchingData && this.state.season == this.state.keepWatchingData.season) {
       const episode = this.state.keepWatchingData.episode;
       keepWatchingView = <div>
-        <button ref="keepwatching" className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(episode)
-        }> </button>
+        <div tabIndex={0} ref={this.keepWatchingRef} className="nooutline" onClick={() => this.play(episode)} >
+          <PlayCircleOutline color="primary" ></PlayCircleOutline>
+        </div>
         < span > Keep watching: {episode} </span>
       </div>;
     }
 
     const body = <div>
-      <Modal show={true} animation={false} onHide={() => this.props.cancelFunction()}>
-        <Modal.Header>
-          <Modal.Title>{this.props.showName}</Modal.Title>
-        </Modal.Header>
+      <Dialog open={true} fullScreen={true} onClose={() => this.props.cancelFunction()}>
+        <DialogTitle>
+          {this.props.showName}
+        </DialogTitle>
 
-        <Modal.Body>
-
+        <DialogContent>
           {keepWatchingView}
           <div>
-            <select ref="selector" defaultValue={this.state.season} onChange={evt => this.setSeason(evt.target.value)} >
+            <NativeSelect inputRef={this.selectorRef} defaultValue={this.state.season} onChange={evt => this.setSeason(evt.target.value)} >
               {seasons}
-            </select>
+            </NativeSelect>
             <div>
               <div>
               </div>
               {episodes}
             </div>
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button ref="cancel" className="btn btn-secondary" onClick={() => this.props.cancelFunction()}> Cancel </button>
-        </Modal.Footer>
-      </Modal>
+        </DialogContent>
+
+        <DialogActions>
+          <div tabIndex={0} className="maestroLabelButton" onClick={() => this.props.cancelFunction() } ref={this.cancelRef} >
+            <Button variant="contained" color="secondary"> Cancel </Button>
+          </div>
+        </DialogActions>
+      </Dialog>
     </div>;
 
-    const parentRefs = () => this.refs;
-    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refNames={this.state.refs} parentRefs={parentRefs}>{body}</Scrollable></div >;
+    return <div><Scrollable isDialog={true} navigation={this.props.navigation} refs={this.state.refs} >{body}</Scrollable></div >;
   }
 
 }

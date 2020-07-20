@@ -2,6 +2,7 @@ import React from "react";
 
 import MetadataPossibility from "./MetadataPossibility";
 import ApiCaller from "../../utilities/providers/ApiCaller";
+import { TextField } from "@material-ui/core";
 
 export interface MetadataProps {
   apiCaller: ApiCaller;
@@ -65,9 +66,9 @@ export default class Metadata extends React.Component<MetadataProps, MetadataSta
           <option value="tv/show">TV Show</option>
         </select>
         <div>
-          Name:
-          <input type="text" value={this.state.name} onChange={(evt) => this.setState({ name: evt.target.value })} />
+          <TextField  id="filled-basic" label="Name" variant="filled" onChange={(evt) => this.setState({ name: evt.target.value })} value={this.state.name} />
         </div>
+
         <div>
           Name to search for:
           <input type="text" value={this.state.metadataName} onChange={(evt) => this.setState({ metadataName: evt.target.value })} />

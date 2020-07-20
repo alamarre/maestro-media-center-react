@@ -5,7 +5,7 @@ export type ScrollableProps = {
   navigation: INavigation;
   parentRefs?: () => { [key: string]: ReactInstance };
   refNames?: string[];
-  refs?: React.RefObject<HTMLButtonElement | HTMLInputElement | HTMLDivElement>[];
+  refs?: React.RefObject<HTMLButtonElement | HTMLInputElement | HTMLDivElement>[][];
   isDialog: boolean;
   scrollOnHorizontal?: boolean;
 }
@@ -18,11 +18,13 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
 
   private isDialog: boolean;
   public selectedIndex: number;
+  horizontalIndex: number;
 
   constructor(props) {
     super(props);
     this.selectedIndex = 0;
-    this.state = { selectedIndex: 0, };
+    this.horizontalIndex = 0;
+    this.state = { selectedIndex: 0 };
   }
 
   componentDidMount() {
@@ -59,7 +61,7 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
     }
 
     if (this.props.refs && this.props.refs.length > 0) {
-      this.props.refs[this.selectedIndex].current.focus();
+      this.props.refs[this.selectedIndex][this.horizontalIndex].current.focus();
     }
   }
 
@@ -72,12 +74,26 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
   moveLeft() {
     if (this.props.scrollOnHorizontal) {
       this.focusPrevious();
+    } else if(this.props.refs[this.selectedIndex].length > 1) {
+      //
+      this.horizontalIndex--
+      if(this.horizontalIndex < 0 ) {
+        this.horizontalIndex = this.props.refs[this.selectedIndex].length -1;
+      }
+      this.focusCurrent();
     }
   }
 
   moveRight() {
     if (this.props.scrollOnHorizontal) {
       this.focusNext();
+    } else if(this.props.refs[this.selectedIndex].length > 1) {
+      //
+      this.horizontalIndex++;
+      if(this.horizontalIndex >= this.props.refs[this.selectedIndex].length) {
+        this.horizontalIndex = 0;
+      }
+      this.focusCurrent();
     }
   }
 
@@ -87,18 +103,21 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
     }
 
     if (this.props.refs && this.props.refs.length > 0) {
-      this.props.refs[this.selectedIndex].current.click();
+      this.props.refs[this.selectedIndex][this.horizontalIndex].current.click();
     }
   }
 
   focusNext() {
     this.selectedIndex++;
-    if (this.selectedIndex >= this.props.refNames.length) {
+    if (this.selectedIndex >= (this.props.refs || this.props.refNames).length) {
       this.selectedIndex = 0;
     }
 
     if (this.props.refs && this.props.refs.length > 0) {
-      this.props.refs[this.selectedIndex].current.focus();
+      if(this.props.refs[this.selectedIndex].length <= this.horizontalIndex) {
+        this.horizontalIndex = this.props.refs[this.selectedIndex].length-1;
+      }
+      this.props.refs[this.selectedIndex][this.horizontalIndex].current.focus();
     } else {
       this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
     }
@@ -107,11 +126,14 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
   focusPrevious() {
     this.selectedIndex--;
     if (this.selectedIndex < 0) {
-      this.selectedIndex = this.props.refNames.length - 1;
+      this.selectedIndex = (this.props.refs || this.props.refNames).length - 1;
     }
 
     if (this.props.refs && this.props.refs.length > 0) {
-      this.props.refs[this.selectedIndex].current.focus();
+      if(this.props.refs[this.selectedIndex].length <= this.horizontalIndex) {
+        this.horizontalIndex = this.props.refs[this.selectedIndex].length-1;
+      }
+      this.props.refs[this.selectedIndex][this.horizontalIndex].current.focus();
     } else {
       this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["focus"]();
     }

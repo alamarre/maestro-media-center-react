@@ -16,6 +16,11 @@ $modal-md: 90%;
   outline-offset: -5px;
 }
 
+input:focus, .maestroLabelButton:focus, button:focus, select:focus {
+  outline: 5px solid white;
+  outline-offset: 0px;
+}
+
 .homeHeader {
   padding-top: 10px;
   padding-bottom: 10px;

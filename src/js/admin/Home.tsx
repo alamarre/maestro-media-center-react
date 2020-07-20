@@ -17,7 +17,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
     this.state = {};
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (!this.props.authTokenManager.isAuthenticated() && this.props.location.pathname != "/login") {
       this.props.history.push("/login");
     }

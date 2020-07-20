@@ -1,0 +1,128 @@
+#app {
+
+
+    height: 100%;
+    width: 100%;
+    padding: 30px;
+    position: absolute;
+
+}
+
+body {
+  background-color: black;
+  color: white;
+  font-size: 50px;
+}
+
+.settings {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 1;
+}
+
+a.nostyle:link {
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
+}
+
+a.nostyle:visited {
+    text-decoration: inherit;
+    color: inherit;
+    cursor: auto;
+}
+
+.cast-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.maestroButton, .maestroLabelButton {
+    background-color: transparent;
+    border: none;
+    color: #DDD;
+    margin: 15px;
+    font-size: 20px;
+    padding: 0;
+}
+
+.nooutline:focus {
+  outline: none;
+}
+
+.nooutline:focus .MuiSvgIcon-colorPrimary {
+  outline: none;
+  color: #FF0;
+}
+
+.fa-stack {
+  color: red;
+}
+
+div:focus .fa-stack {
+  color: #FF0;
+}
+
+div:focus .maestroButton, .remoteButton:focus {
+    outline: 0;
+    background-color: #FF0;
+    border: 5px solid #FF0;
+}
+
+.roundedButton {
+    border: 5px solid #DDD;
+    border-radius: 50%;
+    font-size: 20px;
+}
+
+.remoteButton {
+    background-color: transparent;
+    border: 5px solid #DDD;
+    color: #DDD;
+    margin: 15px;
+    padding: 0;
+    font-size: 20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+.remoteButton:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.2);
+    cursor: pointer;
+}
+.remoteButton:active {
+    border-color: #FFF;
+    color: #FFF;
+    cursor: pointer;
+}
+.remoteButton:focus {
+    outline: 0;
+}
+.remoteContainer {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center
+}
+
+#wrapper {
+    height: 100%;
+    display: table;
+}
+
+*:focus {
+  outline: 5px solid;
+  outline-offset: -5px;
+}
+
+input:focus, .maestroLabelButton:focus, button:focus, select:focus {
+  outline: 5px solid white;
+  outline-offset: 0px;
+}
+
+.homeHeader {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

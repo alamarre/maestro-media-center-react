@@ -2,7 +2,10 @@ import React from "react";
 
 import ApiCaller from "../../utilities/providers/ApiCaller";
 import MovieMetadata from "../../models/MovieMetadata";
+import MetadataImage from "../../components/generic/MetadataImage";
 import uuid from "uuid/v4";
+import MetadataPossibility from "./MetadataPossibility";
+import { TextField } from "@material-ui/core";
 
 const tvPattern = /s?([0-9]{1,3})(\s|[.exEX-])+([0-9]{1,3})/i;
 const removeLeadingPattern = /^(\s|[-.])*(.*)$/i;
@@ -35,7 +38,7 @@ function parseByName(value) {
     return { show, movieName: value, season, name, episode, type: "tv", };
   }
 
-  return { type: "movie", moveieName: value, name: value, };
+  return { type: "movie", movieName: value, name: value, };
 }
 
 interface File {
@@ -83,12 +86,19 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
   }
 
   async updateMetadataInfo(file: File) {
-    const prefix = file.type == "movie" ? `movie` : `tv/show`;
+    const prefix = file.data.type == "movie" ? `movie/${file.data.movieName}` : `tv/${file.data.show}`;
     try {
-      const actualMetadata = await this.props.userApiCaller.get<MovieMetadata>("metadata", `${prefix}/${file.name}`);
-      file.metadata = actualMetadata;
+      const actualMetadata = await this.props.userApiCaller.get<MovieMetadata>("metadata", prefix);
+      if (!actualMetadata.id) {
+        const possibleMetadata = await this.props.apiCaller.get("metadata", prefix);
+        file.possibleMetadata = possibleMetadata;
+      } else {
+        file.metadata = actualMetadata;
+      }
+
+
     } catch (e) {
-      const possibleMetadata = await this.props.apiCaller.get("metadata", `${file.type}/${file.name}`);
+      const possibleMetadata = await this.props.apiCaller.get("metadata", prefix);
       file.possibleMetadata = possibleMetadata;
     }
 
@@ -212,9 +222,16 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
         <option value="movie">Movie</option>
       </select>;
 
+      const metadataForm = f.metadata ?
+        <MetadataImage width={150} height={225} name={f.data.show || f.data.movieName} type={f.videoType} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} />
+        : f.possibleMetadata ?
+          <MetadataPossibility approveFunction={() => { }} width="150px" height="225px" item={f.possibleMetadata} />
+          : null;
+
+
       const form = f.videoType ? f.videoType == "tv" ?
         <div>
-          <div>Show Name: <input onChange={(evt) => f.data.show = evt.target.name} defaultValue={f.data.show}></input></div>
+          <div><TextField id="filled-basic" label="Show Name" variant="filled" onChange={(evt) => f.data.show = evt.target.name} defaultValue={f.data.show} /></div>
           <div>Season: <input onChange={(evt) => f.data.season = evt.target.name} defaultValue={f.data.season}></input></div>
           <div>Episode: <input onChange={(evt) => f.data.episode = evt.target.name} defaultValue={f.data.episode}></input></div>
           <div>Name: <input onChange={(evt) => f.data.name = evt.target.name} defaultValue={f.data.name}></input></div>
@@ -226,6 +243,7 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
 
       const formWrapper = f.videoType ? <div>{selector}{form}</div> : null;
       return <div key={f.name}>
+        {metadataForm}
         <div>{f.name}</div>
         {formWrapper}
         {bottom}
@@ -244,7 +262,7 @@ export default class Uploader extends React.Component<UploaderProps, UploaderSta
         </label>
 
         <div>{files}</div>
-      </div>
+      </div >
     );
   }
 }

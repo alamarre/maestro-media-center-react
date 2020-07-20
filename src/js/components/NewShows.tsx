@@ -1,7 +1,7 @@
 import React from "react";
 
 import Carousel from "./generic/Carousel";
-import ShowPicker from "./ShowPicker";
+import ShowPicker from "./pickers/ShowPicker";
 import MetadataImage from "./generic/MetadataImage";
 
 import ISimpleDataProvider from "../utilities/providers/data/ISimpleDataProvider";

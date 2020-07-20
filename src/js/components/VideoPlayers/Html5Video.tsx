@@ -31,6 +31,9 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
         seek: this.seek.bind(this),
       });
     }
+
+    this.handleFocus = this.handleFocus.bind(this);
+    this.handleFocusLost = this.handleFocusLost.bind(this);
   }
 
   getVideoElement() {
@@ -38,8 +41,24 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
   }
 
   componentDidMount() {
-
+    window.addEventListener("pause", this.handleFocusLost);
+    window.addEventListener("resume", this.handleFocus);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener("pause", this.handleFocusLost);
+    window.removeEventListener("resume", this.handleFocus);
+  }
+
+  handleFocusLost() {
+    this.getVideoElement()?.pause();
+  }
+
+  handleFocus() {
+    this.getVideoElement()?.play();
+  }
+
+
 
   pause() {
     this.getVideoElement().pause();
@@ -79,7 +98,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     this.getVideoElement().currentTime = (this.getVideoElement().duration * percent) / 100;
   }
 
-  componentDidUpdate(prevProps, ) {
+  componentDidUpdate(prevProps) {
     if (prevProps.sources[0] !== this.props.sources[0]) {
       this.started = false;
       this.getVideoElement().load();

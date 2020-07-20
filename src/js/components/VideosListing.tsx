@@ -1,6 +1,6 @@
 import React from "react";
 
-import ShowPicker from "./ShowPicker";
+import ShowPicker from "./pickers/ShowPicker";
 import MoviePicker from "./pickers/MovieDetails";
 import ScrollableComponent from "./ScrollableComponent";
 import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
@@ -11,6 +11,8 @@ import MetadataProvider from "../utilities/providers/MetadataProvider";
 import VideoLoader from "../utilities/VideoLoader";
 import FileCache from "../models/FileCache";
 import SearchResult from "../models/SearchResult";
+import MetadataImage from "../components/generic/MetadataImage";
+import Grid from "../components/generic/Grid";
 
 import { RouteComponentProps, } from "react-router-dom";
 
@@ -35,12 +37,15 @@ export interface VideosListingState {
   showPath?: string;
   cachePath?: FileCache;
   refs: string[];
+  fileRefs: React.RefObject<HTMLDivElement>[];
 }
 
 export default class VideosListing extends React.Component<VideosListingProps, VideosListingState> {
+  private fileChooserRef : React.Ref<Grid>;
   constructor(props) {
     super(props);
-    this.state = { rootPath: "", folders: [], files: [], refs: [], };
+    this.fileChooserRef = React.createRef<Grid>();
+    this.state = { rootPath: "", folders: [], files: [], refs: [], fileRefs: [] };
   }
 
   componentDidMount() {
@@ -78,8 +83,9 @@ export default class VideosListing extends React.Component<VideosListingProps, V
     ).concat(
       folderData.files.map((f, i) => `file-${i}`)
     );
+    const fileRefs : React.RefObject<HTMLDivElement>[] = folderData.files.map(() => React.createRef<HTMLDivElement>());
 
-    this.setState({ "folders": folderData.folders, refs, "files": folderData.files, }, () => {
+    this.setState({ "folders": folderData.folders, refs, "files": folderData.files, fileRefs }, () => {
       //this.focus();
     });
   }
@@ -92,6 +98,9 @@ export default class VideosListing extends React.Component<VideosListingProps, V
 
   cancelShowChooser() {
     this.setState({ "showName": null, movieName: null, }, () => {
+      if(this.state.files.length > 0) {
+        return this.props.navigation.focusDialog(this.fileChooserRef["current"]);
+      }
       this.props.navigation.focusDialog(this);
     });
   }
@@ -103,7 +112,7 @@ export default class VideosListing extends React.Component<VideosListingProps, V
   render() {
     var folders = this.state.folders.map((folder, i) => {
       const ref = `folder-${i}`;
-      return <div key={folder}><button className="maestroButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button></div>;
+      return <div key={folder}><button className="maestroLabelButton" key={folder} ref={ref} onClick={this.fetchFolder.bind(this, folder)}>{folder}</button></div>;
     });
 
     //var index = 0;
@@ -111,22 +120,31 @@ export default class VideosListing extends React.Component<VideosListingProps, V
       const fileName = file.name;
       //const folder = (file.path) ? file.path.substring(0, file.path.lastIndexOf("/")) : self.state.root;
 
-      const ref = `file-${i}`;
+      const ref = this.state.fileRefs[i];
       if (file.type && file.type == "tv") {
-        const imageSource = `${this.props.imageRoot}/${window["accountId"]}/50x75/tv/show/${file.name}.png`;
 
-        return <button className="maestroButton" ref={ref} style={{ margin: "20px", display: "block", }} key={fileName} onClick={() => this.selectSource(file)} >
+
+        //const imageSource = `${this.props.imageRoot}/${window["accountId"]}/50x75/tv/show/${file.name}.png`;
+
+        /*return <button className="maestroButton" ref={ref} style={{ margin: "20px", display: "block", }} key={fileName} onClick={() => this.selectSource(file)} >
           <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
           {fileName}
-        </button>;
+        </button>;*/
       }
 
-      const imageSource = `${this.props.imageRoot}/${window["accountId"]}/50x75/movies/${file.name}.png`;
+      const clickFunction = file.type == "tv" ? () => this.selectSource(file) : this.loadVideo.bind(this, fileName);
 
-      return <button ref={ref} className="maestroButton" style={{ margin: "20px", display: "block", }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
+      return <div style={{ display: "inline", }} key={fileName} ref={ref} tabIndex={0} onClick={clickFunction}>
+        <MetadataImage key={fileName} displayNameOnFail={true} style={{ display: "inline-block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={file.type} name={file.name} ></MetadataImage>
+      </div>;
+      //const imageSource = `${this.props.imageRoot}/${window["accountId"]}/50x75/movies/${file.name}.png`;
+
+      /*return <button ref={ref} className="maestroButton" style={{ margin: "20px", display: "block", }} key={fileName} onClick={this.loadVideo.bind(this, fileName)} >
         <img style={{ border: "white 1px solid", marginRight: "10px", }} src={imageSource} width="50px" height="75px" />
         {fileName}
-      </button>;
+      </button>*/
+
+
     });
 
     let showPicker = null;
@@ -156,15 +174,20 @@ export default class VideosListing extends React.Component<VideosListingProps, V
     }
 
     const parentRefs = () => this.refs;
+    const fileInfo = files.length == 0 ? files :
+      <Grid isDialog={true} ref={this.fileChooserRef} navigation={this.props.navigation} refs={this.state.fileRefs}>
+        {files}
+      </Grid>;
 
-
+    const folderPicker = files.length > 0 ? null
+      : <ScrollableComponent key={this.state.rootPath} isDialog={true} parentRefs={parentRefs} navigation={this.props.navigation} refNames={this.state.refs}>
+        {folders}
+      </ScrollableComponent>;
     return (
       <div>
-        <ScrollableComponent key={this.state.rootPath} isDialog={true} parentRefs={parentRefs} navigation={this.props.navigation} refNames={this.state.refs}>
-          {folders}
-          {files}
-          {showPicker}
-        </ScrollableComponent>
+        {folderPicker}
+        {fileInfo}
+        {showPicker}
       </div >
     );
   }

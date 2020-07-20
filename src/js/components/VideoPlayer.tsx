@@ -121,6 +121,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
         const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].reload();
         this.setState({ sources, subtitles, name, seekTime, promptReload: false, });
         this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
+        this.props.navigation.focusDialog(this);
       };
       const goHome = () => {
         this.props.history.replace("/");
@@ -210,7 +211,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
 
     const orderedSources = [].concat(sources);
     for (const source of sources) {
-      const newSource = null;//await this.props.episodeLoader.getAvailableLocalSource(source);
+      const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
       if (newSource) {
         orderedSources.unshift(newSource);
       }
@@ -250,7 +251,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     } else {
       const orderedSources = [].concat(sources);
       for (const source of sources) {
-        const newSource = null;//await this.props.episodeLoader.getAvailableLocalSource(source);
+        const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
         if (newSource) {
           orderedSources.unshift(newSource);
         }
@@ -264,7 +265,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].goToPrevious();
     const orderedSources = [].concat(sources);
     for (const source of sources) {
-      const newSource = null; //await this.props.episodeLoader.getAvailableLocalSource(source);
+      const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
       if (newSource) {
         orderedSources.unshift(newSource);
       }

@@ -1,8 +1,10 @@
 import React from "react";
-import { Modal, } from "react-bootstrap";
+import { Button, Dialog, DialogActions, DialogTitle, DialogContent } from "@material-ui/core";
+
 import INavigation from "../../utilities/providers/navigation/INavigation";
 import CollectionsManager from "../../utilities/CollectionsManager";
 import KeepWatching from "../../models/KeepWatchingData";
+import Scrollable from "../ScrollableComponent";
 
 export interface CollectionPickerProps {
   navOrder?: number;
@@ -19,13 +21,18 @@ export interface CollectionPickerProps {
 export interface CollectionPickerState {
   collection: any;
   keepWatchingData?: KeepWatching;
+  refs?: React.RefObject<HTMLButtonElement | HTMLInputElement | HTMLDivElement>[][];
 }
 
 export default class CollectionPicker extends React.Component<CollectionPickerProps, CollectionPickerState> {
 
+  private cancelRef : React.RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
+  private keepWatchingRef : React.RefObject<HTMLButtonElement> = React.createRef<HTMLButtonElement>();
+  private videoRefs : React.RefObject<HTMLButtonElement>[] = [];
+
   constructor(props) {
     super(props);
-    this.state = { "collection": null, };
+    this.state = { "collection": null };
     this.loadCollectionData();
   }
 
@@ -33,10 +40,18 @@ export default class CollectionPicker extends React.Component<CollectionPickerPr
     const collectionInfo: any = await this.props.collectionsManager.getCollection(this.props.collectionName);
     const collection = collectionInfo.movies;
     let keepWatchingData = await this.props.showProgressProvider.getShowProgress("collection");
+    const refs : React.RefObject<HTMLButtonElement | HTMLInputElement | HTMLDivElement>[][] = [];
     if (!keepWatchingData || keepWatchingData.season !== this.props.collectionName) {
       keepWatchingData = null;
+    } else {
+      refs.push([this.keepWatchingRef]);
     }
-    this.setState({ collection, keepWatchingData, });
+
+    this.videoRefs = collection.map(() => [React.createRef<HTMLButtonElement>()]);
+    refs.push(this.videoRefs);
+    refs.push([this.cancelRef]);
+
+    this.setState({ collection, keepWatchingData, refs });
   }
 
   play(video) {
@@ -50,9 +65,9 @@ export default class CollectionPicker extends React.Component<CollectionPickerPr
       return <div></div>;
     }
 
-    const videos = this.state.collection.map(video => {
+    const videos = this.state.collection.map((video, i) => {
       return <div key={video}>
-        <button className="maestroButton roundedButton fa fa-play" onClick={() => this.play(video)}></button>
+        <button ref={this.videoRefs[i][0]} className="maestroButton roundedButton fa fa-play" onClick={() => this.play(video)}></button>
         <span>{video}</span>
       </div>;
 
@@ -63,31 +78,34 @@ export default class CollectionPicker extends React.Component<CollectionPickerPr
       const index = this.state.keepWatchingData.episode;
       const video = this.state.collection[index];
       keepWatchingView = <div>
-        <button className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(video)}></button>
+        <button ref={this.keepWatchingRef} className="maestroButton roundedButton fa fa-play c" onClick={() => this.play(video)}></button>
         <span>Keep watching: {video}</span>
       </div>;
     }
 
     const body = <div>
-      <Modal show={true} animation={false} onHide={() => this.props.cancelFunction()}>
-        <Modal.Header>
-          <Modal.Title>{this.props.collectionName}</Modal.Title>
-        </Modal.Header>
+      <Dialog open={true} fullScreen={true} onClose={() => this.props.cancelFunction()}>
 
-        <Modal.Body>
+        <DialogTitle>
+          {this.props.collectionName}
+        </DialogTitle>
 
+        <DialogContent>
           {keepWatchingView}
           <hr style={{ backgroundColor: "white", }} ></hr>
           {videos}
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-secondary" onClick={() => this.props.cancelFunction()}>Cancel</button>
-        </Modal.Footer>
-      </Modal>
+        </DialogContent>
+
+        <DialogActions>
+          <div tabIndex={0} className="maestroLabelButton" onClick={() => this.props.cancelFunction() } ref={this.cancelRef} >
+            <Button variant="contained" color="secondary"> Cancel </Button>
+          </div>
+        </DialogActions>
+      </Dialog>
     </div>;
 
     return (
-      <div>{body}</div>
+      <div><Scrollable isDialog={true} navigation={this.props.navigation} refs={this.state.refs} >{body}</Scrollable></div >
     );
   }
 }
