@@ -13,6 +13,8 @@ import FileCache from "../models/FileCache";
 import CacheBasedEpisodeProvider from "../utilities/providers/CacheBasedEpisodeProvider";
 import MetadataProvider from "../utilities/providers/MetadataProvider";
 
+import {mainImageScale} from "../AppScale";
+
 function lastWatchedSort(a, b) {
   return (b.lastUpdated || 0) - (a.lastUpdated || 0);
 }
@@ -55,8 +57,8 @@ export default class KeepWatchingComponent extends React.Component<KeepWatchingP
     if (this.dragging) {
       return;
     }
-    if (video.show === "movie") {
-      return this.props.videoLoader.loadVideo(video.show, video.episode.substring("Movies/".length), 0);
+    if (video.show.indexOf("movie") === 0) {
+      return this.props.videoLoader.loadVideo("movie", video.episode.substring("Movies/".length), 0);
     }
 
     if (video.show === "collection") {
@@ -89,23 +91,28 @@ export default class KeepWatchingComponent extends React.Component<KeepWatchingP
   }
 
   render() {
+    const height = mainImageScale.height;
+    const width = mainImageScale.width;
+    const adjustedWidth = mainImageScale.scaledWidth;
+    const adjustedHeight = mainImageScale.scaledHeight;
+
     const videos = this.state.videos.slice(0, 30).map((video) => {
-      const type = video.show === "movie" ? "movies" :
+      const type = video.show.indexOf("movie") === 0 ? "movies" :
         video.show === "playlist" ? "playlist" :
           video.show === "collection" ? "collections" : "tv";
-      const name = video.show === "movie" ? video.episode.substring("Movies/".length) :
+      const name = video.show.indexOf("movie") === 0 ? video.episode.substring("Movies/".length) :
         video.show === "collection" ?
           video.season :
           video.show === "playlist" ?
             video.season :
             video.show;
-      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "225px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
+      return <div style={{ "display": "inline-block", width: `${adjustedWidth}px`, margin: "0 0 0 0", padding: "0 0 0 0", height: `${adjustedHeight}px`, overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
         key={video.show} onClick={this.play.bind(this, video)}>
-        <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type={type} name={name} ></MetadataImage>
+        <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={width} height={height} type={type} name={name} ></MetadataImage>
       </div>;
     });
 
-    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={225}>{videos}</Carousel>;
+    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={adjustedWidth} height={adjustedHeight}>{videos}</Carousel>;
 
     if (this.state.videos.length > 0) {
       videosView = <div>

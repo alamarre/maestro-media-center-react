@@ -1,6 +1,7 @@
 import React from "react";
 import { Component, } from "react";
 import CSS from "csstype";
+import {scaleImage} from "../../AppScale";
 
 export interface MetadataImageProps {
   navOrder?: number;
@@ -78,7 +79,7 @@ export default class MetadataImage extends Component<MetadataImageProps, Metadat
     const image = this.state.failed ? `${dimensions}/${failedImage}` : `${window["accountId"]}/${dimensions}/${imagePath}.png`;
     const src = `${imageRoot}/${image}`;
 
-    const style = Object.assign({ display: "block", width, height, }, this.props.style);
+    const style = Object.assign({ display: "block", width: scaleImage(width), height: scaleImage(height), }, this.props.style);
     return <img style={style} src={src} onError={this.errorHandler.bind(this)}></img>;
   }
 }

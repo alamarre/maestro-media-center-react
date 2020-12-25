@@ -9,6 +9,7 @@ import RecentlyUpdatedTvShow from "../models/RecentlyUpdatedTvShow";
 import INavigation from "../utilities/providers/navigation/INavigation";
 import ICacheProvider from "../utilities/providers/ICacheProvider";
 import FileCache from "../models/FileCache";
+import {mainImageScale} from "../AppScale";
 
 export interface NewShowsProps {
   showProvider: ISimpleDataProvider<RecentlyUpdatedTvShow>;
@@ -65,16 +66,20 @@ export default class NewShows extends React.Component<NewShowsProps, NewShowsSta
     if (this.state.shows.length === 0) {
       return <div>Loading</div>;
     }
+    const height = mainImageScale.height;
+    const width = mainImageScale.width;
+    const adjustedWidth = mainImageScale.scaledWidth;
+    const adjustedHeight = mainImageScale.scaledHeight;
     const shows = this.state.shows.slice(0, 30).map((show) => {
 
       const name = show;
-      return <div style={{ "display": "inline-block", width: "150px", margin: "0 0 0 0", padding: "0 0 0 0", height: "225px", overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
+      return <div style={{ "display": "inline-block", width: `${adjustedWidth}px`, margin: "0 0 0 0", padding: "0 0 0 0", height: `${adjustedHeight}px`, overflow: "hidden", textAlign: "left", verticalAlign: "top", wordWrap: "break-word", }}
         key={show} onClick={this.play.bind(this, show)}>
-        <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={150} height={225} type="tv" name={show}></MetadataImage>
+        <MetadataImage displayNameOnFail={true} style={{ display: "block", margin: "0 0 0 0", padding: "0 0 0 0", }} width={width} height={height} type="tv" name={show}></MetadataImage>
       </div>;
     });
 
-    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={150} height={225}>{shows}</Carousel>;
+    let videosView = <Carousel navOrder={this.props.navOrder} navigation={this.props.navigation} isDragging={this.isDragging.bind(this)} itemWidth={adjustedWidth} height={adjustedHeight}>{shows}</Carousel>;
 
     if (this.state.shows.length > 0) {
       videosView = <div>

@@ -6,7 +6,7 @@ import FileCache from "../../models/FileCache";
 import INavigation from "../../utilities/providers/navigation/INavigation";
 import Scrollable from "../ScrollableComponent";
 import KeepWatching from "../../models/KeepWatchingData";
-import {PlayCircleOutline} from "@material-ui/icons";
+import PlayCircleOutline from "@material-ui/icons/PlayCircleOutline";
 
 export interface ShowPickerProps {
   navOrder?: number;

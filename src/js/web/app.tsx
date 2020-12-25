@@ -1,6 +1,6 @@
 //const 'bootstrap';
 require("@babel/polyfill");
-import "@fortawesome/fontawesome-free/js/all";
+//import "@fortawesome/fontawesome-free/js/all";
 import React from "react";
 import ReactDOM from "react-dom";
 import { Route, } from "react-router";

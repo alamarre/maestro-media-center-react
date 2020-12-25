@@ -10,6 +10,7 @@ var path = require("path");
 var BUILD_DIR = path.resolve(__dirname, "build");
 var APP_DIR = path.resolve(__dirname, "src/js/");
 
+const analyze = process.env.ANALYZE_BUILD ? true: false;
 var jquery = require("jquery");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
@@ -63,6 +64,10 @@ var alwaysPlugins = [
     filename: "style.css",
     allChunks: true,
   }),];
+
+if(analyze) {
+  alwaysPlugins.push(new BundleAnalyzerPlugin());
+}
 module.exports = {
   devServer: {
     compress: true,
@@ -79,6 +84,7 @@ module.exports = {
   },
   optimization: {
     minimize: debug ? false : true,
+    usedExports: true
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js", ".jsx",],

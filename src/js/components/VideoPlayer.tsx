@@ -49,6 +49,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
   private progressTimer: any;
   private playerTypeHandlers: { [key: string]: IPlayerManager };
   private query: { [key: string]: string };
+  private player;
 
   constructor(props) {
     super(props);
@@ -119,7 +120,14 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     if (this.state.promptReload) {
       const reload = async () => {
         const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].reload();
-        this.setState({ sources, subtitles, name, seekTime, promptReload: false, });
+        const orderedSources = [].concat(sources);
+        for (const source of sources) {
+          const newSource = await this.props.episodeLoader.getAvailableLocalSource(source);
+          if (newSource) {
+            orderedSources.unshift(newSource);
+          }
+        }
+        this.setState({ sources: orderedSources, subtitles, name, seekTime, promptReload: false });
         this.props.videoLoader.setUrl(this.type, path, index, false, this.profile);
         this.props.navigation.focusDialog(this);
       };
@@ -225,9 +233,10 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
   }
 
   onPlay(player) {
+    this.player = player;
     if (!this.progressTimer) {
       this.progressTimer = setInterval(() => {
-        const time = player.getCurrentTime();
+        const time = (this.player || player).getCurrentTime();
         if (time) {
           this.playerTypeHandlers[this.type].recordProgress(time);
         }

@@ -97,8 +97,8 @@ export default class Grid extends React.Component<GridProps, GridState> {
     }
 
     candidates = candidates.filter(c => seekForward
-      ? c.current.offsetTop > refs[index].current.offsetTop
-      : c.current.offsetTop < refs[index].current.offsetTop);
+      ? c.current.getBoundingClientRect().y > refs[index].current.getBoundingClientRect().y
+      : c.current.getBoundingClientRect().y < refs[index].current.getBoundingClientRect().y);
 
 
     if(candidates.length == 0) {
@@ -111,10 +111,10 @@ export default class Grid extends React.Component<GridProps, GridState> {
       return refs[index];
     }
 
-    const topOffsets: number[] = candidates.map(c => c.current.offsetTop).filter(t => t!= refs[index].current.offsetTop);
+    const topOffsets: number[] = candidates.map(c => c.current.getBoundingClientRect().y).filter(t => t!= refs[index].current.getBoundingClientRect().y);
 
     const rowOffsetHeight = seekForward ? Math.min(...topOffsets) : Math.max(...topOffsets);
-    candidates = candidates.filter(c => c.current.offsetTop == rowOffsetHeight);
+    candidates = candidates.filter(c => c.current.getBoundingClientRect().y == rowOffsetHeight);
 
     const distances : number[] = candidates.map(c => Math.abs(c.current.offsetLeft - refs[index].current.offsetLeft));
     const matchIndex = distances.indexOf(Math.min(...distances));
@@ -125,33 +125,6 @@ export default class Grid extends React.Component<GridProps, GridState> {
     const next = this.findNearestMatch(this.selectedIndex, true);
     this.selectedIndex = this.props.refs.indexOf(next);
     this.focusCurrent();
-    /*// down movement jump to ref with closest x and greater y
-    const x = this.props.refs[this.selectedIndex].current.offsetLeft;
-    const y = this.props.refs[this.selectedIndex].current.offsetTop;
-    let currentIndex = -1;
-    if(this.props.refs[this.props.refs.length -1].current.offsetTop <= y) {
-      // have to start at the beginning
-
-    } else {
-      for(let i=0; i<this.props.refs.length; i++) {
-        const prospect = this.props.refs[i+this.selectedIndex].current;
-        if(prospect.offsetTop > y) {
-          if(prospect.offsetLeft<= x) {
-            currentIndex = i;
-          }
-          else {
-            if(currentIndex > -1) {
-              if(prospect.offsetTop == this.props.refs[currentIndex].current.offsetTop
-                && prospect.offsetLeft - x < x - this.props.refs[currentIndex].current.offsetLeft) {
-                currentIndex = i;
-              }
-            } else {
-              currentIndex = i;
-            }
-          }
-        }
-      }
-    }*/
   }
 
   focusPrevious() {

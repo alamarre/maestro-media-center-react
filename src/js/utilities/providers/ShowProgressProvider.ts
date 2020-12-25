@@ -46,7 +46,7 @@ export default class ShowProgressProvider {
         } else if (folder.type && folder.type.toLowerCase() === "playlist") {
           return { show: "playlist", episode: parts[0], };
         } else if (!folder.type || folder.type.toLowerCase() !== "tv") {
-          return { show: "movie", episode: path, };
+          return { show: `movie_${path}`, episode: path, };
         }
       }
     }
@@ -98,11 +98,12 @@ export default class ShowProgressProvider {
         } else if (!folder.type || folder.type.toLowerCase() === "movie") {
           return await this.apiCaller.post("shows", "keep-watching",
             {
-              show: "movie",
+              show: `movie_${path}`,
               season: null,
               episode: path,
               status: status,
               progress: progress,
+              expires: Math.floor(Date.now() / 1000) + (3600 * 24 * 14)
             });
         }
       }
