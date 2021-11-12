@@ -98,16 +98,21 @@ const newMoviesProvider = new NewMoviesProvider(apiCaller, cacheProvider);
 
 const videoLoader = new VideoLoader(webSocketSender);
 
-window["tvShowSort"] = function (a, b) {
-  if (a.lastIndexOf(".") > -1) {
-    a = a.substring(0, a.lastIndexOf("."));
+function stripExtension(file: string) {
+  if (file.lastIndexOf(".") > -1) {
+    const extension = file.substring(file.lastIndexOf(".")+1);
+    if(extension.match(/^[a-zA-Z0-9]{2,4}$/)) {
+      return file.substring(0, file.lastIndexOf("."));
+    }
   }
-  if (b.lastIndexOf(".") > -1) {
-    b = b.substring(0, b.lastIndexOf("."));
-  }
+  return file;
+}
+
+window["tvShowSort"] = function (a: string, b: string) {
+  a = stripExtension(a);
+  b = stripExtension(b);
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base", });
 };
-
 const imageRoot = "https://maestro-images.omny.ca";
 
 import MetadataProvider from "../utilities/providers/MetadataProvider";
@@ -128,7 +133,7 @@ ReactDOM.render((
       <Route exact path="/" component={(props) => (<Home {...props} dataProviders={dataProviders} homepageCollectionManager={homepageCollectionManager} navigation={keyboardNavigation} accountProvider={accountProvider} newMoviesProvider={newMoviesProvider} metadataProvider={metadataProvider} episodeLoader={cacheBasedEpisodeProvider} playlistManager={playlistProvider} collectionsManager={collectionsManager} imageRoot={imageRoot} videoLoader={videoLoader} settingsManager={settingsManager} webSocketSender={webSocketSender} remoteController={webSocketRemoteController} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} searcher={cacheBasedSearch} authTokenManager={authTokenManager} />)} />
       <Route path="/videos" exact component={(props) => (<VideosListing {...props} navigation={keyboardNavigation} metadataProvider={metadataProvider} imageRoot={imageRoot} videoLoader={videoLoader} playlistManager={playlistProvider} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider} />)} />
       <Route exact path="/videos/:videoType" component={(props) => (<VideosListing {...props} navigation={keyboardNavigation} metadataProvider={metadataProvider} imageRoot={imageRoot} videoLoader={videoLoader} playlistManager={playlistProvider} showProgressProvider={showProgressProvider} cacheProvider={cacheProvider} episodeLoader={searchBasedShowProvider} />)} />
-      <Route path="/view" component={(props) => (<VideoPlayer {...props} navigation={keyboardNavigation} queryStringReader={new QueryStringReader()} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} showProgressProvider={showProgressProvider} episodeLoader={episodeProvider} remoteController={webSocketRemoteController} />)} />
+      <Route path="/view" component={(props) => (<VideoPlayer {...props} settings={settingsManager} navigation={keyboardNavigation} queryStringReader={new QueryStringReader()} playlistManager={playlistProvider} collectionsManager={collectionsManager} videoLoader={videoLoader} showProgressProvider={showProgressProvider} episodeLoader={episodeProvider} remoteController={webSocketRemoteController} />)} />
       <Route path="/login" component={(props) => (<LoginComponent {...props} navigation={keyboardNavigation} authTokenManager={authTokenManager} login={loginProvider} />)} />
       <Route path="/profile" component={(props) => (<ChooseProfile {...props} serverProvider={cacheBasedEpisodeProvider} navigation={keyboardNavigation} cache={cacheProvider} search={cacheBasedSearch} authTokenManager={authTokenManager} profileProvider={profileProvider} />)} />
       <Route path="/remote" component={(props) => (<RemoteControllerComponent {...props} navigation={keyboardNavigation} remote={webSocketSender} />)} />

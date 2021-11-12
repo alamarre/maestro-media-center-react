@@ -68,8 +68,11 @@ export default class KeyboardNavigation implements INavigation {
         break;
       case 13:
         if (e.type == "keypress") {
-          this.select();
-          //e.preventDefault();
+          if(this.select()) {
+            e.preventDefault();
+          }
+        } else {
+          console.log("skipped", code);
         }
         break;
     }
@@ -96,6 +99,7 @@ export default class KeyboardNavigation implements INavigation {
       const element = this.elements[this.index];
       if (element.selectCurrent) {
         element.selectCurrent();
+        return true;
       }
     }
   }
@@ -105,7 +109,7 @@ export default class KeyboardNavigation implements INavigation {
       element,
       persist: navOrder === -1,
       focus: () => element.focus(),
-      selectCurrent: () => element.click(),
+      selectCurrent: () => { console.log(element); element.click()},
       type: "element",
       moveLeft: () => { },
       moveRight: () => { },

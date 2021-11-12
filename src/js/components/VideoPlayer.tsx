@@ -18,6 +18,7 @@ import VideoLoader from "../utilities/VideoLoader";
 import QueryStringReader from "../utilities/QueryStringReader";
 import { RouteComponentProps, } from "react-router-dom";
 import IEpisodeProvider from "../utilities/providers/IEpisodeProvider";
+import ISettingsManager from "../utilities/ISettingsManager";
 
 export interface VideoPlayerProps extends RouteComponentProps {
   navigation: INavigation;
@@ -28,6 +29,7 @@ export interface VideoPlayerProps extends RouteComponentProps {
   playlistManager: PlaylistManager;
   collectionsManager: CollectionsManager;
   videoLoader: VideoLoader;
+  settings: ISettingsManager;
 }
 
 export interface VideoPlayerState {
@@ -40,6 +42,7 @@ export interface VideoPlayerState {
   subtitles?: string[];
   name?: string;
   showEpisodeInfo: boolean;
+  playWithVlc: boolean;
 }
 
 export default class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
@@ -50,6 +53,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
   private playerTypeHandlers: { [key: string]: IPlayerManager };
   private query: { [key: string]: string };
   private player;
+  private eventListener;
 
   constructor(props) {
     super(props);
@@ -57,7 +61,8 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     this.type = this.query["type"];
     this.profile = this.query["profile"];
     this.preventIdleTimer = null;
-    this.state = { refs: [], "overlayVisibility": false, showEpisodeInfo: false, showMenu: false, seekTime: -1, promptReload: false, };
+
+    this.state = { refs: [], "overlayVisibility": false, playWithVlc: this.props.settings.get("playWithVlc") != "", showEpisodeInfo: false, showMenu: false, seekTime: -1, promptReload: false, };
     this.progressTimer = null;
     if (this.props.remoteController) {
       this.props.remoteController.mapUpdateFunctions({
@@ -67,6 +72,17 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
         toggleVisibility: this.toggleVisibility.bind(this),
       });
     }
+
+    this.eventListener = (event) => {
+      const {progress, duration} = event.detail;
+      if(progress == 0 && duration == 0) {
+        this.goToNext();
+      } else {
+        // figure this one out
+      }
+    };
+
+    document.addEventListener("stopped-playing", this.eventListener);
 
     this.playerTypeHandlers = {
       tv: new TvShowSeriesPlayer(this.props.episodeLoader, this.props.showProgressProvider),
@@ -83,6 +99,17 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     }
   }
 
+  componentDidUpdate(previousProps, previousState : VideoPlayerState) {
+    if(this.state.playWithVlc && previousState.sources != this.state.sources && window["MaestroNative"]) {
+      window["MaestroNative"]["showVideo"](JSON.stringify({
+        title: this.state.name,
+        sources: this.state.sources.map(s => new URL(s).href),
+        subtitleSources: (this.state.subtitles || []).map(s => new URL(s).href),
+        startTime: Math.floor(this.state.seekTime)
+      }));
+    }
+  }
+
   openMenu() {
     this.setState({ "showMenu": true, }, () => {
       //this.props.navigation.focusDialog(this.refs.menu);
@@ -93,6 +120,10 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     this.setState({ "showMenu": false, }, () => {
       this.props.navigation.focusDialog(this);
     })
+  }
+
+  selectCurrent() {
+    this.player?.pause();
   }
 
   componentDidMount() {
@@ -117,6 +148,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
   }
 
   render() {
+
     if (this.state.promptReload) {
       const reload = async () => {
         const { sources, subtitles, name, seekTime, path, index, } = await this.playerTypeHandlers[this.type].reload();
@@ -169,7 +201,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
       currentEpisodeStyle["opacity"] = 1;
     }
     let videoSource = null;
-    if (this.state.seekTime > -1) {
+    if (this.state.seekTime > -1 && ! this.state.playWithVlc) {
       videoSource = <Html5VideoPlayer key="videoplayer" remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles} onEnded={this.goToNext.bind(this)}
         onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
       />;
@@ -178,11 +210,14 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     let menu = null;
     if (this.state.showMenu) {
       const items = [
+        { name: "Play", action: () => { this.player?.play(); this.closeMenu();}, },
+        { name: "Skip Forward", action: () => { this.player?.skipForward(); }, },
+        { name: "Skip Back", action: () => { this.player?.skipBack();}, },
+        { name: "Download", action: () => { this.download(); this.closeMenu(); }, },
         { name: "Go Home", action: () => this.props.history.replace("/"), },
-        { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.closeMenu(); }, },
+        { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.player?.play(); this.closeMenu(); }, },
         { name: "Previous episode", action: () => { this.goToPrevious(); this.closeMenu(); }, },
-        { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }, },
-        { name: "Close", action: () => this.closeMenu(), },
+        { name: "Next episode", action: () => { this.goToNext(); this.closeMenu(); }, }
       ];
       menu = <Menu navigation={this.props.navigation} ref={menu} items={items}></Menu>
     }
@@ -194,6 +229,13 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
         {overlay}
       </div>
     );
+  }
+
+  download() {
+    if(this.state?.sources[0]) {
+      const url = new URL(this.state.sources[0]).href + "?download=true";
+      window.open(url, "_blank");
+    }
   }
 
   toggleVisibility() {
@@ -230,6 +272,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
 
   onPause() {
     this.showEpisodeInfo();
+    this.openMenu();
   }
 
   onPlay(player) {
@@ -243,6 +286,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
       }, 30 * 1000);
     }
     this.hideEpisodeInfo();
+    this.closeMenu();
   }
 
   showEpisodeInfo() {

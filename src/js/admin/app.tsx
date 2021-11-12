@@ -43,13 +43,19 @@ const div = document.createElement("div");
 div.className = "app";
 document.body.appendChild(div);
 
-window["tvShowSort"] = function (a, b) {
-  if (a.lastIndexOf(".") > -1) {
-    a = a.substring(0, a.lastIndexOf("."));
+function stripExtension(file: string) {
+  if (file.lastIndexOf(".") > -1) {
+    const extension = file.substring(file.lastIndexOf(".")+1);
+    if(extension.match(/^[a-zA-Z0-9]{2,4}$/)) {
+      return file.substring(0, file.lastIndexOf("."));
+    }
   }
-  if (b.lastIndexOf(".") > -1) {
-    b = b.substring(0, b.lastIndexOf("."));
-  }
+  return file;
+}
+
+window["tvShowSort"] = function (a: string, b: string) {
+  a = stripExtension(a);
+  b = stripExtension(b);
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base", });
 };
 

@@ -99,10 +99,16 @@ export default class Scrollable extends React.Component<ScrollableProps, Scrolla
 
   selectCurrent() {
     if (this.state && this.props.refNames && this.props.refNames.length > 0 && Object.keys(this.props.parentRefs()).length > 0) {
+      if(this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["type"] == "checkbox") {
+        return;
+      }
       this.props.parentRefs()[this.props.refNames[this.selectedIndex]]["click"]();
     }
 
     if (this.props.refs && this.props.refs.length > 0) {
+      if(this.props.refs[this.selectedIndex][this.horizontalIndex].current["type"] == "checkbox") {
+        return;
+      }
       this.props.refs[this.selectedIndex][this.horizontalIndex].current.click();
     }
   }

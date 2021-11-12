@@ -58,8 +58,6 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     this.getVideoElement()?.play();
   }
 
-
-
   pause() {
     this.getVideoElement().pause();
   }
@@ -121,7 +119,9 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     if (video.error && video.duration - video.currentTime < 2) {
       return this.props.onEnded(this);
     }
-    this.props.onPause(this);
+    if(!video.ended && !video.seeking) {
+      this.props.onPause(this);
+    }
   }
 
   render() {
@@ -132,7 +132,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     });
 
     return <video key={"video"} crossOrigin="anonymous"
-      onClick={() => this.playPause()}
+      onClick={(e) => { e.preventDefault(); this.playPause();}}
       onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }}
       onEnded={() => this.props.onEnded(this)}
       onPlay={() => this.playStarted()}

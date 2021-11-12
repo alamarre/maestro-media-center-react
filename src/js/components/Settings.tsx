@@ -22,6 +22,7 @@ export interface SettingsState {
   myClientName: string;
   remoteClients: string[];
   playToRemoteClient: string;
+  playWithVlc: boolean;
   lockProfilePin: number;
 }
 
@@ -31,13 +32,18 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
     super(props, true);
     //this.allRefs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
 
+    let refs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
+    if(window["MaestroNative"]) {
+      refs= refs.slice(0, 3).concat(["play-with-vlc"]).concat(refs.slice(3));
+    }
     this.state = {
       remoteControl: this.props.settingsManager.get("remoteControl") == "true",
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
+      playWithVlc: this.props.settingsManager.get("playWithVlc") != "",
       lockProfilePin: parseInt(this.props.settingsManager.get("lockProfilePin")),
-      refs: ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",],
+      refs: refs
     };
     this.handleClientNameChange = this.handleClientNameChange.bind(this);
     this.handleSendToClientNameChange = this.handleSendToClientNameChange.bind(this);
@@ -110,6 +116,12 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
     this.props.history.push("/login");
   }
 
+  toggleVlc(event) {
+    const value = this.handleInputChange(event);
+    this.setState({playWithVlc: value});
+
+  }
+
   togglePin() {
     const pinNeeded = this.props.settingsManager.get("lockProfilePin");
     if (pinNeeded) {
@@ -147,10 +159,19 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
     if (!this.state.remoteClients.includes(this.state.playToRemoteClient)) {
       options.unshift(<option key={this.state.playToRemoteClient} value={this.state.playToRemoteClient}>{this.state.playToRemoteClient} - Offline</option>);
     }
+
     const otherOptions = <select ref="play-to-remote-client" className="form-control" value={this.state.playToRemoteClient} name="playToRemoteClient" onChange={this.handleSendToClientNameChange}>
       <option value="">This device</option>
       {options}
     </select>;
+
+    let playWithVlc = null;
+    if(window["MaestroNative"]) {
+      playWithVlc = <div className="form-group">
+        <input ref="play-with-vlc" type="checkbox" className="form-check-input" name="playWithVlc" defaultChecked={this.state.playWithVlc} onClick={this.toggleVlc.bind(this)} />
+      Play videos using VLC
+      </div>;
+    }
 
     var body = <div style={{ backgroundColor: "black", padding: "20px 20px 20px 20px", }}>
       {remoteControlSettings}
@@ -159,9 +180,10 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
         {otherOptions}
       </div>
       <div className="form-group">
-        <input ref="pin" type="checkbox" className="form-check-input" name="lockProfilePin" checked={this.state.lockProfilePin > 0} onClick={this.togglePin.bind(this)} />
+        <input ref="pin" type="checkbox" className="form-check-input" name="lockProfilePin" defaultChecked={this.state.lockProfilePin > 0} onClick={this.togglePin.bind(this)} />
         Require a pin to change profile
       </div>
+      {playWithVlc}
       <div className="form-group">
         <button ref="switch" className="btn btn-primary" onClick={this.switchProfile.bind(this)}>Switch Profile</button>
       </div>
