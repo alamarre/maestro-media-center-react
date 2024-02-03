@@ -19,7 +19,7 @@ export default class CookieSettingsManager implements ISettingsManager, ICookieM
         try {
           const { value, expires, } = JSON.parse(item);
           if (expires && expires >= (new Date().getTime())) {
-            return value;
+            return value.toString();
           }
         } catch (e) {
           console.error(e);

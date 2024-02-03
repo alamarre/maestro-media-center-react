@@ -48,7 +48,7 @@ export default class App extends React.Component<AppProps, {}> {
       return;
     }
 
-    if (!this.props.authTokenManager.isProfileSet() && this.props.location.pathname != "/login" && this.props.location.pathname != "/profile") {
+    if ((!this.props.authTokenManager.isProfileSet() || this.props.settingsManager.get("promptProfile") == "true") && this.props.location.pathname != "/login" && this.props.location.pathname != "/profile") {
       this.props.history.replace("/profile");
     } else {
       try {

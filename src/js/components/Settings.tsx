@@ -18,6 +18,7 @@ export interface SettingsProps extends RouterProps {
 
 export interface SettingsState {
   refs: string[];
+  promptProfile: boolean;
   remoteControl: boolean;
   myClientName: string;
   remoteClients: string[];
@@ -32,12 +33,13 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
     super(props, true);
     //this.allRefs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
 
-    let refs = ["my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
+    let refs = ["prompt-profile", "my-client-name", "play-to-remote-client", "pin", "switch", "logout", "close",];
     if(window["MaestroNative"]) {
       refs= refs.slice(0, 3).concat(["play-with-vlc"]).concat(refs.slice(3));
     }
     this.state = {
       remoteControl: this.props.settingsManager.get("remoteControl") == "true",
+      promptProfile: this.props.settingsManager.get("promptProfile") == "true",
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
       playToRemoteClient: this.props.settingsManager.get("playToRemoteClient"),
@@ -66,6 +68,7 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
     });
 
     this.setState({
+      promptProfile: this.props.settingsManager.get("promptProfile") == "true",
       remoteControl: this.props.settingsManager.get("remoteControl") == "true",
       myClientName: this.props.settingsManager.get("myClientName") || "",
       remoteClients: this.props.webSocketSender.getDevices(),
@@ -114,6 +117,12 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
   logout() {
     document.cookie = "";
     this.props.history.push("/login");
+  }
+
+  toggleProfilePrompt(event) {
+    const value = this.handleInputChange(event);
+    this.setState({promptProfile: value});
+    this.props.settingsManager.set("promptProfile", value);
   }
 
   toggleVlc(event) {
@@ -174,6 +183,10 @@ export default class Settings extends React.Component<SettingsProps, SettingsSta
     }
 
     var body = <div style={{ backgroundColor: "black", padding: "20px 20px 20px 20px", }}>
+      <div className="form-group">
+        <input ref="prompt-profile" type="checkbox" className="form-check-input" name="promptProfile" defaultChecked={this.state.promptProfile} onClick={this.toggleProfilePrompt.bind(this)} />
+        Ask which profile to use on startup
+      </div>
       {remoteControlSettings}
       <div className="form-group">
         <label htmlFor="playToRemoteClient">Play videos on which device</label>
