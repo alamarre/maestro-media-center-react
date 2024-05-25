@@ -74,8 +74,8 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     }
 
     this.eventListener = (event) => {
-      const {progress, duration} = event.detail;
-      if(progress == 0 && duration == 0) {
+      const { progress, duration } = event.detail;
+      if (progress == 0 && duration == 0) {
         this.goToNext();
       } else {
         // figure this one out
@@ -99,8 +99,8 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     }
   }
 
-  componentDidUpdate(previousProps, previousState : VideoPlayerState) {
-    if(this.state.playWithVlc && previousState.sources != this.state.sources && window["MaestroNative"]) {
+  componentDidUpdate(previousProps, previousState: VideoPlayerState) {
+    if (this.state.playWithVlc && previousState.sources != this.state.sources && window["MaestroNative"]) {
       window["MaestroNative"]["showVideo"](JSON.stringify({
         title: this.state.name,
         sources: this.state.sources.map(s => new URL(s).href),
@@ -201,7 +201,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
       currentEpisodeStyle["opacity"] = 1;
     }
     let videoSource = null;
-    if (this.state.seekTime > -1 && ! this.state.playWithVlc) {
+    if (this.state.seekTime > -1 && !this.state.playWithVlc) {
       videoSource = <Html5VideoPlayer key="videoplayer" remoteController={this.props.remoteController} startTime={this.state.seekTime} sources={this.state.sources} subtitles={this.state.subtitles} onEnded={this.goToNext.bind(this)}
         onPlay={this.onPlay.bind(this)} onPause={this.onPause.bind(this)}
       />;
@@ -210,9 +210,13 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
     let menu = null;
     if (this.state.showMenu) {
       const items = [
-        { name: "Play", action: () => { this.player?.play(); this.closeMenu();}, },
+        { name: "Play", action: () => { this.player?.play(); this.closeMenu(); }, },
         { name: "Skip Forward", action: () => { this.player?.skipForward(); }, },
-        { name: "Skip Back", action: () => { this.player?.skipBack();}, },
+        { name: "Skip Back", action: () => { this.player?.skipBack(); }, },
+        { name: `Play Faster (${Math.floor((this.player?.getPlaybackSpeed() + 0.1) * 100) / 100})`, action: () => { this.player?.speedUp(); this.forceUpdate(); }, },
+        {
+          name: `Play Slower(${Math.floor((this.player?.getPlaybackSpeed() - 0.1) * 100) / 100})`, action: () => { this.player?.slowDown(); this.forceUpdate(); },
+        },
         { name: "Download", action: () => { this.download(); this.closeMenu(); }, },
         { name: "Go Home", action: () => this.props.history.replace("/"), },
         { name: "Toggle Screen Visibility", action: () => { this.toggleVisibility(); this.player?.play(); this.closeMenu(); }, },
@@ -232,7 +236,7 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps, Video
   }
 
   download() {
-    if(this.state?.sources[0]) {
+    if (this.state?.sources[0]) {
       const url = new URL(this.state.sources[0]).href + "?download=true";
       window.open(url, "_blank");
     }

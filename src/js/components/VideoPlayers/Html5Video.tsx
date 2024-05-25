@@ -19,7 +19,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
   private video = React.createRef<HTMLVideoElement>();
   private started: boolean;
 
-  constructor(props, ) {
+  constructor(props,) {
     super(props);
     this.started = false;
     if (this.props.remoteController) {
@@ -83,6 +83,18 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     this.getVideoElement().currentTime -= time;
   }
 
+  speedUp() {
+    this.getVideoElement().playbackRate += 0.1;
+  }
+
+  slowDown() {
+    this.getVideoElement().playbackRate -= 0.1;
+  }
+
+  getPlaybackSpeed() {
+    return this.getVideoElement().playbackRate;
+  }
+
   seekToTime(time) {
     this.getVideoElement().focus();
     this.getVideoElement().currentTime = time;
@@ -92,7 +104,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     return this.getVideoElement() && this.getVideoElement().currentTime;
   }
 
-  seek(percent, ) {
+  seek(percent,) {
     this.getVideoElement().currentTime = (this.getVideoElement().duration * percent) / 100;
   }
 
@@ -119,7 +131,7 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
     if (video.error && video.duration - video.currentTime < 2) {
       return this.props.onEnded(this);
     }
-    if(!video.ended && !video.seeking) {
+    if (!video.ended && !video.seeking) {
       this.props.onPause(this);
     }
   }
@@ -127,12 +139,12 @@ export default class Html5VideoPlayer extends React.Component<Html5VideoPlayerPr
   render() {
     const subtitles = this.props.subtitles ?
       <track src={this.props.subtitles[0]} kind="subtitles" srcLang="en" label="English" default></track> : null;
-    const sources = this.props.sources.map((s: any, ) => {
+    const sources = this.props.sources.map((s: any,) => {
       return <source src={s} key={s} type="video/mp4"></source>;
     });
 
     return <video key={"video"} crossOrigin="anonymous"
-      onClick={(e) => { e.preventDefault(); this.playPause();}}
+      onClick={(e) => { e.preventDefault(); this.playPause(); }}
       onLoadedMetadata={() => { this.seekToTime(this.props.startTime); }}
       onEnded={() => this.props.onEnded(this)}
       onPlay={() => this.playStarted()}
